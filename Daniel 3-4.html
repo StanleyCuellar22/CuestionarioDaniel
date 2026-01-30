@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulos 3-4 (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #78350f;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #d97706;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #f59e0b;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #fbbf24;
+            background: #fffbeb;
+        }
+
+        .option.selected {
+            border-color: #f59e0b;
+            background: #fef3c7;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #f59e0b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #d97706;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #f59e0b;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #92400e;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulos 3-4</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 60</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulos 3-4 (Reina Valera 1995)</div>
+    </div>
+
+    <script>
+        const allQuestions = [
+            {q: "¿De qué material hizo el rey Nabucodonosor la estatua del capítulo 3?", o: ["De plata", "De oro", "De bronce", "De hierro"], c: "De oro"},
+            {q: "¿Cuál era la altura de la estatua que hizo Nabucodonosor?", o: ["Cincuenta codos", "Sesenta codos", "Setenta codos", "Ochenta codos"], c: "Sesenta codos"},
+            {q: "¿Cuál era la anchura de la estatua que hizo Nabucodonosor?", o: ["Cinco codos", "Seis codos", "Siete codos", "Ocho codos"], c: "Seis codos"},
+            {q: "¿Dónde levantó Nabucodonosor la estatua?", o: ["En el valle de Dura, en la provincia de Babilonia", "En el campo de Dura, en la provincia de Babilonia", "En la llanura de Dura, en la provincia de Babilonia", "En el llano de Dura, en la provincia de Babilonia"], c: "En el campo de Dura, en la provincia de Babilonia"},
+            {q: "¿Qué ordenó el rey que hicieran al oír el son de los instrumentos musicales?", o: ["Que se arrodillaran y adoraran la estatua", "Que se postraran y adoraran la estatua", "Que se inclinaran y adoraran la estatua", "Que se humillaran y adoraran la estatua"], c: "Que se postraran y adoraran la estatua"},
+            {q: "¿Qué pasaría con quien no se postrara y adorara la estatua?", o: ["Sería echado dentro de un horno de fuego encendido", "Sería echado dentro de un horno de fuego ardiente", "Sería lanzado dentro de un horno de fuego ardiente", "Sería arrojado dentro de un horno de fuego ardiente"], c: "Sería echado dentro de un horno de fuego ardiente"},
+            {q: "¿Quiénes vinieron y acusaron maliciosamente a los judíos?", o: ["Algunos hombres babilonios", "Algunos hombres caldeos", "Algunos hombres asirios", "Algunos hombres persas"], c: "Algunos hombres caldeos"},
+            {q: "¿Sobre qué había puesto el rey a Sadrac, Mesac y Abed-nego?", o: ["Sobre las tareas de la provincia de Babilonia", "Sobre los negocios de la provincia de Babilonia", "Sobre los asuntos de la provincia de Babilonia", "Sobre las labores de la provincia de Babilonia"], c: "Sobre los negocios de la provincia de Babilonia"},
+            {q: "¿Qué dijeron los caldeos que no hacían Sadrac, Mesac y Abed-nego?", o: ["No te han respetado", "No te han honrado", "No te han obedecido", "No te han temido"], c: "No te han respetado"},
+            {q: "¿Qué preguntó Nabucodonosor a los tres jóvenes sobre adorar la estatua?", o: ["¿Es cierto, Sadrac, Mesac y Abed-nego, que vosotros no honráis a mi dios?", "¿Es verdad, Sadrac, Mesac y Abed-nego, que vosotros no honráis a mi dios?", "¿Es real, Sadrac, Mesac y Abed-nego, que vosotros no honráis a mi dios?", "¿Es correcto, Sadrac, Mesac y Abed-nego, que vosotros no honráis a mi dios?"], c: "¿Es verdad, Sadrac, Mesac y Abed-nego, que vosotros no honráis a mi dios?"},
+            {q: "¿Qué preguntó el rey sobre quién los libraría de sus manos?", o: ["¿Y qué dios será el que os salve de mis manos?", "¿Y qué dios será el que os libre de mis manos?", "¿Y qué dios será el que os rescate de mis manos?", "¿Y qué dios será el que os proteja de mis manos?"], c: "¿Y qué dios será el que os libre de mis manos?"},
+            {q: "¿Qué respondieron Sadrac, Mesac y Abed-nego al rey?", o: ["No es necesario que te contestemos sobre este asunto", "No es necesario que te respondamos sobre este asunto", "No es preciso que te respondamos sobre este asunto", "No hace falta que te respondamos sobre este asunto"], c: "No es necesario que te respondamos sobre este asunto"},
+            {q: "Según Sadrac, Mesac y Abed-nego, ¿de qué puede librarlos su Dios?", o: ["Del horno de fuego encendido", "Del horno de fuego ardiente", "Del horno de fuego abrasador", "Del horno de fuego consumidor"], c: "Del horno de fuego ardiente"},
+            {q: "¿Qué dijeron los tres jóvenes si Dios no los libraba?", o: ["Que no adorarían a los dioses del rey ni la estatua", "Que no servirían a los dioses del rey ni adorarían la estatua", "Que no honrarían a los dioses del rey ni la estatua", "Que no venerarían a los dioses del rey ni la estatua"], c: "Que no servirían a los dioses ni tampoco adoraremos la estatua que has levantado"},
+            {q: "¿Qué le pasó a Nabucodonosor cuando oyó la respuesta de los tres jóvenes?", o: ["Se llenó de ira, mudó el aspecto de su rostro", "Se llenó de ira, cambió el aspecto de su rostro", "Se llenó de ira, transformó el aspecto de su rostro", "Se llenó de ira, alteró el aspecto de su rostro"], c: "Se llenó de ira, cambió el aspecto de su rostro"},
+            {q: "¿Cuánto ordenó el rey que se calentara más el horno?", o: ["Seis veces más de lo acostumbrado", "Siete veces más de lo acostumbrado", "Ocho veces más de lo acostumbrado", "Diez veces más de lo acostumbrado"], c: "Siete veces más de lo acostumbrado"},
+            {q: "¿A quiénes ordenó el rey que ataran a Sadrac, Mesac y Abed-nego?", o: ["A hombres muy fuertes que tenía en su ejército", "A hombres muy vigorosos que tenía en su ejército", "A hombres muy robustos que tenía en su ejército", "A hombres muy poderosos que tenía en su ejército"], c: "A hombres muy vigorosos que tenía en su ejército"},
+            {q: "¿Con qué fueron atados y echados al horno los tres jóvenes?", o: ["Con sus mantos, sus calzados, sus túnicas y sus vestidos", "Con sus mantos, sus calzados, sus turbantes y sus vestidos", "Con sus mantos, sus sandalias, sus turbantes y sus vestidos", "Con sus túnicas, sus calzados, sus turbantes y sus vestidos"], c: "Con sus mantos, sus calzados, sus turbantes y sus vestidos"},
+            {q: "¿Qué les pasó a los hombres que echaron a los tres jóvenes al horno?", o: ["La llama del fuego los quemó", "La llama del fuego los mató", "La llama del fuego los consumió", "La llama del fuego los abrasó"], c: "La llama del fuego los mató"},
+            {q: "¿Cuántos hombres vio el rey caminando en el fuego?", o: ["Tres hombres", "Cuatro hombres", "Cinco hombres", "Seis hombres"], c: "Cuatro hombres"},
+            {q: "¿Cómo estaban los hombres que vio el rey en el fuego?", o: ["Desatados", "Sueltos", "Libres", "Liberados"], c: "Sueltos"},
+            {q: "¿A qué era semejante el aspecto del cuarto hombre?", o: ["A un hijo de Dios", "A un hijo de los dioses", "A un ángel de Dios", "A un ser divino"], c: "A un hijo de los dioses"},
+            {q: "¿Cómo llamó Nabucodonosor a Sadrac, Mesac y Abed-nego cuando los sacó del horno?", o: ["Siervos del Dios Altísimo", "Servidores del Dios Altísimo", "Ministros del Dios Altísimo", "Adoradores del Dios Altísimo"], c: "Siervos del Dios Altísimo"},
+            {q: "¿Qué no había tenido poder sobre los cuerpos de los tres jóvenes?", o: ["El fuego", "La llama", "El calor", "Las brasas"], c: "El fuego"},
+            {q: "¿Qué parte de los tres jóvenes no se había quemado?", o: ["Ni siquiera el pelo de sus cabezas", "Ni aun el cabello de sus cabezas", "Ni tan solo el cabello de sus cabezas", "Ni un cabello de sus cabezas"], c: "Ni aun el cabello de sus cabezas"},
+            {q: "¿Cómo estaban las ropas de los tres jóvenes después del fuego?", o: ["Intactas", "Ilesas", "Completas", "Enteras"], c: "Intactas"},
+            {q: "¿Qué no tenían las ropas de los tres jóvenes?", o: ["Ni siquiera señal de fuego", "Ni siquiera olor de fuego", "Ni siquiera marca de fuego", "Ni siquiera huella de fuego"], c: "Ni siquiera olor de fuego"},
+            {q: "Según Nabucodonosor, ¿qué envió Dios para librar a sus siervos?", o: ["Su ángel", "Su mensajero", "Su enviado", "Su espíritu"], c: "Su ángel"},
+            {q: "¿Qué entregaron los tres jóvenes antes que servir a otro dios?", o: ["Sus vidas", "Sus cuerpos", "Sus almas", "Su existencia"], c: "Sus cuerpos"},
+            {q: "¿En qué se convertiría la casa de quien blasfemara contra Dios?", o: ["En basural", "En estercolero", "En muladar", "En ruinas"], c: "En estercolero"},
+            {q: "¿Qué hizo el rey con Sadrac, Mesac y Abed-nego al final del capítulo 3?", o: ["Los honró en la provincia de Babilonia", "Los engrandeció en la provincia de Babilonia", "Los exaltó en la provincia de Babilonia", "Los promovió en la provincia de Babilonia"], c: "Los engrandeció en la provincia de Babilonia"},
+            {q: "Al inicio del capítulo 4, ¿a quiénes se dirige Nabucodonosor?", o: ["A todos los pueblos, naciones y lenguas que habitan en toda la tierra", "A todos los pueblos, naciones y lenguas que moran en toda la tierra", "A todos los pueblos, naciones y lenguas que viven en toda la tierra", "A todos los pueblos, naciones y lenguas que están en toda la tierra"], c: "A todos los pueblos, naciones y lenguas que moran en toda la tierra"},
+            {q: "¿Qué dijo Nabucodonosor que debía declarar?", o: ["Las señales y prodigios que el Dios Altísimo ha hecho conmigo", "Las señales y milagros que el Dios Altísimo ha hecho conmigo", "Los portentos y milagros que el Dios Altísimo ha hecho conmigo", "Los prodigios y maravillas que el Dios Altísimo ha hecho conmigo"], c: "Las señales y milagros que el Dios Altísimo ha hecho conmigo"},
+            {q: "Según Nabucodonosor, ¿cómo es el reino de Dios?", o: ["Reino eterno", "Reino sempiterno", "Reino perpetuo", "Reino infinito"], c: "Reino sempiterno"},
+            {q: "¿Cómo estaba Nabucodonosor en su casa antes del sueño?", o: ["Tranquilo en mi casa, próspero en mi palacio", "Tranquilo en mi casa, floreciente en mi palacio", "En paz en mi casa, floreciente en mi palacio", "Sosegado en mi casa, floreciente en mi palacio"], c: "Tranquilo en mi casa, floreciente en mi palacio"},
+            {q: "¿Qué le pasó a Nabucodonosor cuando tuvo el sueño?", o: ["Las imaginaciones y visiones de mi cabeza me perturbaron", "Las imaginaciones y visiones de mi cabeza me turbaron", "Las imaginaciones y visiones de mi mente me turbaron", "Los pensamientos y visiones de mi cabeza me turbaron"], c: "Las imaginaciones y visiones de mi cabeza me turbaron"},
+            {q: "¿Quiénes vinieron cuando el rey mandó llamar a los sabios?", o: ["Magos, astrólogos, caldeos y sabios", "Magos, astrólogos, caldeos y adivinos", "Magos, astrólogos, encantadores y adivinos", "Sabios, astrólogos, caldeos y adivinos"], c: "Magos, astrólogos, caldeos y adivinos"},
+            {q: "¿Cuál era el nombre de Daniel según el nombre del dios de Nabucodonosor?", o: ["Beltsasar", "Belsasar", "Baltasar", "Beltasar"], c: "Beltsasar"},
+            {q: "¿Qué dijo Nabucodonosor que moraba en Daniel?", o: ["El espíritu del Dios santo", "El espíritu de los dioses santos", "El espíritu de los santos dioses", "El espíritu del Santo Dios"], c: "El espíritu de los dioses santos"},
+            {q: "¿Cómo llamó el rey a Daniel en el capítulo 4?", o: ["Jefe de los sabios", "Jefe de los magos", "Príncipe de los magos", "Cabeza de los magos"], c: "Jefe de los magos"},
+            {q: "¿Hasta dónde llegaba la copa del árbol que vio Nabucodonosor?", o: ["Hasta los cielos", "Hasta el cielo", "Hasta las nubes", "Hasta lo alto"], c: "Hasta el cielo"},
+            {q: "¿Desde dónde se alcanzaba a ver el árbol?", o: ["Desde todos los confines de la tierra", "Desde todos los extremos de la tierra", "Desde todos los límites de la tierra", "Desde todas las fronteras de la tierra"], c: "Desde todos los confines de la tierra"},
+            {q: "¿Cómo era el follaje del árbol?", o: ["Hermoso", "Frondoso", "Abundante", "Exuberante"], c: "Hermoso"},
+            {q: "¿Quién descendía del cielo según el sueño de Nabucodonosor?", o: ["Un vigilante y santo", "Un ángel santo", "Un guardián santo", "Un centinela santo"], c: "Un vigilante y santo"},
+            {q: "¿Qué ordenó el vigilante que hicieran con las raíces del árbol?", o: ["La cepa de sus raíces dejaréis en la tierra", "El tronco de sus raíces dejaréis en la tierra", "La base de sus raíces dejaréis en la tierra", "El tocón de sus raíces dejaréis en la tierra"], c: "La cepa de sus raíces dejaréis en la tierra"},
+            {q: "¿Con qué debían dejar la cepa en la tierra?", o: ["Con atadura de hierro y de cobre", "Con atadura de hierro y de bronce", "Con cadena de hierro y de bronce", "Con ligadura de hierro y de bronce"], c: "Con atadura de hierro y de bronce"},
+            {q: "¿Cuántos tiempos debían pasar sobre el árbol según el sueño?", o: ["Cinco tiempos", "Seis tiempos", "Siete tiempos", "Ocho tiempos"], c: "Siete tiempos"},
+            {q: "¿Cuánto tiempo quedó Daniel atónito después de oír el sueño?", o: ["Casi media hora", "Casi una hora", "Casi dos horas", "Casi un día"], c: "Casi una hora"},
+            {q: "¿Qué le dijo Daniel al rey sobre para quién debía ser el sueño?", o: ["El sueño sea para tus adversarios", "El sueño sea para tus enemigos", "El sueño sea para tus contrarios", "El sueño sea para los que te odian"], c: "El sueño sea para tus enemigos"},
+            {q: "Según la interpretación de Daniel, ¿quién era el árbol?", o: ["Tú mismo eres, rey", "Tú mismo eres, oh rey", "Tú eres, oh rey", "Tú lo eres, oh rey"], c: "Tú mismo eres, oh rey"},
+            {q: "¿Qué dijo Daniel que pasaría sobre Nabucodonosor?", o: ["Seis tiempos pasarán sobre ti", "Siete tiempos pasarán sobre ti", "Ocho tiempos pasarán sobre ti", "Nueve tiempos pasarán sobre ti"], c: "Siete tiempos pasarán sobre ti"},
+            {q: "Según Daniel, ¿qué debía reconocer Nabucodonosor?", o: ["Que el Altísimo domina en el reino de los hombres", "Que el Altísimo tiene dominio en el reino de los hombres", "Que el Altísimo gobierna en el reino de los hombres", "Que el Altísimo reina en el reino de los hombres"], c: "Que el Altísimo tiene dominio en el reino de los hombres"},
+            {q: "¿Qué consejo le dio Daniel al rey?", o: ["Redime tus pecados con justicia", "Rescata tus pecados con justicia", "Expía tus pecados con justicia", "Borra tus pecados con justicia"], c: "Redime tus pecados con justicia"},
+            {q: "¿Cuánto tiempo después se cumplió el sueño en Nabucodonosor?", o: ["Al cabo de diez meses", "Al cabo de once meses", "Al cabo de doce meses", "Al cabo de trece meses"], c: "Al cabo de doce meses"},
+            {q: "¿Dónde estaba paseando el rey cuando se cumplió la profecía?", o: ["Por el palacio real de Babilonia", "Por el templo real de Babilonia", "Por la fortaleza real de Babilonia", "Por la torre real de Babilonia"], c: "Por el palacio real de Babilonia"},
+            {q: "¿Qué dijo el rey sobre Babilonia mientras paseaba?", o: ["¿No es ésta la gran Babilonia que edifiqué para casa real?", "¿No es ésta la gran Babilonia que yo edifiqué para casa real?", "¿No es ésta la grande Babilonia que yo edifiqué para casa real?", "¿No es ésta la gran Babilonia que construí para casa real?"], c: "¿No es ésta la gran Babilonia que yo edifiqué para casa real?"},
+            {q: "¿Cuándo vino la voz del cielo?", o: ["Aún estaba la palabra en los labios del rey", "Aún estaba la palabra en la boca del rey", "Aún estaba la palabra en la lengua del rey", "Todavía estaba la palabra en la boca del rey"], c: "Aún estaba la palabra en la boca del rey"},
+            {q: "¿Qué comía Nabucodonosor durante su juicio?", o: ["Comía hierba como los bueyes", "Comía pasto como los bueyes", "Comía yerba como los bueyes", "Comía forraje como los bueyes"], c: "Comía hierba como los bueyes"},
+            {q: "¿Cómo creció el pelo de Nabucodonosor?", o: ["Como plumas de águila", "Como plumas de ave", "Como plumas de buitre", "Como alas de águila"], c: "Como plumas de águila"},
+            {q: "¿Cómo crecieron las uñas de Nabucodonosor?", o: ["Como las de las aves", "Como las de los pájaros", "Como garras de aves", "Como uñas de bestias"], c: "Como las de las aves"},
+            {q: "¿Cuándo le fue devuelta la razón a Nabucodonosor?", o: ["Al fin de los tiempos", "Al fin del tiempo", "Al cabo del tiempo", "Después del tiempo"], c: "Al fin del tiempo"}
+        ];
+
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
