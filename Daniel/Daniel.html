@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionarios Daniel RV 1995</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .container {
+            flex: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .quiz-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .quiz-item {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 12px;
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            text-decoration: none;
+            color: white;
+        }
+
+        .quiz-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+        }
+
+        .quiz-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .quiz-info {
+            flex: 1;
+        }
+
+        .quiz-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .quiz-subtitle {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .quiz-item {
+                padding: 15px 20px;
+            }
+
+            .quiz-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .quiz-title {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📖 Cuestionarios Daniel RV 1995</h1>
+        
+        <div class="quiz-list">
+            <a href="Daniel 1-2.html" class="quiz-item">
+                <div class="quiz-icon">📝</div>
+                <div class="quiz-info">
+                    <div class="quiz-title">Daniel 1-2</div>
+                    <div class="quiz-subtitle">Capítulos 1 y 2</div>
+                </div>
+            </a>
+
+            <a href="Daniel 3-4.html" class="quiz-item">
+                <div class="quiz-icon">📝</div>
+                <div class="quiz-info">
+                    <div class="quiz-title">Daniel 3-4</div>
+                    <div class="quiz-subtitle">Capítulos 3 y 4</div>
+                </div>
+            </a>
+
+            <a href="Daniel 5-6.html" class="quiz-item">
+                <div class="quiz-icon">📝</div>
+                <div class="quiz-info">
+                    <div class="quiz-title">Daniel 5-6</div>
+                    <div class="quiz-subtitle">Capítulos 5 y 6</div>
+                </div>
+            </a>
+
+            <a href="Daniel 7-8.html" class="quiz-item">
+                <div class="quiz-icon">📝</div>
+                <div class="quiz-info">
+                    <div class="quiz-title">Daniel 7-8</div>
+                    <div class="quiz-subtitle">Capítulos 7 y 8</div>
+                </div>
+            </a>
+
+            <a href="Daniel 9-10.html" class="quiz-item">
+                <div class="quiz-icon">📝</div>
+                <div class="quiz-info">
+                    <div class="quiz-title">Daniel 9-10</div>
+                    <div class="quiz-subtitle">Capítulos 9 y 10</div>
+                </div>
+            </a>
+
+            <a href="Daniel 11-12.html" class="quiz-item">
+                <div class="quiz-icon">📝</div>
+                <div class="quiz-info">
+                    <div class="quiz-title">Daniel 11-12</div>
+                    <div class="quiz-subtitle">Capítulos 11 y 12</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        🌟 Club JABNIA 🌟
+    </footer>
+</body>
+</html>
