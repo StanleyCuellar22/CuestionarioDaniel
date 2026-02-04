@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulos 5-6 (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulos 5-6</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulos 5-6 (Reina Valera 1995)</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            {q: "¿A cuántos de sus príncipes hizo el rey Belsasar un gran banquete?", o: ["A quinientos de sus príncipes", "A mil de sus príncipes", "A dos mil de sus príncipes", "A quinientos de sus nobles"], c: "A mil de sus príncipes"},
+            {q: "¿En presencia de cuántos bebía vino Belsasar?", o: ["En presencia de los quinientos", "En presencia de los mil", "En presencia de los dos mil", "En presencia de todos"], c: "En presencia de los mil"},
+            {q: "¿Qué mandó traer Belsasar con el gusto del vino?", o: ["Los vasos de oro y de plata que Nabucodonosor había traído del templo", "Los vasos de oro y de plata que Nabucodonosor, su padre, había traído del templo de Jerusalén", "Los vasos de oro que Nabucodonosor, su padre, había traído del templo de Jerusalén", "Los vasos sagrados que Nabucodonosor, su padre, había traído del templo"], c: "Los vasos de oro y de plata que Nabucodonosor, su padre, había traído del templo de Jerusalén"},
+            {q: "¿Para qué quería Belsasar los vasos del templo?", o: ["Para que bebieran de ellos el rey y sus príncipes", "Para que bebieran de ellos el rey y sus grandes, sus mujeres y sus concubinas", "Para que bebieran de ellos todos los invitados", "Para que bebieran de ellos el rey y su familia"], c: "Para que bebieran de ellos el rey y sus grandes, sus mujeres y sus concubinas"},
+            {q: "¿De dónde habían traído los vasos de oro?", o: ["Del templo de Dios, que estaba en Jerusalén", "Del templo de la casa de Dios, que estaba en Jerusalén", "Del templo santo de Jerusalén", "De la casa de Dios en Jerusalén"], c: "Del templo de la casa de Dios, que estaba en Jerusalén"},
+            {q: "¿A qué dioses alabaron mientras bebían vino?", o: ["A los dioses de oro, plata, bronce y hierro", "A los dioses de oro y plata, de bronce, de hierro, de madera y de piedra", "A los dioses de oro, plata, madera y piedra", "A todos sus dioses paganos"], c: "A los dioses de oro y plata, de bronce, de hierro, de madera y de piedra"},
+            {q: "¿Qué apareció en aquella misma hora?", o: ["Los dedos de una mano que escribía", "Los dedos de una mano de hombre que escribía", "Una mano que escribía", "Los dedos de una mano divina"], c: "Los dedos de una mano de hombre que escribía"},
+            {q: "¿Dónde escribía la mano?", o: ["Sobre lo blanco de la pared del palacio real", "Sobre lo encalado de la pared del palacio real", "Sobre la pared blanca del palacio real", "Sobre el muro del palacio real"], c: "Sobre lo encalado de la pared del palacio real"},
+            {q: "¿Qué veía el rey?", o: ["La mano que escribía", "Los dedos que escribían", "La escritura en la pared", "El mensaje divino"], c: "La mano que escribía"},
+            {q: "¿Qué le pasó al rey cuando vio la mano?", o: ["El rey palideció y sus pensamientos lo perturbaron", "El rey palideció y sus pensamientos lo turbaron", "El rey se asustó y sus pensamientos lo turbaron", "El rey empalideció y sus pensamientos lo turbaron"], c: "El rey palideció y sus pensamientos lo turbaron"},
+            {q: "¿Qué se debilitó del rey?", o: ["Sus piernas", "Sus caderas", "Sus miembros", "Sus extremidades"], c: "Sus caderas"},
+            {q: "¿Qué hacían las rodillas del rey?", o: ["Temblaban entre sí", "Daban la una contra la otra", "Chocaban una con otra", "Se golpeaban mutuamente"], c: "Daban la una contra la otra"},
+            {q: "¿Qué gritó el rey en alta voz?", o: ["Que hicieran venir sabios, caldeos y adivinos", "Que hicieran venir magos, caldeos y adivinos", "Que hicieran venir magos, astrólogos y caldeos", "Que hicieran venir todos los sabios"], c: "Que hicieran venir magos, caldeos y adivinos"},
+            {q: "¿De qué sería vestido quien leyera la escritura?", o: ["De escarlata", "De púrpura", "De carmesí", "De rojo"], c: "De púrpura"},
+            {q: "¿Qué llevaría en su cuello quien interpretara la escritura?", o: ["Una cadena de oro", "Un collar de oro", "Un ornamento de oro", "Una medalla de oro"], c: "Un collar de oro"},
+            {q: "¿Qué posición tendría en el reino quien interpretara la escritura?", o: ["Será el segundo señor en el reino", "Será el tercer señor en el reino", "Será el primer ministro del reino", "Será gobernador del reino"], c: "Será el tercer señor en el reino"},
+            {q: "¿Pudieron los sabios del rey leer la escritura?", o: ["Sí, pero no interpretarla", "No pudieron leer la escritura ni dar al rey su interpretación", "Solo algunos pudieron leerla", "Pudieron leer pero no entender"], c: "No pudieron leer la escritura ni dar al rey su interpretación"},
+            {q: "¿Cómo se puso el rey Belsasar cuando los sabios no pudieron interpretar?", o: ["Se turbó mucho y palideció", "Se turbó sobremanera y palideció", "Se turbó grandemente y palideció", "Se turbó en extremo y palideció"], c: "Se turbó sobremanera y palideció"},
+            {q: "¿Cómo estaban los príncipes?", o: ["Confundidos", "Perplejos", "Asombrados", "Atónitos"], c: "Perplejos"},
+            {q: "¿Quién entró a la sala del banquete?", o: ["La esposa del rey", "La reina", "La reina madre", "La consorte"], c: "La reina"},
+            {q: "¿Qué le dijo la reina al rey al principio?", o: ["¡Rey, vive eternamente!", "¡Rey, vive para siempre!", "¡Oh rey, vive para siempre!", "¡Rey, que vivas eternamente!"], c: "¡Rey, vive para siempre!"},
+            {q: "Según la reina, ¿qué moraba en Daniel?", o: ["El espíritu del Dios santo", "El espíritu de los dioses santos", "El espíritu de Dios", "El Espíritu Santo"], c: "El espíritu de los dioses santos"},
+            {q: "¿Qué se halló en Daniel en los días del padre de Belsasar?", o: ["Luz, inteligencia y sabiduría", "Sabiduría, luz e inteligencia", "Conocimiento, luz y sabiduría", "Entendimiento, luz e inteligencia"], c: "Luz, inteligencia y sabiduría"},
+            {q: "¿Como qué era la sabiduría de Daniel?", o: ["Como la sabiduría de Dios", "Como la sabiduría de los dioses", "Como sabiduría divina", "Como sabiduría celestial"], c: "Como la sabiduría de los dioses"},
+            {q: "¿Qué constituyó Nabucodonosor a Daniel?", o: ["Jefe sobre todos los sabios", "Jefe sobre todos los magos, astrólogos, caldeos y adivinos", "Primer ministro del reino", "Gobernador principal"], c: "Jefe sobre todos los magos, astrólogos, caldeos y adivinos"},
+            {q: "¿Qué nombre le puso el rey a Daniel?", o: ["Belsasar", "Beltsasar", "Baltasar", "Beltasar"], c: "Beltsasar"},
+            {q: "¿De dónde era Daniel según preguntó el rey Belsasar?", o: ["De los hijos de los cautivos de Judá", "De los hijos de la cautividad de Judá", "De los cautivos de Judá", "De los desterrados de Judá"], c: "De los hijos de la cautividad de Judá"},
+            {q: "¿Quién trajo a Daniel de Judea según Belsasar?", o: ["Nabucodonosor", "Mi padre", "El rey anterior", "Mi antecesor"], c: "Mi padre"},
+            {q: "¿Qué dijo el rey que había oído de Daniel?", o: ["Que el espíritu de Dios está en ti", "Que el espíritu de los dioses santos está en ti", "Que el Espíritu Santo está en ti", "Que espíritu divino está en ti"], c: "Que el espíritu de los dioses santos está en ti"},
+            {q: "¿Qué se halló en Daniel según el rey?", o: ["Luz, entendimiento y sabiduría mayor", "Luz, entendimiento y mayor sabiduría", "Luz, inteligencia y mayor sabiduría", "Luz, ciencia y mayor sabiduría"], c: "Luz, entendimiento y mayor sabiduría"},
+            {q: "¿Qué dijo el rey que había oído que Daniel podía hacer?", o: ["Interpretar y resolver problemas", "Interpretar y resolver dificultades", "Interpretar y resolver enigmas", "Interpretar y descifrar misterios"], c: "Interpretar y resolver dificultades"},
+            {q: "¿Qué respondió Daniel sobre los dones del rey?", o: ["Tus dones sean para ti", "Acepto tus dones", "No necesito tus dones", "Guarda tus dones"], c: "Tus dones sean para ti"},
+            {q: "¿A quién dijo Daniel que diera las recompensas?", o: ["A otros", "A tus siervos", "A quien quieras", "A los necesitados"], c: "A otros"},
+            {q: "¿Qué dijo Daniel que dio el Altísimo Dios a Nabucodonosor?", o: ["El reino, la grandeza, la gloria y el poder", "El reino, la grandeza, la gloria y la majestad", "El reino, el poder, la gloria y la majestad", "El trono, la grandeza, la gloria y la majestad"], c: "El reino, la grandeza, la gloria y la majestad"},
+            {q: "¿Qué hacían todos los pueblos delante de Nabucodonosor?", o: ["Temían y temblaban delante de él", "Temblaban y temían delante de él", "Se inclinaban y temían delante de él", "Reverenciaban y temían delante de él"], c: "Temblaban y temían delante de él"},
+            {q: "¿Cuándo fue depuesto Nabucodonosor del trono?", o: ["Cuando su corazón se enalteció y su espíritu se endureció", "Cuando su corazón se ensoberbeció y su espíritu se endureció en su orgullo", "Cuando su corazón se llenó de orgullo y su espíritu se endureció", "Cuando se ensoberbeció y su corazón se endureció"], c: "Cuando su corazón se ensoberbeció y su espíritu se endureció en su orgullo"},
+            {q: "¿De dónde fue echado Nabucodonosor?", o: ["De entre los hijos de los hombres", "De entre los hombres", "De su reino", "De su palacio"], c: "De entre los hijos de los hombres"},
+            {q: "¿A qué se hizo semejante la mente de Nabucodonosor?", o: ["A la de los animales", "A la de las bestias", "A la de las fieras", "A la de los brutos"], c: "A la de las bestias"},
+            {q: "¿Con quiénes fue la habitación de Nabucodonosor?", o: ["Con los asnos salvajes", "Con los asnos monteses", "Con los asnos del campo", "Con las bestias del campo"], c: "Con los asnos monteses"},
+            {q: "¿Qué le hicieron comer a Nabucodonosor?", o: ["Hierba, como a los bueyes", "Hierba, como al buey", "Pasto, como al buey", "Yerba, como al buey"], c: "Hierba, como al buey"},
+            {q: "¿De qué se empapó el cuerpo de Nabucodonosor?", o: ["Del rocío de los cielos", "Del rocío del cielo", "De la lluvia del cielo", "Del agua del cielo"], c: "Del rocío del cielo"},
+            {q: "¿Qué tuvo que reconocer Nabucodonosor?", o: ["Que el Altísimo Dios domina sobre el reino de los hombres", "Que el Altísimo Dios tiene dominio sobre el reino de los hombres", "Que el Altísimo gobierna sobre el reino de los hombres", "Que Dios tiene poder sobre el reino de los hombres"], c: "Que el Altísimo Dios tiene dominio sobre el reino de los hombres"},
+            {q: "¿Qué no hizo Belsasar según Daniel?", o: ["No has humillado tu corazón", "No has bajado tu orgullo", "No te has arrepentido", "No has reconocido a Dios"], c: "No has humillado tu corazón"},
+            {q: "¿Contra quién se ensoberbeció Belsasar?", o: ["Contra Dios del cielo", "Contra el Señor del cielo", "Contra el Altísimo", "Contra el Todopoderoso"], c: "Contra el Señor del cielo"},
+            {q: "¿Qué hizo traer Belsasar ante sí?", o: ["Los vasos de su templo", "Los vasos de su Casa", "Los utensilios sagrados", "Los vasos del santuario"], c: "Los vasos de su Casa"},
+            {q: "¿A qué dioses dio alabanza Belsasar?", o: ["A dioses de oro, plata, bronce, hierro, madera y piedra", "A dioses de plata y oro, de bronce, de hierro, de madera y de piedra", "A ídolos de oro, plata, bronce y madera", "A dioses falsos de metal y madera"], c: "A dioses de plata y oro, de bronce, de hierro, de madera y de piedra"},
+            {q: "¿Qué no hacen esos dioses según Daniel?", o: ["Ni ven ni oyen ni entienden", "Ni ven ni oyen ni saben", "Ni miran ni escuchan ni comprenden", "No pueden ver ni oír ni conocer"], c: "Ni ven ni oyen ni saben"},
+            {q: "¿A quién nunca honró Belsasar?", o: ["Al Dios verdadero", "Al Dios en cuya mano está tu vida", "Al Altísimo Dios", "Al Dios del cielo"], c: "Al Dios en cuya mano está tu vida"},
+            {q: "¿Qué trazó la mano según Daniel?", o: ["Esta escritura", "Este mensaje", "Estas palabras", "Esta sentencia"], c: "Esta escritura"},
+            {q: "¿Cuál era la escritura que trazó?", o: ["Mene, Mene, Tekel, Uparsin", "Mene, Tekel, Uparsin", "Mene, Mene, Tekel, Parsin", "Mene, Tekel, Parsin"], c: "Mene, Mene, Tekel, Uparsin"},
+            {q: "¿Qué significa Mene según Daniel?", o: ["Contó Dios tu reino y lo ha terminado", "Contó Dios tu reino y le ha puesto fin", "Dios ha contado tu reino y lo ha acabado", "Dios numeró tu reino y le puso fin"], c: "Contó Dios tu reino y le ha puesto fin"},
+            {q: "¿Qué significa Tekel?", o: ["Pesado has sido en balanza y fuiste hallado falto", "Pesado has sido en balanza y hallado falto", "Has sido pesado en balanza y hallado falto", "Fuiste pesado en balanza y hallado falto"], c: "Pesado has sido en balanza y hallado falto"},
+            {q: "¿Qué significa Peres?", o: ["Tu reino ha sido dividido y dado a los medos y persas", "Tu reino ha sido roto y dado a los medos y a los persas", "Tu reino fue dividido y dado a medos y persas", "Tu reino se ha partido y dado a los medos y persas"], c: "Tu reino ha sido roto y dado a los medos y a los persas"},
+            {q: "¿Qué mandó hacer Belsasar con Daniel?", o: ["Vestir a Daniel de púrpura y poner en su cuello un collar de oro", "Vestirlo de púrpura, ponerle un collar de oro", "Darle vestiduras de púrpura y collar de oro", "Honrarlo con púrpura y oro"], c: "Vestir a Daniel de púrpura, poner en su cuello un collar de oro"},
+            {q: "¿Qué proclamaron sobre Daniel?", o: ["Que él era el segundo señor del reino", "Que él era el tercer señor del reino", "Que era gobernador del reino", "Que era príncipe del reino"], c: "Que él era el tercer señor del reino"},
+            {q: "¿Cuándo fue muerto Belsasar?", o: ["La misma noche", "Esa misma noche", "Aquella noche", "Durante la noche"], c: "La misma noche"},
+            {q: "¿Quién era Belsasar según el versículo 30?", o: ["Rey de Babilonia", "Rey de los caldeos", "Rey de los babilonios", "Rey del imperio"], c: "Rey de los caldeos"},
+            {q: "¿Quién tomó el reino después de Belsasar?", o: ["Darío, de Media", "Darío de los medos", "Darío el medo", "El rey Darío"], c: "Darío, de Media"},
+            {q: "¿Cuántos años tenía Darío cuando tomó el reino?", o: ["Sesenta años", "Sesenta y dos años", "Sesenta y cinco años", "Setenta años"], c: "Sesenta y dos años"},
+            {q: "¿Qué pareció bien a Darío constituir sobre el reino?", o: ["Cien sátrapas", "Ciento veinte sátrapas", "Ciento cincuenta sátrapas", "Doscientos sátrapas"], c: "Ciento veinte sátrapas"},
+            {q: "¿Dónde gobernarían los sátrapas?", o: ["En todo el imperio", "En todo el reino", "En todas las provincias", "En todo el territorio"], c: "En todo el reino"},
+            {q: "¿Cuántos gobernadores puso Darío sobre los sátrapas?", o: ["Dos gobernadores", "Tres gobernadores", "Cuatro gobernadores", "Cinco gobernadores"], c: "Tres gobernadores"},
+            {q: "¿Quién era uno de los gobernadores?", o: ["Daniel", "Sadrac", "Mesac", "Abed-nego"], c: "Daniel"},
+            {q: "¿Por qué Daniel era superior a los sátrapas y gobernadores?", o: ["Porque había en él un espíritu excelente", "Porque había en él un espíritu superior", "Porque tenía más sabiduría", "Porque era más fiel"], c: "Porque había en él un espíritu superior"},
+            {q: "¿En qué pensó el rey respecto a Daniel?", o: ["En ponerlo sobre todo el imperio", "En ponerlo sobre todo el reino", "En hacerlo primer ministro", "En nombrarlo su sucesor"], c: "En ponerlo sobre todo el reino"},
+            {q: "¿Qué buscaron los gobernadores y sátrapas contra Daniel?", o: ["Ocasión para acusarlo en lo relacionado con el reino", "Motivo para acusarlo", "Razón para denunciarlo", "Causa para inculparlo"], c: "Ocasión para acusar a Daniel en lo relacionado con el reino"},
+            {q: "¿Por qué no podían hallar motivo contra Daniel?", o: ["Porque él era justo", "Porque él era fiel", "Porque era íntegro", "Porque era prudente"], c: "Porque él era fiel"},
+            {q: "¿Qué no hallaron en Daniel?", o: ["Ningún error ni culpa", "Ningún error ni falta", "Ninguna falta ni pecado", "Ningún defecto ni error"], c: "Ningún error ni falta"},
+            {q: "¿Dónde dijeron que hallarían motivo contra Daniel?", o: ["En relación con su religión", "En relación con la ley de su Dios", "En su fe", "En su adoración"], c: "En relación con la ley de su Dios"},
+            {q: "¿Qué le dijeron al rey los gobernadores y sátrapas?", o: ["¡Rey Darío, vive eternamente!", "¡Rey Darío, para siempre vive!", "¡Oh rey Darío, vive para siempre!", "¡Rey, que vivas para siempre!"], c: "¡Rey Darío, para siempre vive!"},
+            {q: "¿Durante cuántos días no se podía hacer petición según el edicto?", o: ["Durante veinte días", "Durante treinta días", "Durante cuarenta días", "Durante cincuenta días"], c: "Durante treinta días"},
+            {q: "¿A dónde sería echado quien hiciera petición a otro?", o: ["Al foso de los leones", "Al pozo de los leones", "A la cueva de los leones", "Al hoyo de los leones"], c: "Al foso de los leones"},
+            {q: "Según qué ley no podía ser revocado el edicto?", o: ["Conforme a la ley de los medos y persas", "Conforme a la ley de Media y de Persia", "Según la ley de Media y Persia", "Por la ley de los medos y los persas"], c: "Conforme a la ley de Media y de Persia"},
+            {q: "¿Qué característica tenía esta ley?", o: ["Que no podía ser cambiada", "Que no podía ser abrogada", "Que no podía ser modificada", "Que no podía ser anulada"], c: "Que no puede ser abrogada"},
+            {q: "¿Qué hizo el rey Darío con el edicto?", o: ["Lo proclamó", "Lo firmó", "Lo anunció", "Lo publicó"], c: "Lo firmó"},
+            {q: "¿Qué hizo Daniel cuando supo que el edicto había sido firmado?", o: ["Dejó de orar", "Entró en su casa y oró", "Se escondió", "Consultó a Dios en secreto"], c: "Entró en su casa y oró"},
+            {q: "¿Cómo estaban las ventanas de la habitación de Daniel?", o: ["Cerradas", "Entreabiertas", "Abiertas", "Selladas"], c: "Abiertas"},
+            {q: "¿Hacia dónde daban las ventanas?", o: ["Hacia Babilonia", "Hacia el templo", "Hacia Jerusalén", "Hacia el oriente"], c: "Hacia Jerusalén"},
+            {q: "¿Cuántas veces al día se arrodillaba Daniel?", o: ["Dos veces", "Tres veces", "Cuatro veces", "Cinco veces"], c: "Tres veces"},
+            {q: "¿Qué hacía Daniel delante de su Dios?", o: ["Oraba y ayunaba", "Oraba y daba gracias", "Rogaba y clamaba", "Oraba en silencio"], c: "Oraba y daba gracias"},
+            {q: "¿Cómo solía hacerlo Daniel antes?", o: ["En secreto", "En silencio", "Como solía hacerlo antes", "En su corazón"], c: "Como solía hacerlo antes"},
+            {q: "¿Qué hallaron haciendo a Daniel aquellos hombres?", o: ["Meditando", "Orando y rogando", "Clamando", "Alabando"], c: "Orando y rogando"},
+            {q: "¿En presencia de quién oraba Daniel?", o: ["Del rey", "De los hombres", "De su Dios", "Del pueblo"], c: "De su Dios"},
+            {q: "¿Qué preguntaron al rey sobre el edicto?", o: ["Si había sido proclamado", "Si había sido firmado", "Si había sido confirmado", "Si había sido anunciado"], c: "Si había sido confirmado"},
+            {q: "¿Qué respondió el rey sobre la ley?", o: ["Que no podía cambiarse", "Que no podía ser anulada", "Que no podía ser revocada", "Que no podía ser abrogada"], c: "Que no puede ser abrogada"},
+            {q: "¿Cómo describieron a Daniel ante el rey?", o: ["Daniel el hebreo", "Daniel el profeta", "Daniel, que es de los hijos de los cautivos de Judá", "Daniel el sabio"], c: "Daniel, que es de los hijos de los cautivos de Judá"},
+            {q: "¿Cuántas veces al día hacía Daniel su petición?", o: ["Una vez", "Dos veces", "Tres veces", "Muchas veces"], c: "Tres veces"},
+            {q: "¿Cómo se sintió el rey al oír esto?", o: ["Enojado", "Indiferente", "Le pesó en gran manera", "Sorprendido"], c: "Le pesó en gran manera"},
+            {q: "¿Qué intentó hacer el rey hasta la puesta del sol?", o: ["Cambiar la ley", "Castigar a Daniel", "Librar a Daniel", "Hablar con los sátrapas"], c: "Librar a Daniel"},
+            {q: "¿Qué recordaron los hombres al rey?", o: ["Que Daniel era inocente", "Que la ley no podía cambiarse", "Que era ley de Media y Persia", "Que el edicto debía cumplirse"], c: "Que era ley de Media y Persia"},
+            {q: "¿A dónde fue echado Daniel?", o: ["Al pozo", "Al foso de los leones", "A la cueva", "Al calabozo"], c: "Al foso de los leones"},
+            {q: "¿Qué le dijo el rey a Daniel?", o: ["Que Dios lo castigaría", "Que su Dios lo libraría", "Que confiara en sí mismo", "Que tuviera miedo"], c: "Que su Dios lo libraría"},
+            {q: "¿Con qué fue sellada la piedra del foso?", o: ["Con cera", "Con el anillo del rey", "Con el anillo del rey y de sus príncipes", "Con una marca"], c: "Con el anillo del rey y de sus príncipes"},
+            {q: "¿Cómo pasó la noche el rey?", o: ["Con música", "En ayuno", "Con banquete", "Durmiendo"], c: "En ayuno"},
+            {q: "¿Qué no trajeron ante el rey?", o: ["Comida", "Bebida", "Instrumentos musicales", "Consejeros"], c: "Instrumentos musicales"},
+            {q: "¿Cómo fue el sueño del rey?", o: ["Profundo", "Tranquilo", "Se le fue el sueño", "Durmió poco"], c: "Se le fue el sueño"},
+            {q: "¿Cuándo se levantó el rey?", o: ["Al amanecer", "Muy de mañana", "Al mediodía", "Por la noche"], c: "Muy de mañana"},
+            {q: "¿Cómo llamó el rey a Daniel?", o: ["Con voz fuerte", "Con voz de alegría", "Con voz triste", "Con voz de enojo"], c: "Con voz triste"},
+            {q: "¿Qué preguntó el rey a Daniel?", o: ["Si seguía con vida", "Si había sufrido daño", "Si Dios lo había librado", "Si había orado"], c: "Si Dios lo había librado"},
+            {q: "¿Quién cerró la boca de los leones?", o: ["El rey", "Un ángel", "Daniel", "Dios directamente"], c: "Un ángel"},
+            {q: "¿Por qué no le hicieron daño a Daniel?", o: ["Porque los leones dormían", "Porque fue hallado inocente", "Porque el foso era profundo", "Porque los leones estaban llenos"], c: "Porque fue hallado inocente"},
+            {q: "¿Qué no se halló en Daniel al sacarlo?", o: ["Ninguna herida", "Ninguna mancha", "Ninguna lesión", "Ningún daño"], c: "Ninguna lesión"},
+            {q: "¿Por qué fue librado Daniel?", o: ["Porque era sabio", "Porque era fiel al rey", "Porque había confiado en su Dios", "Porque obedecía la ley"], c: "Porque había confiado en su Dios"},
+            {q: "¿Qué hizo el rey con los acusadores de Daniel?", o: ["Los perdonó", "Los desterró", "Los echó al foso de los leones", "Los encarceló"], c: "Los echó al foso de los leones"},
+            {q: "¿Quiénes fueron echados junto con ellos?", o: ["Sus siervos", "Sus familias", "Sus hijos y sus mujeres", "Sus amigos"], c: "Sus hijos y sus mujeres"},
+            {q: "¿Qué escribió el rey Darío después de esto?", o: ["Un decreto", "Una carta", "Un edicto", "Una ordenanza"], c: "Una ordenanza"},
+            {q: "¿A quiénes escribió Darío?", o: ["A los gobernadores", "A los sacerdotes", "A todos los pueblos, naciones y lenguas", "A los ejércitos"], c: "A todos los pueblos, naciones y lenguas"},
+            {q: "¿Cómo describió Darío al Dios de Daniel?", o: ["Dios poderoso", "Dios eterno", "Dios viviente", "Dios verdadero"], c: "Dios viviente"},
+            {q: "¿Hasta cuándo permanece su dominio?", o: ["Hasta mil generaciones", "Hasta el fin", "Para siempre", "Por muchos años"], c: "Hasta el fin"},
+            {q: "¿Durante qué reinados prosperó Daniel?", o: ["De Darío y Ciro", "De Nabucodonosor y Darío", "De Ciro solamente", "De los persas"], c: "De Darío y de Ciro"}
+        ];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
