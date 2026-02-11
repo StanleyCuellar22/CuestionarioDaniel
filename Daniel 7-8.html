@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulos 7-8 (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulos 7-8 </h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulos 7-8 (Reina Valera 1995) Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+        {q: "¿En qué año tuvo Daniel un sueño y visiones?", o: ["En el primer año de Belsasar, rey de Babilonia", "En el año primero de Belsasar, rey de Babilonia", "En el primer año del rey Belsasar de Babilonia", "En el año uno de Belsasar, rey de Babilonia"], c: "En el primer año de Belsasar, rey de Babilonia"},
+        {q: "¿Dónde estaba Daniel cuando tuvo el sueño?", o: ["Mientras estaba en su cama", "Mientras estaba en su lecho", "Mientras estaba en su habitación", "Mientras estaba durmiendo"], c: "Mientras estaba en su lecho"},
+        {q: "¿Qué hizo Daniel después de tener el sueño?", o: ["Escribió el sueño y relató lo principal del asunto", "Escribió el sueño y contó lo principal del asunto", "Anotó el sueño y relató lo importante del asunto", "Escribió el sueño y narró lo principal del asunto"], c: "Escribió el sueño y relató lo principal del asunto"},
+        {q: "¿Qué combatían en el gran mar según la visión?", o: ["Los cuatro vientos del cielo", "Los cuatro vientos de los cielos", "Los vientos del cielo", "Cuatro vientos celestiales"], c: "Los cuatro vientos del cielo"},
+        {q: "¿Cuántas bestias grandes subían del mar?", o: ["Tres bestias grandes", "Cuatro bestias grandes", "Cinco bestias grandes", "Dos bestias grandes"], c: "Cuatro bestias grandes"},
+        {q: "¿Cómo eran las bestias entre sí?", o: ["Diferentes la una de la otra", "Distintas la una de la otra", "Diversas la una de la otra", "Variadas la una de la otra"], c: "Diferentes la una de la otra"},
+        {q: "¿A qué era semejante la primera bestia?", o: ["A un león", "Como un león", "Parecida a un león", "Semejante a un león"], c: "Como un león"},
+        {q: "¿Qué tenía la primera bestia?", o: ["Alas de ave", "Alas de águila", "Alas de pájaro", "Alas grandes"], c: "Alas de águila"},
+        {q: "¿Qué le pasó a las alas de la primera bestia?", o: ["Le fueron arrancadas", "Le fueron quitadas", "Fueron arrancadas", "Le fueron cortadas"], c: "Le fueron arrancadas"},
+        {q: "¿Qué se le dio a la primera bestia?", o: ["Corazón de hombre", "Un corazón de hombre", "Corazón humano", "El corazón de hombre"], c: "Corazón de hombre"},
+        {q: "¿A qué era semejante la segunda bestia?", o: ["A un oso", "Como un oso", "A una osa", "Semejante a un oso"], c: "A un oso"},
+        {q: "¿Cómo se alzaba la segunda bestia?", o: ["De un costado más que del otro", "De un lado más que del otro", "De un costado más que de otro", "Más de un costado que del otro"], c: "De un costado más que del otro"},
+        {q: "¿Qué tenía la segunda bestia en su boca?", o: ["Tres costillas", "Tres costillas entre los dientes", "Tres huesos", "Tres costillas en los dientes"], c: "Tres costillas"},
+        {q: "¿Dónde tenía las costillas la segunda bestia?", o: ["En su boca", "Entre los dientes", "En la boca, entre los dientes", "En su boca, entre sus dientes"], c: "En su boca, entre los dientes"},
+        {q: "¿Qué se le dijo a la segunda bestia?", o: ["Levántate y devora mucha carne", "Álzate y devora mucha carne", "Levántate y come mucha carne", "Levántate y destruye mucha carne"], c: "Levántate y devora mucha carne"},
+        {q: "¿A qué era semejante la tercera bestia?", o: ["A un leopardo", "A un tigre", "A una pantera", "A un felino"], c: "A un leopardo"},
+        {q: "¿Cuántas alas tenía la tercera bestia?", o: ["Dos alas", "Cuatro alas", "Seis alas", "Tres alas"], c: "Cuatro alas"},
+        {q: "¿De qué eran las alas de la tercera bestia?", o: ["De águila", "De ave", "De pájaro", "De ángel"], c: "De ave"},
+        {q: "¿Dónde tenía las alas la tercera bestia?", o: ["En sus espaldas", "En su espalda", "Sobre sus espaldas", "En la espalda"], c: "En sus espaldas"},
+        {q: "¿Cuántas cabezas tenía la tercera bestia?", o: ["Dos cabezas", "Tres cabezas", "Cuatro cabezas", "Cinco cabezas"], c: "Cuatro cabezas"},
+        {q: "¿Qué le fue dado a la tercera bestia?", o: ["Dominio", "Poder", "Autoridad", "Reino"], c: "Dominio"},
+        {q: "¿Cómo era la cuarta bestia?", o: ["Espantosa, terrible y en gran manera fuerte", "Espantosa, terrible y muy fuerte", "Aterradora, terrible y en gran manera fuerte", "Espantosa, aterradora y en gran manera fuerte"], c: "Espantosa, terrible y en gran manera fuerte"},
+        {q: "¿De qué eran los dientes de la cuarta bestia?", o: ["De bronce", "De hierro", "De acero", "De metal"], c: "De hierro"},
+        {q: "¿Qué hacía la cuarta bestia con las sobras?", o: ["Las pisoteaba con sus pies", "Las aplastaba con sus pies", "Las pisaba con sus pies", "Las destruía con sus pies"], c: "Pisoteaba las sobras con sus pies"},
+        {q: "¿Cuántos cuernos tenía la cuarta bestia?", o: ["Siete cuernos", "Ocho cuernos", "Diez cuernos", "Doce cuernos"], c: "Diez cuernos"},
+        {q: "¿Qué salió entre los cuernos?", o: ["Otro cuerno grande", "Otro cuerno pequeño", "Un cuerno pequeño", "Un cuerno menor"], c: "Otro cuerno pequeño"},
+        {q: "¿Cuántos cuernos fueron arrancados delante del cuerno pequeño?", o: ["Dos cuernos", "Tres cuernos", "Cuatro cuernos", "Cinco cuernos"], c: "Tres cuernos"},
+        {q: "¿Qué tenía el cuerno pequeño?", o: ["Ojos como de hombre", "Ojos humanos", "Ojos de persona", "Ojos como los de hombre"], c: "Ojos como de hombre"},
+        {q: "¿Cómo hablaba la boca del cuerno pequeño?", o: ["Con gran arrogancia", "Con gran insolencia", "Con gran soberbia", "Con mucha insolencia"], c: "Con gran insolencia"},
+        {q: "¿Qué fueron puestos según la visión?", o: ["Unos asientos", "Unos tronos", "Unos sillones", "Unos sitiales"], c: "Unos tronos"},
+        {q: "¿Quién se sentó en el trono?", o: ["Un Anciano de días", "El Anciano de días", "Un Anciano de muchos días", "El Anciano eterno"], c: "Un Anciano de días"},
+        {q: "¿De qué color era el vestido del Anciano de días?", o: ["Blanco como la nieve", "Blanco como nieve", "Tan blanco como la nieve", "Blanco cual nieve"], c: "Blanco como la nieve"},
+        {q: "¿A qué era semejante el pelo de su cabeza?", o: ["Como lana pura", "Como lana limpia", "Como lana blanca", "Como lana lavada"], c: "Como lana limpia"},
+        {q: "¿Qué era el trono del Anciano de días?", o: ["Llama de fuego", "Llamas de fuego", "Fuego ardiente", "Llama ardiente"], c: "Llama de fuego"},
+        {q: "¿Qué eran las ruedas del trono?", o: ["Fuego ardiente", "Llamas ardientes", "Fuego encendido", "Llamas de fuego"], c: "Fuego ardiente"},
+        {q: "¿Qué procedía de delante del Anciano de días?", o: ["Un río de fuego", "Ríos de fuego", "Torrentes de fuego", "Corrientes de fuego"], c: "Un río de fuego"},
+        {q: "¿Cuántos lo servían?", o: ["Miles de miles", "Millares de millares", "Miles y miles", "Muchos miles"], c: "Miles de miles"},
+        {q: "¿Cuántos estaban delante de él?", o: ["Miles de miles", "Millones de millones", "Millares de millares", "Muchos millones"], c: "Millones de millones"},
+        {q: "¿Qué fueron abiertos?", o: ["Los libros", "Los rollos", "Las escrituras", "Los registros"], c: "Los libros"},
+        {q: "¿Qué le pasó a la cuarta bestia?", o: ["Fue muerta", "Mataron a la bestia", "La bestia fue muerta", "Fue destruida"], c: "Mataron a la bestia"},
+        {q: "¿Qué pasó con el cuerpo de la cuarta bestia?", o: ["Fue destrozado y entregado para quemarlo en el fuego", "Fue destruido y entregado para quemarlo en el fuego", "Fue destrozado y echado para quemarlo en el fuego", "Fue despedazado y entregado para quemarlo en el fuego"], c: "Fue destrozado y entregado para quemarlo en el fuego"},
+        {q: "¿Qué les habían quitado a las otras bestias?", o: ["Su poder", "Su dominio", "Su reino", "Su autoridad"], c: "Su dominio"},
+        {q: "¿Qué había sido prolongada a las otras bestias?", o: ["La vida hasta cierto tiempo", "La existencia hasta cierto tiempo", "Sus días hasta cierto tiempo", "Su tiempo de vida"], c: "La vida hasta cierto tiempo"},
+        {q: "¿Con qué venía uno como un hijo de hombre?", o: ["Con las nubes del cielo", "Con las nubes de los cielos", "Entre las nubes del cielo", "Sobre las nubes del cielo"], c: "Con las nubes del cielo"},
+        {q: "¿Hasta quién vino el que era como hijo de hombre?", o: ["Hasta el Anciano de muchos días", "Hasta el Anciano de días", "Al Anciano de días", "Delante del Anciano de días"], c: "Hasta el Anciano de días"},
+        {q: "¿Qué le fue dado al hijo de hombre?", o: ["Dominio, gloria y reino", "Poder, gloria y reino", "Dominio, honor y reino", "Autoridad, gloria y reino"], c: "Dominio, gloria y reino"},
+        {q: "¿Cómo es el dominio que le fue dado?", o: ["Dominio eterno, que nunca pasará", "Dominio perpetuo, que nunca pasará", "Dominio sempiterno, que nunca pasará", "Dominio infinito, que nunca pasará"], c: "Dominio eterno, que nunca pasará"},
+        {q: "¿Cómo es el reino que le fue dado?", o: ["Uno que nunca será destruido", "Un reino que nunca será destruido", "Uno que jamás será destruido", "Uno que no será destruido"], c: "Uno que nunca será destruido"},
+        {q: "¿Qué se le turbó a Daniel?", o: ["El espíritu", "El espíritu hasta lo más hondo de mi ser", "El alma", "El corazón"], c: "El espíritu hasta lo más hondo de mi ser"},
+        {q: "¿Qué le asombraron a Daniel?", o: ["Las visiones de mi cabeza", "Las visiones que vi", "Las visiones de mi mente", "Las visiones"], c: "Las visiones de mi cabeza"},
+        {q: "¿Qué son las cuatro grandes bestias según la interpretación?", o: ["Cuatro reyes que se levantarán en la tierra", "Cuatro reinos que se levantarán en la tierra", "Cuatro imperios que se levantarán en la tierra", "Cuatro naciones que se levantarán en la tierra"], c: "Cuatro reyes que se levantarán en la tierra"},
+        {q: "¿Quiénes recibirán el reino después?", o: ["Los santos de Dios", "Los santos del Altísimo", "Los santos del cielo", "Los justos del Altísimo"], c: "Los santos del Altísimo"},
+        {q: "¿Hasta cuándo poseerán el reino los santos?", o: ["Hasta el siglo, eternamente y para siempre", "Hasta la eternidad", "Por siempre jamás", "Para toda la eternidad"], c: "Hasta el siglo, eternamente y para siempre"},
+        {q: "¿Qué tenía la cuarta bestia además de dientes de hierro?", o: ["Garras de bronce", "Uñas de bronce", "Garras de hierro", "Uñas de metal"], c: "Uñas de bronce"},
+        {q: "¿Cuántos cuernos tenía la cuarta bestia en su cabeza?", o: ["Siete cuernos", "Ocho cuernos", "Diez cuernos", "Doce cuernos"], c: "Diez cuernos"},
+        {q: "¿Ante el cuerno pequeño cuántos cuernos habían caído?", o: ["Dos", "Tres", "Cuatro", "Cinco"], c: "Tres"},
+        {q: "¿Contra quiénes hacía guerra el cuerno pequeño?", o: ["Contra los justos", "Contra los santos", "Contra el pueblo de Dios", "Contra los fieles"], c: "Contra los santos"},
+        {q: "¿Qué hacía el cuerno con los santos?", o: ["Los vencía", "Los derrotaba", "Los destruía", "Los mataba"], c: "Los vencía"},
+        {q: "¿Cuándo recibieron el reino los santos?", o: ["Cuando vino el Anciano de días", "Hasta que vino el Anciano de días", "Después que vino el Anciano de días", "Al venir el Anciano de días"], c: "Hasta que vino el Anciano de días"},
+        {q: "¿Qué será la cuarta bestia?", o: ["Un cuarto reino en la tierra", "El cuarto reino en la tierra", "Un cuarto imperio en la tierra", "Cuarto reino sobre la tierra"], c: "Un cuarto reino en la tierra"},
+        {q: "¿Qué hará la cuarta bestia con toda la tierra?", o: ["Devorará, trillará y despedazará", "Devorará, destruirá y despedazará", "Consumirá, trillará y despedazará", "Devorará, aplastará y despedazará"], c: "Devorará, trillará y despedazará"},
+        {q: "¿Qué significan los diez cuernos?", o: ["Que de aquel reino se levantarán diez reyes", "Que de ese reino se levantarán diez reyes", "Diez reyes que se levantarán", "Que surgirán diez reyes de aquel reino"], c: "Que de aquel reino se levantarán diez reyes"},
+        {q: "¿Cómo será el rey que se levantará tras los diez?", o: ["Diferente de los primeros", "Distinto de los primeros", "Diferente a los primeros", "Diverso de los primeros"], c: "Diferente de los primeros"},
+        {q: "¿A cuántos reyes derribará el nuevo rey?", o: ["A dos reyes", "A tres reyes", "A cuatro reyes", "A cinco reyes"], c: "A tres reyes"},
+        {q: "¿Contra quién hablará palabras el nuevo rey?", o: ["Contra el Altísimo", "Contra Dios", "Contra el Señor", "Contra el cielo"], c: "Contra el Altísimo"},
+        {q: "¿A quiénes quebrantará el nuevo rey?", o: ["A los santos de Dios", "A los santos del Altísimo", "A los justos del Altísimo", "Al pueblo santo"], c: "A los santos del Altísimo"},
+        {q: "¿En qué pensará cambiar el nuevo rey?", o: ["Los tiempos y la Ley", "Los tiempos y las leyes", "Las estaciones y la Ley", "Los períodos y la Ley"], c: "Los tiempos y la Ley"},
+        {q: "¿Por cuánto tiempo serán entregados en manos del nuevo rey?", o: ["Hasta tiempo, tiempos y medio tiempo", "Hasta un tiempo, dos tiempos y medio tiempo", "Por tiempo, tiempos y la mitad de un tiempo", "Durante tiempo, tiempos y medio tiempo"], c: "Hasta tiempo, tiempos y medio tiempo"},
+        {q: "¿Qué se sentará para quitarle el dominio al nuevo rey?", o: ["El tribunal", "El Juez", "El juicio", "La corte"], c: "El Juez"},
+        {q: "¿A quiénes será dado el reino debajo de todo el cielo?", o: ["Al pueblo de los santos de Dios", "Al pueblo de los santos del Altísimo", "A los santos del Altísimo", "Al pueblo santo del Altísimo"], c: "Al pueblo de los santos del Altísimo"},
+        {q: "¿Cómo se turbaron los pensamientos de Daniel al final?", o: ["Y mi rostro palideció", "Y mi rostro se demudó", "Y mi rostro cambió", "Y mi semblante cambió"], c: "Y mi rostro se demudó"},
+        {q: "¿En qué año del reinado de Belsasar tuvo Daniel otra visión?", o: ["En el año segundo", "En el año tercero", "En el año cuarto", "En el año quinto"], c: "En el año tercero"},
+        {q: "¿Dónde estaba Daniel en la visión del capítulo 8?", o: ["En Susa, que es la capital del reino", "En Babilonia, la capital", "En Jerusalén, la ciudad santa", "En Susa, la ciudad capital"], c: "En Susa, que es la capital del reino"},
+        {q: "¿En qué provincia estaba Susa?", o: ["En la provincia de Media", "En la provincia de Elam", "En la provincia de Persia", "En la provincia de Babilonia"], c: "En la provincia de Elam"},
+        {q: "¿Junto a qué estaba Daniel en la visión?", o: ["Junto al río Tigris", "Junto al río Éufrates", "Junto al río Ulai", "Junto al río Hidekel"], c: "Junto al río Ulai"},
+        {q: "¿Qué animal vio Daniel delante del río?", o: ["Un toro", "Un carnero", "Un caballo", "Un buey"], c: "Un carnero"},
+        {q: "¿Cuántos cuernos tenía el carnero?", o: ["Un cuerno", "Dos cuernos", "Tres cuernos", "Cuatro cuernos"], c: "Dos cuernos"},
+        {q: "¿Cuál cuerno del carnero era más alto?", o: ["El primero", "El que creció después", "Ambos eran iguales", "El más antiguo"], c: "El más alto creció después"},
+        {q: "¿Hacia dónde hería el carnero con sus cuernos?", o: ["Al oriente, al norte y al sur", "Al poniente, al norte y al sur", "Al norte, al sur y al oriente", "Al poniente, al oriente y al sur"], c: "Al poniente, al norte y al sur"},
+        {q: "¿De dónde venía el macho cabrío?", o: ["Del lado del oriente", "Del lado del poniente", "Del lado del norte", "Del lado del sur"], c: "Del lado del poniente"},
+        {q: "¿Cómo se movía el macho cabrío?", o: ["Sin tocar tierra", "Sobre la tierra", "Volando", "Rápidamente"], c: "Sin tocar tierra"},
+        {q: "¿Qué tenía el macho cabrío entre sus ojos?", o: ["Un cuerno grande", "Un cuerno notable", "Un cuerno poderoso", "Un cuerno fuerte"], c: "Un cuerno notable"},
+        {q: "¿Dónde vio Daniel al carnero cuando el macho cabrío vino?", o: ["En la ribera del río", "A la orilla del río", "Junto al río", "En el río"], c: "En la ribera del río"},
+        {q: "¿Con qué corrió el macho cabrío contra el carnero?", o: ["Con la furia de su poder", "Con la furia de su fuerza", "Con todo su poder", "Con gran fuerza"], c: "Con la furia de su fuerza"},
+        {q: "¿Qué le quebró el macho cabrío al carnero?", o: ["Un cuerno", "Sus dos cuernos", "Ambos cuernos", "Los cuernos"], c: "Sus dos cuernos"},
+        {q: "¿Qué hizo el macho cabrío con el carnero después de derribarlo?", o: ["Lo pisó", "Lo pisoteó", "Lo aplastó", "Lo destruyó"], c: "Lo pisoteó"},
+        {q: "¿Qué pasó cuando el macho cabrío estaba en su mayor fuerza?", o: ["El gran cuerno fue quebrado", "Aquel gran cuerno fue quebrado", "Su cuerno fue quebrado", "El cuerno grande fue quebrado"], c: "Aquel gran cuerno fue quebrado"},
+        {q: "¿Cuántos cuernos salieron en lugar del gran cuerno?", o: ["Dos cuernos notables", "Tres cuernos notables", "Cuatro cuernos notables", "Cinco cuernos notables"], c: "Cuatro cuernos notables"},
+        {q: "¿Hacia dónde salieron los cuatro cuernos?", o: ["Hacia los cuatro puntos cardinales", "Hacia los cuatro vientos del cielo", "Hacia las cuatro direcciones", "Hacia los cuatro rumbos"], c: "Hacia los cuatro vientos del cielo"},
+        {q: "¿De dónde salió un cuerno pequeño en el capítulo 8?", o: ["De uno de ellos", "De uno de los cuatro", "De uno de los cuernos", "Del cuerno mayor"], c: "De uno de ellos"},
+        {q: "¿Hacia dónde creció el cuerno pequeño?", o: ["Hacia el norte, el oriente y la tierra gloriosa", "Hacia el sur y el oriente, y hacia la tierra gloriosa", "Hacia el poniente, el sur y la tierra gloriosa", "Hacia el sur, el norte y la tierra gloriosa"], c: "Hacia el sur y el oriente, y hacia la tierra gloriosa"},
+        {q: "¿Hasta dónde creció el cuerno pequeño?", o: ["Hasta llegar al ejército del cielo", "Hasta alcanzar el ejército del cielo", "Hasta tocar el ejército del cielo", "Hasta el cielo"], c: "Hasta llegar al ejército del cielo"},
+        {q: "¿Qué echó por tierra el cuerno pequeño?", o: ["Parte del ejército y de las estrellas", "El ejército y las estrellas", "Algunos del ejército y estrellas", "Muchos del ejército y de las estrellas"], c: "Parte del ejército y de las estrellas"},
+        {q: "¿Frente a quién se engrandeció el cuerno pequeño?", o: ["Frente al príncipe de los ejércitos", "Ante el príncipe de los ejércitos", "Delante del príncipe de los ejércitos", "Contra el príncipe de los ejércitos"], c: "Frente al príncipe de los ejércitos"},
+        {q: "¿Qué fue quitado por el cuerno pequeño?", o: ["El sacrificio diario", "El sacrificio continuo", "El sacrificio perpetuo", "La ofrenda continua"], c: "El sacrificio continuo"},
+        {q: "¿Cuántas tardes y mañanas duraría la visión según el santo?", o: ["Mil trescientas tardes y mañanas", "Dos mil trescientas tardes y mañanas", "Tres mil trescientas tardes y mañanas", "Dos mil doscientas tardes y mañanas"], c: "Dos mil trescientas tardes y mañanas"},
+        {q: "¿Quién se puso delante de Daniel mientras consideraba la visión?", o: ["Uno con apariencia de ángel", "Uno con apariencia de hombre", "Uno con forma de hombre", "Un hombre"], c: "Uno con apariencia de hombre"},
+        {q: "¿Quién debía enseñar la visión a Daniel?", o: ["Miguel", "Gabriel", "Rafael", "Uriel"], c: "Gabriel"},
+        {q: "¿Desde dónde se oyó la voz que llamó a Gabriel?", o: ["Desde el cielo", "Entre las riberas del Ulai", "Desde el río", "Desde las aguas"], c: "Entre las riberas del Ulai"},
+        {q: "¿Para cuándo es la visión según Gabriel?", o: ["Para el tiempo del juicio", "Para el tiempo del fin", "Para los últimos días", "Para el fin de los tiempos"], c: "Para el tiempo del fin"},
+        {q: "¿Qué pasó con Daniel mientras Gabriel hablaba?", o: ["Caí desmayado", "Caí dormido en tierra sobre mi rostro", "Me quedé dormido", "Perdí el conocimiento"], c: "Caí dormido en tierra sobre mi rostro"},
+        {q: "¿Qué son los dos cuernos del carnero?", o: ["Los reyes de Media y Persia", "Los reyes de Media y de Persia", "Media y Persia", "Los reinos de Media y de Persia"], c: "Los reyes de Media y de Persia"},
+        {q: "¿Qué es el macho cabrío?", o: ["El rey de Grecia", "El reino de Grecia", "Grecia", "El imperio griego"], c: "El rey de Grecia"},
+        {q: "¿Qué es el cuerno grande del macho cabrío?", o: ["El primer rey", "El rey primero", "El primer reino", "El rey principal"], c: "El rey primero"},
+        {q: "¿Cuántos reinos se levantarán en lugar del cuerno quebrado?", o: ["Dos reinos", "Tres reinos", "Cuatro reinos", "Cinco reinos"], c: "Cuatro reinos"},
+        {q: "¿Cómo será el rey que se levantará al fin del reinado?", o: ["Altivo de rostro y sabio en enigmas", "Altivo de rostro y entendido en enigmas", "Arrogante de rostro y entendido en enigmas", "Orgulloso de rostro y sabio en enigmas"], c: "Altivo de rostro y entendido en enigmas"},
+        {q: "¿Con qué se fortalecerá el poder de ese rey?", o: ["Mas no con fuerza propia", "Pero no con su propia fuerza", "Aunque no con poder propio", "Mas no con su poder"], c: "Mas no con fuerza propia"},
+        {q: "¿Qué hará prosperar ese rey?", o: ["El engaño en su mano", "La mentira en su mano", "El fraude en su mano", "La astucia en su mano"], c: "El engaño en su mano"},
+        {q: "¿Contra quién se levantará ese rey?", o: ["Contra el Príncipe de príncipes", "Contra el Príncipe de los príncipes", "Contra el Rey de reyes", "Contra el Señor de señores"], c: "Contra el Príncipe de los príncipes"},
+        {q: "¿Cómo será quebrantado ese rey?", o: ["Aunque no por mano humana", "Pero no por mano humana", "Mas no por mano de hombre", "Aunque no por manos humanas"], c: "Aunque no por mano humana"},
+        {q: "¿Para cuándo es la visión de las tardes y mañanas?", o: ["Para muchos días", "Para días lejanos", "Para el futuro", "Para tiempos venideros"], c: "Para muchos días"},
+        {q: "¿Cómo quedó Daniel después de la visión?", o: ["Quebrantado", "Debilitado", "Enfermo", "Exhausto"], c: "Quebrantado"},
+        {q: "¿Por cuánto tiempo estuvo enfermo Daniel?", o: ["Algunos días", "Varios días", "Muchos días", "Pocos días"], c: "Algunos días"},
+        {q: "¿Qué atendió Daniel cuando se levantó?", o: ["Los negocios del rey", "Los asuntos del rey", "Las tareas del rey", "El trabajo del rey"], c: "Los negocios del rey"}
+        ];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
