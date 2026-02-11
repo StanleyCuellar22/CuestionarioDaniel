@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulos 9-10 (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulos 9-10 </h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulos 9-10 (Reina Valera 1995) Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+        {q: "¿En qué año de Darío tuvo Daniel esta revelación del capítulo 9?", o: ["En el primer año de Darío", "En el año primero de Darío", "En el segundo año de Darío", "Al principio del reinado de Darío"], c: "En el primer año de Darío"},
+        {q: "¿De quién era hijo Darío?", o: ["Hijo de Ciro", "Hijo de Asuero", "Hijo de Nabucodonosor", "Hijo de Belsasar"], c: "Hijo de Asuero"},
+        {q: "¿De qué nación era Darío?", o: ["De la nación de los persas", "De la nación de los medos", "De la nación de los caldeos", "De la nación de los babilonios"], c: "De la nación de los medos"},
+        {q: "¿Sobre qué reino vino a ser rey Darío?", o: ["Sobre el reino de los persas", "Sobre el reino de los medos", "Sobre el reino de los caldeos", "Sobre el reino de Babilonia"], c: "Sobre el reino de los caldeos"},
+        {q: "¿En qué miró atentamente Daniel?", o: ["En las profecías", "En los libros", "En las escrituras", "En los rollos"], c: "En los libros"},
+        {q: "¿Qué miró Daniel en los libros?", o: ["El número de los años", "Los tiempos proféticos", "Las semanas de años", "Los períodos"], c: "El número de los años"},
+        {q: "¿A qué profeta había hablado Jehová sobre las desolaciones de Jerusalén?", o: ["Al profeta Isaías", "Al profeta Jeremías", "Al profeta Ezequiel", "Al profeta Daniel"], c: "Al profeta Jeremías"},
+        {q: "¿Cuántos años debían cumplirse las desolaciones de Jerusalén?", o: ["Sesenta años", "Setenta años", "Ochenta años", "Noventa años"], c: "Setenta años"},
+        {q: "¿A quién volvió Daniel su rostro?", o: ["A Jehová mi Dios", "A Dios, el Señor", "Al Señor Dios", "Al Dios Altísimo"], c: "A Dios, el Señor"},
+        {q: "¿Cómo buscó Daniel a Dios?", o: ["En oración y súplica", "En oración y ruego", "En oración y ayuno", "En oración y lamento"], c: "En oración y ruego"},
+        {q: "¿Con qué buscó Daniel a Dios además de oración y ruego?", o: ["En ayuno, cilicio y ceniza", "En ayuno, ropas ásperas y ceniza", "En ayuno, saco y ceniza", "En ayuno, vestidos de luto y ceniza"], c: "En ayuno, ropas ásperas y ceniza"},
+        {q: "¿A quién oró Daniel?", o: ["A Jehová, mi Dios", "Al Señor mi Dios", "A Dios el Señor", "Al Dios del cielo"], c: "A Jehová, mi Dios"},
+        {q: "¿Qué hizo Daniel además de orar?", o: ["E hice confesión", "E hice súplica", "E hice petición", "E hice ruego"], c: "E hice confesión"},
+        {q: "¿Cómo llamó Daniel a Dios al inicio de su oración?", o: ["Señor, Dios grande, digno de ser temido", "Señor, Dios grande y temible", "Señor, Dios poderoso, digno de ser temido", "Señor, Dios majestuoso, digno de ser temido"], c: "Señor, Dios grande, digno de ser temido"},
+        {q: "¿Qué guarda Dios según la confesión de Daniel?", o: ["El pacto y la misericordia", "El pacto y la bondad", "La alianza y la misericordia", "El pacto y la gracia"], c: "El pacto y la misericordia"},
+        {q: "¿Con quiénes guarda Dios el pacto y la misericordia?", o: ["Con los que le aman y guardan sus mandamientos", "Con los que lo aman y obedecen sus mandamientos", "Con los que le temen y guardan sus mandamientos", "Con los que le sirven y guardan sus mandamientos"], c: "Con los que te aman y guardan tus mandamientos"},
+        {q: "¿Qué confesó Daniel que había hecho su pueblo?", o: ["Hemos pecado, hemos cometido maldad", "Hemos pecado, hemos cometido iniquidad", "Hemos pecado, hemos hecho lo malo", "Hemos pecado, hemos obrado injustamente"], c: "Hemos pecado, hemos cometido iniquidad"},
+        {q: "¿A quiénes no habían obedecido según Daniel?", o: ["A tus siervos los sacerdotes", "A tus siervos los profetas", "A tus mensajeros los profetas", "A tus enviados los profetas"], c: "A tus siervos los profetas"},
+        {q: "¿En nombre de quién hablaron los profetas?", o: ["En tu nombre", "En el nombre de Jehová", "En el nombre del Señor", "En nombre de Dios"], c: "En tu nombre"},
+        {q: "¿A quiénes hablaron los profetas?", o: ["A nuestros reyes, a nuestros príncipes, a nuestros padres y a todo el pueblo", "A nuestros reyes, a nuestros príncipes, a nuestros padres y a todo el pueblo de la tierra", "A nuestros gobernantes, a nuestros príncipes, a nuestros padres y a todo el pueblo de la tierra", "A nuestros reyes, a nuestros líderes, a nuestros padres y a todo el pueblo de la tierra"], c: "A nuestros reyes, a nuestros príncipes, a nuestros padres y a todo el pueblo de la tierra"},
+        {q: "¿De quién es la justicia según Daniel?", o: ["Tuya es, Jehová, la justicia", "Tuya es, Señor, la justicia", "De ti es, Señor, la justicia", "A ti pertenece, Señor, la justicia"], c: "Tuya es, Señor, la justicia"},
+        {q: "¿De quién es la confusión de rostro?", o: ["Nuestra es la confusión de rostro", "Y nuestra la confusión de rostro", "De nosotros es la confusión de rostro", "A nosotros pertenece la confusión de rostro"], c: "Y nuestra la confusión de rostro"},
+        {q: "¿Quiénes llevan confusión de rostro en el día de hoy?", o: ["Todo hombre de Judá, los habitantes de Jerusalén y todo Israel", "Todo varón de Judá, los habitantes de Jerusalén y todo Israel", "Cada hombre de Judá, los habitantes de Jerusalén y todo Israel", "Los hombres de Judá, los habitantes de Jerusalén y todo Israel"], c: "Todo hombre de Judá, los habitantes de Jerusalén y todo Israel"},
+        {q: "¿Dónde están los de Israel según Daniel?", o: ["Los de cerca y los de lejos", "Los cercanos y los lejanos", "Los de aquí y los de allá", "Los próximos y los distantes"], c: "Los de cerca y los de lejos"},
+        {q: "¿Por qué fueron echados a todas las tierras?", o: ["A causa de su pecado con que pecaron contra ti", "A causa de su rebelión con que se rebelaron contra ti", "A causa de su transgresión con que transgredieron contra ti", "A causa de su maldad con que obraron contra ti"], c: "A causa de su rebelión con que se rebelaron contra ti"},
+        {q: "¿De quién es tener misericordia y perdonar?", o: ["De Jehová, nuestro Dios", "Del Señor, nuestro Dios", "De Dios nuestro Señor", "Del Altísimo nuestro Dios"], c: "De Jehová, nuestro Dios"},
+        {q: "¿A la voz de quién no obedecieron?", o: ["A la voz de Jehová, nuestro Dios", "A la voz del Señor, nuestro Dios", "A tu voz, oh Dios", "A la voz de Dios"], c: "A la voz de Jehová, nuestro Dios"},
+        {q: "¿Para qué debían obedecer la voz de Jehová?", o: ["Para andar en sus leyes", "Para caminar en sus leyes", "Para seguir sus leyes", "Para cumplir sus leyes"], c: "Para andar en sus leyes"},
+        {q: "¿Por medio de quiénes puso Dios sus leyes?", o: ["Por medio de sus siervos los sacerdotes", "Por medio de sus siervos los profetas", "Por medio de sus mensajeros los profetas", "Por sus siervos los profetas"], c: "Por medio de sus siervos los profetas"},
+        {q: "¿Qué traspasó todo Israel?", o: ["Tu ley", "Tu Ley", "Tus mandamientos", "Tus estatutos"], c: "Tu Ley"},
+        {q: "¿Qué cayó sobre Israel por su desobediencia?", o: ["La maldición y el castigo", "La maldición y el juramento", "La maldición y la sentencia", "El juicio y el juramento"], c: "La maldición y el juramento"},
+        {q: "¿Dónde está escrito el juramento que cayó sobre Israel?", o: ["En la ley de Moisés, siervo de Dios", "En la ley de Moisés, siervo del Señor", "En la ley de Moisés, profeta de Dios", "En los libros de Moisés, siervo de Dios"], c: "En la ley de Moisés, siervo de Dios"},
+        {q: "¿Qué había hecho Dios debajo del cielo según Daniel?", o: ["Nunca fue hecho debajo del cielo nada semejante a lo hecho contra Jerusalén", "Nunca fue hecho debajo del cielo nada semejante a lo que se ha hecho contra Jerusalén", "Jamás fue hecho debajo del cielo nada semejante a lo que se ha hecho contra Jerusalén", "Nunca se hizo debajo del cielo nada semejante a lo que se ha hecho contra Jerusalén"], c: "Nunca fue hecho debajo del cielo nada semejante a lo que se ha hecho contra Jerusalén"},
+        {q: "¿Conforme a qué vino el mal sobre Israel?", o: ["Conforme está escrito en la ley de Moisés", "Según está escrito en la ley de Moisés", "Como está escrito en la ley de Moisés", "Tal como está escrito en la ley de Moisés"], c: "Conforme está escrito en la ley de Moisés"},
+        {q: "¿Qué no habían hecho a pesar del mal?", o: ["No hemos implorado el favor de Jehová, nuestro Dios", "No hemos buscado el favor de Jehová, nuestro Dios", "No hemos pedido el favor de Jehová, nuestro Dios", "No hemos suplicado el favor de Jehová, nuestro Dios"], c: "No hemos implorado el favor de Jehová, nuestro Dios"},
+        {q: "¿De qué no se habían convertido?", o: ["De nuestras maldades", "De nuestros pecados", "De nuestras iniquidades", "De nuestras transgresiones"], c: "De nuestras maldades"},
+        {q: "¿Qué no habían entendido?", o: ["Tu verdad", "La verdad", "Tu palabra", "Tus caminos"], c: "Tu verdad"},
+        {q: "¿Sobre qué veló Jehová?", o: ["Sobre el castigo", "Sobre el mal", "Sobre el juicio", "Sobre la calamidad"], c: "Sobre el mal"},
+        {q: "¿Por qué es justo Jehová según Daniel?", o: ["En todas sus obras que ha hecho", "En todas las obras que ha hecho", "En todo lo que ha hecho", "En todas sus acciones"], c: "En todas sus obras que ha hecho"},
+        {q: "¿De dónde sacó Dios a su pueblo?", o: ["De la tierra de Egipto", "De Egipto", "Del país de Egipto", "De tierras de Egipto"], c: "De la tierra de Egipto"},
+        {q: "¿Con qué sacó Dios a su pueblo de Egipto?", o: ["Con mano poderosa", "Con mano fuerte", "Con brazo poderoso", "Con gran poder"], c: "Con mano poderosa"},
+        {q: "¿Qué se hizo Dios al sacar a su pueblo de Egipto?", o: ["Renombre cual lo tienes hoy", "Nombre cual lo tienes hoy", "Fama cual la tienes hoy", "Gloria cual la tienes hoy"], c: "Renombre cual lo tienes hoy"},
+        {q: "¿Qué debía apartarse de Jerusalén según Daniel?", o: ["Tu ira y tu furor", "Tu enojo y tu ira", "Tu ira y tu indignación", "Tu cólera y tu furor"], c: "Tu ira y tu furor"},
+        {q: "¿Cómo llamó Daniel a Jerusalén en su oración?", o: ["Tu ciudad Jerusalén, tu monte santo", "Tu ciudad Jerusalén, tu santo monte", "Tu ciudad santa Jerusalén, tu monte", "Tu santa ciudad Jerusalén, tu monte santo"], c: "Tu ciudad Jerusalén, tu santo monte"},
+        {q: "¿Por qué Jerusalén y el pueblo son oprobio?", o: ["A causa de nuestros pecados y por la maldad de nuestros padres", "A causa de nuestras iniquidades y por la maldad de nuestros padres", "A causa de nuestros pecados y por los pecados de nuestros padres", "A causa de nuestras transgresiones y por la maldad de nuestros padres"], c: "A causa de nuestros pecados y por la maldad de nuestros padres"},
+        {q: "¿De quiénes son oprobio Jerusalén y el pueblo?", o: ["De todos los que nos rodean", "De todos nuestros vecinos", "De todos los que están alrededor", "De todas las naciones cercanas"], c: "De todos los que nos rodean"},
+        {q: "¿Qué debía hacer el rostro de Dios sobre el santuario?", o: ["Resplandecer sobre tu santuario asolado", "Brillar sobre tu santuario asolado", "Iluminar sobre tu santuario asolado", "Alumbrar sobre tu santuario asolado"], c: "Haz que tu rostro resplandezca sobre tu santuario asolado"},
+        {q: "¿Por amor de quién pide Daniel que Dios resplandezca sobre el santuario?", o: ["Por amor de ti mismo", "Por amor del Señor", "Por amor de tu nombre", "Por amor de tu pueblo"], c: "Por amor del Señor"},
+        {q: "¿Qué debía hacer Dios con su oído?", o: ["Inclina, Dios mío, tu oído", "Presta, Dios mío, tu oído", "Abre, Dios mío, tu oído", "Dispón, Dios mío, tu oído"], c: "Inclina, Dios mío, tu oído"},
+        {q: "¿Sobre qué es invocado el nombre de Dios?", o: ["La ciudad y el pueblo", "Tu ciudad y tu pueblo", "La ciudad sobre la cual es invocado tu nombre", "Jerusalén y tu pueblo"], c: "La ciudad sobre la cual es invocado tu nombre"},
+        {q: "¿En qué no confiaban para elevar sus ruegos?", o: ["En nuestras justicias", "En nuestras obras justas", "En nuestra justicia", "En nuestros méritos"], c: "En nuestras justicias"},
+        {q: "¿En qué confiaban para elevar sus ruegos?", o: ["En tus muchas misericordias", "En tu gran misericordia", "En tus misericordias abundantes", "En tus infinitas misericordias"], c: "En tus muchas misericordias"},
+        {q: "¿Qué clamó Daniel al final de su oración?", o: ["¡Oye, Señor! ¡Señor, perdona!", "¡Escucha, Señor! ¡Señor, perdona!", "¡Oye, Señor! ¡Señor, ten misericordia!", "¡Atiende, Señor! ¡Señor, perdona!"], c: "¡Oye, Señor! ¡Señor, perdona!"},
+        {q: "¿Por amor de quién no debía tardar Dios?", o: ["Por amor de tu pueblo", "Por amor de ti mismo", "Por amor de tu nombre", "Por amor de tu ciudad"], c: "Por amor de ti mismo"},
+        {q: "¿Qué estaba haciendo Daniel cuando vino Gabriel?", o: ["Estaba orando y confesando mi pecado", "Estaba hablando, orando y confesando mi pecado", "Estaba rogando y confesando mi pecado", "Estaba suplicando y confesando mi pecado"], c: "Aún estaba hablando, orando y confesando mi pecado"},
+        {q: "¿Qué confesaba Daniel además de su pecado?", o: ["El pecado de mi pueblo Israel", "Los pecados de mi pueblo Israel", "La iniquidad de mi pueblo Israel", "Las transgresiones de mi pueblo Israel"], c: "El pecado de mi pueblo Israel"},
+        {q: "¿Dónde derramaba Daniel su ruego?", o: ["Delante de Jehová, mi Dios", "Delante del Señor, mi Dios", "Ante Jehová, mi Dios", "En presencia de Jehová, mi Dios"], c: "Delante de Jehová, mi Dios"},
+        {q: "¿Por qué monte derramaba Daniel su ruego?", o: ["Por el monte santo de mi Dios", "Por tu monte santo", "Por el santo monte", "Por el monte de Sión"], c: "Por el monte santo de mi Dios"},
+        {q: "¿A quién había visto Daniel en la visión al principio?", o: ["Al varón Gabriel", "Al ángel Gabriel", "A Gabriel", "Al mensajero Gabriel"], c: "El varón Gabriel"},
+        {q: "¿Cómo vino Gabriel a Daniel?", o: ["Volando con presteza", "Volando rápidamente", "Volando velozmente", "Volando apresuradamente"], c: "Volando con presteza"},
+        {q: "¿A qué hora vino Gabriel a Daniel?", o: ["Como a la hora del sacrificio de la mañana", "Como a la hora del sacrificio de la tarde", "Como a la hora de la oración", "Como a la hora del incienso"], c: "Como a la hora del sacrificio de la tarde"},
+        {q: "¿Para qué salió Gabriel según le dijo a Daniel?", o: ["Para darte sabiduría y entendimiento", "Para darte conocimiento y entendimiento", "Para darte sabiduría y comprensión", "Para darte revelación y entendimiento"], c: "Para darte sabiduría y entendimiento"},
+        {q: "¿Cuándo fue dada la orden según Gabriel?", o: ["Al principio de tus ruegos", "Al comienzo de tus ruegos", "Cuando comenzaste tus ruegos", "Al inicio de tu oración"], c: "Al principio de tus ruegos"},
+        {q: "¿Por qué vino Gabriel a Daniel?", o: ["Porque tú eres muy amado", "Porque tú eres amado", "Porque eres muy estimado", "Porque eres muy apreciado"], c: "Porque tú eres muy amado"},
+        {q: "¿Qué debía entender Daniel?", o: ["La orden y la visión", "La palabra y la visión", "El mensaje y la visión", "La revelación y la visión"], c: "La orden, y entiende la visión"},
+        {q: "¿Cuántas semanas están determinadas sobre el pueblo y la ciudad santa?", o: ["Sesenta semanas", "Setenta semanas", "Ochenta semanas", "Noventa semanas"], c: "Setenta semanas"},
+        {q: "¿Para qué están determinadas las setenta semanas?", o: ["Para terminar la prevaricación, poner fin al pecado", "Para acabar la transgresión, poner fin al pecado", "Para terminar la rebelión, poner fin al pecado", "Para terminar la prevaricación, acabar con el pecado"], c: "Para terminar la prevaricación, poner fin al pecado"},
+        {q: "¿Qué más debían hacer las setenta semanas?", o: ["Y expiar la iniquidad", "Y perdonar la iniquidad", "Y quitar la iniquidad", "Y borrar la iniquidad"], c: "Y expiar la iniquidad"},
+        {q: "¿Qué debían traer las setenta semanas?", o: ["La justicia eterna", "La justicia perdurable", "La justicia sempiterna", "La justicia perpetua"], c: "La justicia perdurable"},
+        {q: "¿Qué debían sellar las setenta semanas?", o: ["La visión y la profecía", "La visión y el profeta", "Las visiones y la profecía", "La revelación y la profecía"], c: "La visión y la profecía"},
+        {q: "¿A quién debían ungir las setenta semanas?", o: ["Al Santo de los santos", "Al Santísimo", "Al lugar santísimo", "Al Santo de Dios"], c: "Al Santo de los santos"},
+        {q: "¿Desde qué orden se cuenta hasta el Mesías Príncipe?", o: ["Desde la salida de la orden para restaurar y edificar a Jerusalén", "Desde la salida del decreto para restaurar y edificar a Jerusalén", "Desde la orden para restaurar y reconstruir a Jerusalén", "Desde el mandato para restaurar y edificar a Jerusalén"], c: "Desde la salida de la orden para restaurar y edificar a Jerusalén"},
+        {q: "¿Cuántas semanas habrá hasta el Mesías Príncipe?", o: ["Siete semanas y sesenta semanas", "Siete semanas y sesenta y dos semanas", "Ocho semanas y sesenta y dos semanas", "Siete semanas y sesenta y tres semanas"], c: "Siete semanas y sesenta y dos semanas"},
+        {q: "¿Qué se volverá a edificar en tiempos angustiosos?", o: ["La plaza y el muro", "La ciudad y el muro", "Las calles y el muro", "La plaza y las murallas"], c: "La plaza y el muro"},
+        {q: "¿Qué pasará después de las sesenta y dos semanas?", o: ["Se matará al Mesías", "Se quitará la vida al Mesías", "Morirá el Mesías", "Será muerto el Mesías"], c: "Se quitará la vida al Mesías"},
+        {q: "¿Qué le quedará al Mesías después de quitarle la vida?", o: ["Nada ya le quedará", "Y nada ya le quedará", "Y ya nada le quedará", "Ya nada le quedará"], c: "Y nada ya le quedará"},
+        {q: "¿Qué destruirá el pueblo de un príncipe que ha de venir?", o: ["La ciudad y el santuario", "La ciudad y el templo", "Jerusalén y el santuario", "La ciudad santa y el santuario"], c: "La ciudad y el santuario"},
+        {q: "¿Cómo llegará el final según la profecía?", o: ["Como una inundación", "Como un diluvio", "Como aguas impetuosas", "Como crecida de río"], c: "Como una inundación"},
+        {q: "¿Por cuánto tiempo más confirmará el pacto?", o: ["Por una semana más", "Por otra semana", "Por otra semana más", "Por la última semana"], c: "Por otra semana más"},
+        {q: "¿Cuándo hará cesar el sacrificio y la ofrenda?", o: ["A la mitad de la semana", "En medio de la semana", "A mediados de la semana", "En la mitad de la semana"], c: "A la mitad de la semana"},
+        {q: "¿En qué año de Ciro fue revelada palabra a Daniel en el capítulo 10?", o: ["En el primer año de Ciro", "En el segundo año de Ciro", "En el tercer año de Ciro", "En el cuarto año de Ciro"], c: "En el tercer año de Ciro"},
+        {q: "¿Cómo era la palabra revelada a Daniel?", o: ["La palabra era verdadera y el conflicto grande", "La palabra era verdadera y la guerra grande", "La palabra era cierta y el conflicto grande", "La palabra era verdadera y el tiempo largo"], c: "La palabra era verdadera y el conflicto grande"},
+        {q: "¿Por cuánto tiempo estuvo afligido Daniel?", o: ["Por espacio de dos semanas", "Por espacio de tres semanas", "Por espacio de cuatro semanas", "Por un mes"], c: "Por espacio de tres semanas"},
+        {q: "¿Qué no comió Daniel durante las tres semanas?", o: ["Manjar delicado", "Manjares delicados", "Comida deliciosa", "Alimento delicado"], c: "Manjar delicado"},
+        {q: "¿Qué no entró en la boca de Daniel?", o: ["Carne ni vino", "Carne ni bebida", "Alimento ni vino", "Comida ni vino"], c: "Carne ni vino"},
+        {q: "¿Con qué no se ungió Daniel?", o: ["Con perfume", "Con aceite", "Con ungüento", "Con bálsamo"], c: "Con perfume"},
+        {q: "¿Qué día del primer mes estaba Daniel a la orilla del río?", o: ["El día veintiuno", "El día veinticuatro", "El día veintiocho", "El día treinta"], c: "El día veinticuatro"},
+        {q: "¿A la orilla de qué río estaba Daniel?", o: ["Del gran río Tigris", "Del gran río Hidekel", "Del gran río Éufrates", "Del gran río Ulai"], c: "Del gran río Hidekel"},
+        {q: "¿De qué estaba vestido el varón que vio Daniel?", o: ["De lino", "De vestiduras blancas", "De ropas resplandecientes", "De túnica blanca"], c: "De lino"},
+        {q: "¿Con qué estaba ceñida la cintura del varón?", o: ["Con oro de Ofir", "Con oro de Ufaz", "Con oro puro", "Con oro fino"], c: "Con oro de Ufaz"},
+        {q: "¿A qué era semejante el cuerpo del varón?", o: ["Como de jaspe", "Como de berilo", "Como de cristal", "Como de zafiro"], c: "Como de berilo"},
+        {q: "¿A qué parecía el rostro del varón?", o: ["Un relámpago", "Como un relámpago", "Llamas de fuego", "Luz brillante"], c: "Un relámpago"},
+        {q: "¿A qué eran semejantes los ojos del varón?", o: ["Como antorchas de fuego", "Como llamas de fuego", "Como brasas de fuego", "Como fuego ardiente"], c: "Como antorchas de fuego"},
+        {q: "¿De qué color eran los brazos y pies del varón?", o: ["Como de bronce pulido", "Como de color de bronce bruñido", "Como de bronce resplandeciente", "Como de bronce brillante"], c: "Como de color de bronce bruñido"},
+        {q: "¿A qué era semejante el sonido de las palabras del varón?", o: ["Como el estruendo de una multitud", "Como el ruido de una multitud", "Como el sonido de muchas aguas", "Como el bramido de una multitud"], c: "Como el estruendo de una multitud"},
+        {q: "¿Quién vio la visión del varón?", o: ["Sólo yo, Daniel", "Solamente yo, Daniel", "Únicamente yo, Daniel", "Yo solo, Daniel"], c: "Sólo yo, Daniel"},
+        {q: "¿Qué les pasó a los hombres que estaban con Daniel?", o: ["Se apoderó de ellos un gran temor", "Les sobrevino un gran temor", "Fueron llenos de gran temor", "Cayó sobre ellos un gran temor"], c: "Se apoderó de ellos un gran temor"},
+        {q: "¿Qué hicieron los hombres que estaban con Daniel?", o: ["Huyeron y se escondieron", "Corrieron y se escondieron", "Huyeron y se ocultaron", "Escaparon y se escondieron"], c: "Huyeron y se escondieron"},
+        {q: "¿Qué le pasó a Daniel ante la visión?", o: ["Pero no quedaron fuerzas en mí", "No me quedaron fuerzas", "Perdí todas mis fuerzas", "Se me fueron todas las fuerzas"], c: "Pero no quedaron fuerzas en mí"},
+        {q: "¿En qué se cambiaron las fuerzas de Daniel?", o: ["En debilidad", "En desfallecimiento", "En flaqueza", "En decaimiento"], c: "En desfallecimiento"},
+        {q: "¿Cómo cayó Daniel al oír las palabras del varón?", o: ["Caí sobre mi rostro en un profundo sueño", "Caí dormido sobre mi rostro", "Caí inconsciente sobre mi rostro", "Me desplomé sobre mi rostro"], c: "Caí sobre mi rostro en un profundo sueño"},
+        {q: "¿Qué tocó a Daniel para levantarlo?", o: ["Una mano", "Un ángel", "El varón", "Un ser"], c: "Una mano"},
+        {q: "¿Sobre qué hizo que se pusiera Daniel la mano?", o: ["Sobre mis rodillas y sobre las palmas de mis manos", "Sobre mis rodillas y mis manos", "En cuatro patas", "Sobre mis pies y mis manos"], c: "Sobre mis rodillas y sobre las palmas de mis manos"},
+        {q: "¿Cómo llamó el varón a Daniel?", o: ["Daniel, varón muy amado", "Daniel, hombre muy amado", "Daniel, varón amado", "Daniel, hombre muy estimado"], c: "Daniel, varón muy amado"},
+        {q: "¿Qué debía hacer Daniel con las palabras?", o: ["Está atento a las palabras", "Presta atención a las palabras", "Escucha atentamente las palabras", "Pon atención a las palabras"], c: "Está atento a las palabras"},
+        {q: "¿Cómo se puso Daniel mientras el varón hablaba?", o: ["Me puse en pie temblando", "Me levanté temblando", "Me incorporé temblando", "Me paré temblando"], c: "Me puse en pie temblando"},
+        {q: "¿Desde cuándo fueron oídas las palabras de Daniel?", o: ["Desde el primer día que dispusiste tu corazón", "Desde el día que dispusiste tu corazón", "Desde que dispusiste tu corazón", "Desde el momento que dispusiste tu corazón"], c: "Desde el primer día que dispusiste tu corazón"},
+        {q: "¿A qué dispuso Daniel su corazón?", o: ["A entender y a humillarte en la presencia de tu Dios", "A comprender y a humillarte en la presencia de tu Dios", "A entender y a humillarte delante de tu Dios", "A buscar y a humillarte en la presencia de tu Dios"], c: "A entender y a humillarte en la presencia de tu Dios"},
+        {q: "¿Quién se opuso al mensajero durante veintiún días?", o: ["El príncipe del reino de Persia", "El príncipe de Persia", "El príncipe del rey de Persia", "El ángel del reino de Persia"], c: "El príncipe del reino de Persia"},
+        {q: "¿Quién vino para ayudar al mensajero?", o: ["Miguel, uno de los principales príncipes", "Miguel, el arcángel", "Miguel, el príncipe principal", "Miguel, uno de los primeros príncipes"], c: "Miguel, uno de los principales príncipes"},
+        {q: "¿Para qué vino el mensajero a Daniel?", o: ["Para hacerte saber lo que ha de venir a tu pueblo", "Para hacerte saber lo que ha de sucederle a tu pueblo en los últimos días", "Para revelarte lo que sucederá a tu pueblo", "Para mostrarte lo que vendrá sobre tu pueblo"], c: "Para hacerte saber lo que ha de sucederle a tu pueblo en los últimos días"},
+        {q: "¿Para cuándo es la visión del capítulo 10?", o: ["Para los últimos días", "Para esos días", "Para aquellos días", "Para el fin"], c: "Para esos días"},
+        {q: "¿Quién tocó los labios de Daniel?", o: ["Uno con semejanza de hijo de hombre", "Uno semejante a hijo de hombre", "Uno como hijo de hombre", "Un ser semejante a hombre"], c: "Uno con semejanza de hijo de hombre"},
+        {q: "¿Qué le sobrevinieron a Daniel con la visión?", o: ["Dolores", "Angustias", "Sufrimientos", "Aflicciones"], c: "Dolores"},
+        {q: "¿Qué no le quedaba a Daniel después de la visión?", o: ["Fuerzas", "Aliento", "Vigor", "Energía"], c: "Fuerzas"},
+        {q: "¿Qué tocó a Daniel otra vez?", o: ["Aquel que tenía semejanza de hombre", "El que parecía hombre", "El que era como hombre", "Aquel con apariencia de hombre"], c: "Aquel que tenía semejanza de hombre"},
+        {q: "¿Qué le dijo el varón a Daniel para consolarlo?", o: ["Muy amado, no temas; la paz sea contigo", "Muy estimado, no temas; la paz sea contigo", "Amado, no temas; la paz sea contigo", "Muy querido, no temas; la paz sea contigo"], c: "Muy amado, no temas; la paz sea contigo"},
+        {q: "¿Contra quién tenía que volver a pelear el mensajero?", o: ["Contra el príncipe de Persia", "Contra el ángel de Persia", "Contra el gobernante de Persia", "Contra el espíritu de Persia"], c: "Contra el príncipe de Persia"},
+        {q: "¿Quién vendría después del príncipe de Persia?", o: ["El príncipe de Grecia", "El ángel de Grecia", "El gobernante de Grecia", "El espíritu de Grecia"], c: "El príncipe de Grecia"},
+        {q: "¿Dónde estaba escrito lo que el mensajero declararía?", o: ["En el libro de la verdad", "En el rollo de la verdad", "En las escrituras de la verdad", "En el libro verdadero"], c: "En el libro de la verdad"},
+        {q: "¿Quién ayudaba al mensajero contra los príncipes?", o: ["Miguel vuestro príncipe", "Miguel tu príncipe", "Miguel el arcángel", "Miguel el príncipe"], c: "Miguel vuestro príncipe"}
+
+        ];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
