@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulo 3 Asociacion (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulo 3 Asociacion</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulo 3 Asociacion (Reina Valera 1995) Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            // ── NIVEL 1 ──────────────────────────────────────────────────────────────
+
+            {q: "1. ¿Qué hizo el rey Nabucodonosor? Daniel 3:1", o: ["Una estatua de oro", "Una estatua de oro fino", "Una estatua de oro puro", "Una estatua hecha de oro"], c: "Una estatua de oro"},
+            {q: "2. ¿Cuál era la altura de la estatua? Daniel 3:1", o: ["Sesenta codos", "Sesenta y seis codos", "Cincuenta codos", "Sesenta codos y medio"], c: "Sesenta codos"},
+            {q: "3. ¿Cuál era la anchura? Daniel 3:1", o: ["Seis codos", "Seis codos de ancho", "Seis codos y medio", "Cinco codos"], c: "Seis codos"},
+            {q: "4. ¿Dónde la levantó? Daniel 3:1", o: ["En el campo de Dura", "En la llanura de Dura", "En el campo llamado Dura", "En la provincia de Dura"], c: "En el campo de Dura"},
+            {q: "5. ¿En qué provincia estaba el campo de Dura? Daniel 3:1", o: ["En la provincia de Babilonia", "En la región de Babilonia", "En Babilonia", "En el reino de Babilonia"], c: "En la provincia de Babilonia"},
+            {q: "6. ¿Qué ordenó reunir primero el rey? Daniel 3:2", o: ["Los sátrapas", "Los magistrados", "Los capitanes", "Los gobernadores"], c: "Los sátrapas"},
+            {q: "7. ¿Qué cargo aparece después de capitanes? Daniel 3:2", o: ["Oidores", "Consejeros", "Tesoreros", "Jueces"], c: "Oidores"},
+            {q: "8. ¿Para qué debían reunirse? Daniel 3:2", o: ["Para la dedicación de la estatua", "Para la inauguración de la estatua", "Para adorar la estatua", "Para honrar la estatua"], c: "Para la dedicación de la estatua"},
+            {q: "9. ¿Cómo estaban delante de la estatua? Daniel 3:3", o: ["En pie", "Arrodillados", "Postrados", "Reunidos"], c: "En pie"},
+            {q: "10. ¿Qué anunció el pregonero? Daniel 3:4", o: ["Se os ordena a vosotros, pueblos, naciones y lenguas", "Se os manda a todos los pueblos", "Se os convoca, pueblos y naciones", "Se os ordena a todas las lenguas"], c: "Se os ordena a vosotros, pueblos, naciones y lenguas"},
+            {q: "11. ¿Qué debían hacer al oír la música? Daniel 3:5", o: ["Postrarse y adorar la estatua de oro", "Inclinarse ante la estatua", "Adorar la estatua del rey", "Postrarse delante del rey"], c: "Postrarse y adorar la estatua de oro"},
+            {q: "12. ¿Qué instrumento se menciona primero? Daniel 3:5", o: ["La bocina", "La flauta", "La cítara", "El arpa"], c: "La bocina"},
+            {q: "13. ¿Qué instrumento aparece después del arpa? Daniel 3:5", o: ["El salterio", "La zampoña", "La flauta", "La cítara"], c: "El salterio"},
+            {q: "14. ¿Qué sucedería con quien no adorara? Daniel 3:6", o: ["Sería echado dentro de un horno de fuego ardiente", "Sería lanzado al fuego", "Sería puesto en el horno", "Sería quemado en el horno"], c: "Sería echado dentro de un horno de fuego ardiente"},
+            {q: "15. ¿Qué palabra antecede a 'será echado'? Daniel 3:6", o: ["Inmediatamente", "Al instante", "En ese momento", "Prontamente"], c: "Inmediatamente"},
+            {q: "16. ¿Qué hicieron todos los pueblos al oír la música? Daniel 3:7", o: ["Se postraron y adoraron la estatua de oro", "Se inclinaron y adoraron", "Adoraron la estatua", "Se arrodillaron ante la estatua"], c: "Se postraron y adoraron la estatua de oro"},
+            {q: "17. ¿Quiénes acusaron maliciosamente? Daniel 3:8", o: ["Algunos hombres caldeos", "Unos hombres caldeos", "Algunos caldeos", "Unos caldeos"], c: "Algunos hombres caldeos"},
+            {q: "18. ¿Cómo saludaron al rey? Daniel 3:9", o: ["¡Rey, para siempre vive!", "¡Rey, vive para siempre!", "¡Oh rey, vive para siempre!", "¡Rey, que vivas para siempre!"], c: "¡Rey, para siempre vive!"},
+            {q: "19. ¿Qué dijeron que había dado el rey? Daniel 3:10", o: ["Una ley", "Un decreto", "Un mandato", "Una orden"], c: "Una ley"},
+            {q: "20. ¿Qué debía hacer 'todo hombre' según la ley? Daniel 3:10", o: ["Postrarse y adorar la estatua de oro", "Inclinarse ante la estatua", "Adorar al dios del rey", "Postrarse ante el rey"], c: "Postrarse y adorar la estatua de oro"},
+
+            // ── NIVEL 2 ──────────────────────────────────────────────────────────────
+
+            {q: "21. ¿A quiénes pusiste sobre los negocios de la provincia? Daniel 3:12", o: ["Sadrac, Mesac y Abed-nego", "Daniel y sus amigos", "Sadrac y Mesac", "Abed-nego y Daniel"], c: "Sadrac, Mesac y Abed-nego"},
+            {q: "22. ¿Qué dijeron que no habían respetado? Daniel 3:12", o: ["No te han respetado", "No han obedecido tu ley", "No han cumplido tu decreto", "No han obedecido tu mandato"], c: "No te han respetado"},
+            {q: "23. ¿Cómo estaba el rey cuando mandó traerlos? Daniel 3:13", o: ["Con ira y con enojo", "Con enojo e ira", "Con gran ira", "Con furia"], c: "Con ira y con enojo"},
+            {q: "24. ¿Qué preguntó el rey? Daniel 3:14", o: ["¿Es verdad... que vosotros no honráis a mi dios?", "¿Es cierto que no adoráis mi dios?", "¿Es verdad que no adoráis?", "¿Es verdad que no obedecéis?"], c: "¿Es verdad... que vosotros no honráis a mi dios?"},
+            {q: "25. ¿Qué expresión exacta usaron los jóvenes? Daniel 3:16", o: ["No es necesario que te respondamos sobre este asunto", "No es necesario responderte", "No necesitamos responderte", "No debemos responderte"], c: "No es necesario que te respondamos sobre este asunto"},
+            {q: "26. ¿Cómo inicia el versículo 17? Daniel 3:17", o: ["Nuestro Dios, a quien servimos", "Nuestro Dios al que servimos", "Nuestro Dios que servimos", "El Dios a quien servimos"], c: "Nuestro Dios, a quien servimos"},
+            {q: "27. ¿Qué puede hacer Dios según ellos? Daniel 3:17", o: ["Puede librarnos del horno de fuego ardiente", "Puede librarnos del horno ardiente", "Puede salvarnos del fuego", "Puede rescatarnos del horno"], c: "Puede librarnos del horno de fuego ardiente"},
+            {q: "28. ¿Qué añadieron después? Daniel 3:17", o: ["Y de tus manos, rey, nos librará", "Y de tus manos nos salvará", "Y nos librará de tus manos", "Y de tus manos nos rescatará"], c: "Y de tus manos, rey, nos librará"},
+            {q: "29. ¿Cómo comienza el versículo 18? Daniel 3:18", o: ["Y si no, has de saber, oh rey", "Y si no, debes saber, rey", "Y si no, has de saber rey", "Y si no, sabrás, oh rey"], c: "Y si no, has de saber, oh rey"},
+            {q: "30. ¿Qué afirmaron no hacer? Daniel 3:18", o: ["No serviremos a tus dioses ni tampoco adoraremos la estatua", "No adoraremos tus dioses ni la estatua", "No serviremos ni adoraremos", "No serviremos a tus dioses"], c: "No serviremos a tus dioses ni tampoco adoraremos la estatua"},
+            {q: "31. ¿Qué dijo el rey que ocurriría 'en la misma hora'? Daniel 3:15", o: ["Seréis echados en medio de un horno de fuego ardiente", "Seréis echados al horno ardiente", "Seréis lanzados al fuego", "Seréis quemados en el horno"], c: "Seréis echados en medio de un horno de fuego ardiente"},
+            {q: "32. ¿Qué preguntó el rey desafiando a Dios? Daniel 3:15", o: ["¿Y qué dios será el que os libre de mis manos?", "¿Qué dios podrá librarlos?", "¿Qué dios los salvará del horno?", "¿Quién será el dios que los libre?"], c: "¿Y qué dios será el que os libre de mis manos?"},
+            {q: "33. ¿Qué cambió el rey contra ellos? Daniel 3:19", o: ["Cambió el aspecto de su rostro", "Cambió su semblante", "Cambió su expresión", "Cambió su mirada"], c: "Cambió el aspecto de su rostro"},
+            {q: "34. ¿Qué ordenó respecto al horno? Daniel 3:19", o: ["Que el horno se calentara siete veces más de lo acostumbrado", "Que se calentara siete veces más", "Que se calentara más fuerte", "Que se calentara siete veces"], c: "Que el horno se calentara siete veces más de lo acostumbrado"},
+            {q: "35. ¿A quiénes ordenó que ataran a los jóvenes? Daniel 3:20", o: ["A hombres muy vigorosos que tenía en su ejército", "A hombres vigorosos del ejército", "A hombres fuertes", "A soldados vigorosos"], c: "A hombres muy vigorosos que tenía en su ejército"},
+            {q: "36. ¿Cómo fueron echados al horno? Daniel 3:21", o: ["Fueron echados dentro del horno de fuego ardiente", "Fueron lanzados al horno ardiente", "Fueron puestos en el horno", "Fueron arrojados al fuego"], c: "Fueron echados dentro del horno de fuego ardiente"},
+            {q: "37. ¿Qué sucedió a los que los alzaron? Daniel 3:22", o: ["La llama del fuego los mató", "La llama del fuego los hirió", "El fuego los alcanzó", "El horno los quemó"], c: "La llama del fuego los mató"},
+            {q: "38. ¿Cómo cayeron dentro del horno? Daniel 3:23", o: ["Cayeron atados dentro del horno de fuego ardiente", "Cayeron dentro del horno", "Cayeron al fuego", "Cayeron atados al horno"], c: "Cayeron atados dentro del horno de fuego ardiente"},
+            {q: "39. ¿Qué hizo el rey después de ver el horno? Daniel 3:24", o: ["Se espantó y se levantó apresuradamente", "Se levantó con espanto", "Se sorprendió", "Se levantó rápidamente"], c: "Se espantó y se levantó apresuradamente"},
+            {q: "40. ¿Qué preguntó a los de su consejo? Daniel 3:24", o: ["¿No echaron a tres hombres atados dentro del fuego?", "¿No lanzaron tres hombres al fuego?", "¿No pusieron tres hombres en el horno?", "¿No fueron echados tres hombres?"], c: "¿No echaron a tres hombres atados dentro del fuego?"},
+
+            // ── NIVEL 3 ──────────────────────────────────────────────────────────────
+
+            {q: "41. ¿Cuántos hombres dijo el rey que veía? Daniel 3:25", o: ["Cuatro hombres", "Tres hombres", "Cinco hombres", "Cuatro hombres atados"], c: "Cuatro hombres"},
+            {q: "42. ¿Cómo estaban dentro del fuego? Daniel 3:25", o: ["Sueltos, que se pasean en medio del fuego", "Sueltos en medio del fuego", "Paseándose dentro del fuego", "Sueltos y caminando"], c: "Sueltos, que se pasean en medio del fuego"},
+            {q: "43. ¿Cómo estaban respecto al daño? Daniel 3:25", o: ["Sin sufrir ningún daño", "Sin sufrir daño alguno", "Sin daño", "Sin ningún perjuicio"], c: "Sin sufrir ningún daño"},
+            {q: "44. ¿Cómo era el aspecto del cuarto? Daniel 3:25", o: ["Semejante a un hijo de los dioses", "Semejante a los dioses", "Semejante a un dios", "Semejante a hijo de los dioses"], c: "Semejante a un hijo de los dioses"},
+            {q: "45. ¿A dónde se acercó el rey? Daniel 3:26", o: ["A la puerta del horno de fuego ardiente", "A la entrada del horno", "A la puerta del horno ardiente", "A la puerta del fuego"], c: "A la puerta del horno de fuego ardiente"},
+            {q: "46. ¿Cómo los llamó el rey? Daniel 3:26", o: ["Siervos del Dios Altísimo", "Siervos del Dios verdadero", "Siervos del Dios grande", "Siervos del Dios poderoso"], c: "Siervos del Dios Altísimo"},
+            {q: "47. ¿Qué les ordenó? Daniel 3:26", o: ["Salid y venid", "Salid del fuego", "Venid aquí", "Salid inmediatamente"], c: "Salid y venid"},
+            {q: "48. ¿Qué hicieron ellos? Daniel 3:26", o: ["Salieron de en medio del fuego", "Salieron del horno", "Salieron del fuego ardiente", "Salieron inmediatamente"], c: "Salieron de en medio del fuego"},
+            {q: "49. ¿Quiénes se juntaron para mirar? Daniel 3:27", o: ["Los sátrapas, los gobernadores, los capitanes y los consejeros del rey", "Los sátrapas y gobernadores", "Los consejeros del rey", "Los capitanes y jueces"], c: "Los sátrapas, los gobernadores, los capitanes y los consejeros del rey"},
+            {q: "50. ¿Qué no había tenido poder sobre sus cuerpos? Daniel 3:27", o: ["El fuego", "La llama", "El horno", "El calor"], c: "El fuego"},
+            {q: "51. ¿Qué no se había quemado? Daniel 3:27", o: ["Ni aun el cabello de sus cabezas", "Ni el cabello", "Ni su cabello", "Ni el cabello de sus cabezas"], c: "Ni aun el cabello de sus cabezas"},
+            {q: "52. ¿Cómo estaban sus ropas? Daniel 3:27", o: ["Intactas", "Sin quemarse", "Sin daño", "Perfectas"], c: "Intactas"},
+            {q: "53. ¿Qué no tenían? Daniel 3:27", o: ["Ni siquiera olor de fuego", "Ni olor a humo", "Ni olor de humo", "Ni olor de quemado"], c: "Ni siquiera olor de fuego"},
+            {q: "54. ¿Qué dijo el rey después del milagro? Daniel 3:28", o: ["Bendito sea el Dios de Sadrac, Mesac y Abed-nego", "Bendito sea su Dios", "Bendito sea el Dios Altísimo", "Bendito sea el Dios que los libró"], c: "Bendito sea el Dios de Sadrac, Mesac y Abed-nego"},
+            {q: "55. ¿Qué envió Dios? Daniel 3:28", o: ["Su ángel", "Un ángel", "El ángel", "Un ángel poderoso"], c: "Su ángel"},
+            {q: "56. ¿Qué hicieron ellos respecto al edicto? Daniel 3:28", o: ["No cumplieron el edicto del rey", "No obedecieron el decreto", "No guardaron la ley", "No cumplieron su mandato"], c: "No cumplieron el edicto del rey"},
+            {q: "57. ¿Qué entregaron antes que servir a otro dios? Daniel 3:28", o: ["Entregaron sus cuerpos", "Entregaron sus vidas", "Entregaron su cuerpo", "Entregaron su vida"], c: "Entregaron sus cuerpos"},
+            {q: "58. ¿Qué no hicieron? Daniel 3:28", o: ["Servir y adorar a otro dios que su Dios", "Servir a otro dios", "Adorar otro dios", "Servir ni adorar otro dios"], c: "Servir y adorar a otro dios que su Dios"},
+            {q: "59. ¿Qué decretó el rey después? Daniel 3:29", o: ["Que todo pueblo, nación o lengua que diga blasfemia contra el Dios de ellos sea descuartizado", "Que nadie blasfeme contra ese Dios", "Que el que blasfeme sea castigado", "Que todo blasfemo sea condenado"], c: "Que todo pueblo, nación o lengua que diga blasfemia contra el Dios de ellos sea descuartizado"},
+            {q: "60. ¿En qué sería convertida su casa? Daniel 3:29", o: ["En estercolero", "En ruinas", "En cenizas", "En polvo"], c: "En estercolero"},
+
+        ];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
