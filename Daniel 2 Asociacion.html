@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulo 2 Asociacion (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulo 2 Asociacion</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulo 2 Asociacion (Reina Valera 1995) Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            {q: "¿En qué año del reinado de Nabucodonosor tuvo sueños Nabucodonosor? (Daniel 2:1)", o: ["En el segundo año del reinado de Nabucodonosor", "En el segundo año del reino de Nabucodonosor", "En el primer año del reinado de Nabucodonosor", "En el segundo año del reinado del rey"], c: "En el segundo año del reinado de Nabucodonosor"},
+
+{q: "¿Qué le sucedió al espíritu del rey después de tener el sueño? (Daniel 2:1)", o: ["Se turbó su espíritu", "Se turbó el espíritu del rey", "Su espíritu fue turbado", "Se perturbó su espíritu"], c: "Se turbó su espíritu"},
+
+{q: "¿Qué se le fue al rey después del sueño? (Daniel 2:1)", o: ["Se le fue el sueño", "Se le fue su sueño", "El sueño se le fue", "Se fue el sueño del rey"], c: "Se le fue el sueño"},
+
+{q: "¿A quiénes hizo llamar el rey para que le explicaran sus sueños? (Daniel 2:2)", o: ["Magos, astrólogos, encantadores y caldeos", "Magos, encantadores, astrólogos y caldeos", "Magos, astrólogos y caldeos", "Magos, astrólogos, adivinos y caldeos"], c: "Magos, astrólogos, encantadores y caldeos"},
+
+{q: "¿En qué lengua hablaron los caldeos al rey? (Daniel 2:4)", o: ["En lengua aramea", "En arameo", "En lengua de los arameos", "En la lengua aramea"], c: "En lengua aramea"},
+
+{q: "¿Qué dijo el rey que haría si no le decían el sueño y su interpretación? (Daniel 2:5)", o: ["Seréis hechos pedazos y vuestras casas serán convertidas en estercoleros", "Seréis hechos pedazos y vuestras casas convertidas en estercolero", "Seréis despedazados y vuestras casas serán estercoleros", "Seréis hechos pedazos y convertidas vuestras casas en estercolero"], c: "Seréis hechos pedazos y vuestras casas serán convertidas en estercoleros"},
+
+{q: "¿Qué recibirían si decían el sueño y su interpretación? (Daniel 2:6)", o: ["Dones, favores y gran honra", "Dones y favores y gran honra", "Dones, favores y honra grande", "Dones, favores y mucha honra"], c: "Dones, favores y gran honra"},
+
+{q: "¿Qué dijeron los caldeos que no había sobre la tierra? (Daniel 2:10)", o: ["No hay hombre sobre la tierra que pueda declarar el asunto del rey", "No hay hombre en la tierra que pueda declarar el asunto del rey", "No hay hombre sobre la tierra que declare el asunto del rey", "No hay hombre sobre la tierra que pueda revelar el asunto del rey"], c: "No hay hombre sobre la tierra que pueda declarar el asunto del rey"},
+
+{q: "¿Qué dijeron que era el asunto que el rey demandaba? (Daniel 2:11)", o: ["Difícil", "Muy difícil", "Cosa difícil", "Demasiado difícil"], c: "Difícil"},
+
+{q: "¿Qué mandó el rey con ira y gran enojo? (Daniel 2:12)", o: ["Que mataran a todos los sabios de Babilonia", "Que mataran a los sabios de Babilonia", "Que mataran a todos los sabios", "Que fueran muertos todos los sabios de Babilonia"], c: "Que mataran a todos los sabios de Babilonia"},
+
+{q: "¿Con quién habló Daniel sabia y prudentemente? (Daniel 2:14)", o: ["A Arioc, capitán de la guardia del rey", "A Arioc, capitán del rey", "A Arioc, jefe de la guardia", "A Arioc, capitán de la guardia"], c: "A Arioc, capitán de la guardia del rey"},
+
+{q: "¿Qué pidió Daniel al rey? (Daniel 2:16)", o: ["Que le concediera tiempo", "Que le diera tiempo", "Que le concediese tiempo", "Que le concediera más tiempo"], c: "Que le concediera tiempo"},
+
+{q: "¿A quiénes hizo saber Daniel lo que sucedía? (Daniel 2:17)", o: ["A Ananías, Misael y Azarías, sus compañeros", "A Ananías, Misael y Azarías", "A sus compañeros Ananías, Misael y Azarías", "A Ananías y Misael y Azarías"], c: "A Ananías, Misael y Azarías, sus compañeros"},
+
+{q: "¿Para qué pidieron misericordias del Dios del cielo? (Daniel 2:18)", o: ["Para que Daniel no pereciera", "Para que no perecieran con los demás sabios de Babilonia", "Para que Daniel y sus compañeros no perecieran con los demás sabios de Babilonia", "Para que no murieran con los sabios"], c: "Para que Daniel y sus compañeros no perecieran con los demás sabios de Babilonia"},
+
+{q: "¿Cómo fue revelado el secreto a Daniel? (Daniel 2:19)", o: ["En visión nocturna", "En una visión de noche", "En visión durante la noche", "En visión de noche"], c: "En visión de noche"},
+
+{q: "¿Qué dijo Daniel que son de Dios? (Daniel 2:20)", o: ["El poder y la sabiduría", "La gloria y el poder", "El poder y la eterna sabiduría", "El poder y su sabiduría"], c: "El poder y la sabiduría"},
+
+{q: "¿Qué hace Dios con los reyes? (Daniel 2:21)", o: ["Quita reyes y establece reyes", "Quita reyes y pone reyes", "Pone reyes y quita reyes", "Establece reyes y los quita"], c: "Quita reyes y pone reyes"},
+
+{q: "¿Qué revela Dios según Daniel 2:22? (Daniel 2:22)", o: ["Lo profundo y lo secreto", "Lo escondido y lo profundo", "Lo secreto y lo oculto", "Lo profundo y lo escondido"], c: "Lo profundo y lo escondido"},
+
+{q: "¿Qué conoce Dios según Daniel 2:22? (Daniel 2:22)", o: ["Lo que está en las tinieblas", "Lo que está oculto en tinieblas", "Lo que está en la oscuridad", "Lo que está en tinieblas"], c: "Lo que está en tinieblas"},
+
+{q: "¿Qué mora con Dios? (Daniel 2:22)", o: ["La luz eterna", "La luz", "La luz verdadera", "La luz del cielo"], c: "La luz"},
+
+{q: "¿Qué dijo Daniel que Dios les había revelado? (Daniel 2:23)", o: ["Lo que le pedimos", "Lo que habíamos pedido", "Lo que pedimos", "Lo que te pedimos"], c: "Lo que te pedimos"},
+
+{q: "¿Qué pidió Daniel a Arioc? (Daniel 2:24)", o: ["No mates a los sabios de Babilonia", "No destruyas a los sabios", "No mates a los sabios del reino", "No acabes con los sabios"], c: "No mates a los sabios de Babilonia"},
+
+{q: "¿Qué dijo Arioc que había hallado? (Daniel 2:25)", o: ["Un hombre de los deportados de Judá", "Un hombre deportado de Judá", "Un varón cautivo de Judá", "Un hombre de Judá"], c: "Un hombre de los deportados de Judá"},
+
+{q: "¿Cómo llamaban a Daniel? (Daniel 2:26)", o: ["Belsasar", "Baltasar", "Beltsasar", "Beltsasar el hebreo"], c: "Beltsasar"},
+
+{q: "¿Qué respondió Daniel que no podían revelar los sabios? (Daniel 2:27)", o: ["El misterio que el rey demanda", "El misterio del rey", "El asunto que el rey demanda", "El misterio que demanda el rey"], c: "El misterio que el rey demanda"},
+
+{q: "¿Dónde hay un Dios que revela los misterios? (Daniel 2:28)", o: ["En el cielo", "En los cielos", "En lo alto", "En los altos cielos"], c: "En los cielos"},
+
+{q: "¿Qué ha hecho saber Dios al rey Nabucodonosor? (Daniel 2:28)", o: ["Lo que ha de acontecer en los últimos días", "Lo que acontecerá en los últimos días", "Lo que ha de suceder en los postreros días", "Lo que acontecerá en lo por venir"], c: "Lo que ha de acontecer en los últimos días"},
+
+{q: "¿Dónde estaba el rey cuando le vinieron pensamientos? (Daniel 2:29)", o: ["En tu cama", "Sobre tu cama", "En el lecho", "En su cama"], c: "En tu cama"},
+
+{q: "¿Quién revela los misterios según Daniel 2:29? (Daniel 2:29)", o: ["El Dios del cielo", "El que revela los misterios", "El Señor de los misterios", "El Dios de los cielos"], c: "El que revela los misterios"},
+
+{q: "¿Qué entendiera el rey según Daniel 2:30? (Daniel 2:30)", o: ["Los pensamientos de tu corazón", "Los pensamientos de su corazón", "Los pensamientos del corazón", "Lo que estaba en su corazón"], c: "Los pensamientos de tu corazón"},
+
+{q: "¿Qué vio el rey en su sueño? (Daniel 2:31)", o: ["Una gran imagen", "Una imagen muy grande", "Una imagen grande", "Una gran estatua"], c: "Una gran imagen"},
+
+{q: "¿Cómo era la gloria de la imagen? (Daniel 2:31)", o: ["Muy sublime", "Grande y sublime", "Sublime", "Muy grande y sublime"], c: "Muy sublime"},
+
+{q: "¿Cómo estaba la imagen delante del rey? (Daniel 2:31)", o: ["En pie delante de ti", "En pie delante del rey", "Delante de ti en pie", "Estaba en pie"], c: "En pie delante de ti"},
+
+{q: "¿Cómo era el aspecto de la imagen? (Daniel 2:31)", o: ["Terrible", "Muy terrible", "Espantoso", "Imponente"], c: "Terrible"},
+
+{q: "¿De qué era la cabeza de la imagen? (Daniel 2:32)", o: ["De oro fino", "De oro", "De oro puro", "De oro refinado"], c: "De oro fino"},
+
+{q: "¿De qué eran el pecho y los brazos? (Daniel 2:32)", o: ["De plata", "De plata fina", "De plata pura", "De plata refinada"], c: "De plata"},
+
+{q: "¿De qué eran el vientre y los muslos? (Daniel 2:32)", o: ["De bronce", "De bronce fino", "De bronce puro", "De bronce fundido"], c: "De bronce"},
+
+{q: "¿De qué eran las piernas? (Daniel 2:33)", o: ["De hierro", "De hierro fuerte", "De hierro puro", "De hierro refinado"], c: "De hierro"},
+
+{q: "¿De qué eran los pies? (Daniel 2:33)", o: ["En parte de hierro y en parte de barro cocido", "En parte hierro y barro cocido", "En parte de hierro y barro", "En parte hierro y en parte barro"], c: "En parte de hierro y en parte de barro cocido"},
+
+{q: "¿Qué se desprendió sin que la cortara mano alguna? (Daniel 2:34)", o: ["Una piedra", "Una gran piedra", "Una piedra del monte", "Una piedra pequeña"], c: "Una piedra"},
+
+{q: "¿Dónde hirió la piedra a la imagen? (Daniel 2:34)", o: ["En sus pies de hierro y de barro cocido", "En los pies de hierro y barro", "En sus pies de hierro y barro", "En los pies de hierro y de barro cocido"], c: "En sus pies de hierro y de barro cocido"},
+
+{q: "¿Qué hizo la piedra a los pies? (Daniel 2:34)", o: ["Los quebró", "Los desmenuzó", "Los hizo pedazos", "Los destruyó"], c: "Los desmenuzó"},
+
+{q: "¿Qué fueron desmenuzados también? (Daniel 2:35)", o: ["El hierro, el barro cocido, el bronce, la plata y el oro", "El hierro, el barro, el bronce, la plata y el oro", "El hierro y el barro cocido, el bronce, la plata y el oro", "El hierro, barro cocido, bronce, plata y oro"], c: "El hierro, el barro cocido, el bronce, la plata y el oro"},
+
+{q: "¿Cómo fueron esos materiales después de ser desmenuzados? (Daniel 2:35)", o: ["Como tamo de las eras del verano", "Como tamo del verano", "Como paja del verano", "Como tamo de era en verano"], c: "Como tamo de las eras del verano"},
+
+{q: "¿Qué hizo el viento con ellos? (Daniel 2:35)", o: ["Se los llevó sin que de ellos quedara rastro alguno", "Los llevó el viento sin dejar rastro", "El viento los llevó sin quedar rastro", "Se los llevó el viento sin dejar rastro"], c: "Se los llevó sin que de ellos quedara rastro alguno"},
+
+{q: "¿En qué se convirtió la piedra? (Daniel 2:35)", o: ["En un monte grande que llenó toda la tierra", "En un gran monte que llenó la tierra", "En un monte que llenó toda la tierra", "En un gran monte que llenó toda la tierra"], c: "En un gran monte que llenó toda la tierra"},
+
+{q: "¿Qué le había dado el Dios del cielo al rey? (Daniel 2:37)", o: ["Reino, poder y majestad", "Reino, poder, fuerza y majestad", "Poder, fuerza y majestad", "Reino y poder"], c: "Reino, poder, fuerza y majestad"},
+
+{q: "¿Qué le había entregado en sus manos? (Daniel 2:38)", o: ["Los hijos de los hombres, las bestias del campo y las aves del cielo", "Hijos de hombres, bestias del campo y aves del cielo", "Los hombres, las bestias y las aves", "Hijos de hombres y aves del cielo"], c: "Hijos de hombres, bestias del campo y aves del cielo"},
+
+{q: "¿Qué le dio Dios sobre todo? (Daniel 2:38)", o: ["El dominio sobre todo", "Dominio sobre todo", "Dominio de todo", "El dominio de todo"], c: "El dominio sobre todo"},
+
+{q: "¿Qué era Nabucodonosor según la interpretación? (Daniel 2:38)", o: ["La cabeza de oro", "Cabeza de oro", "La cabeza del oro", "Aquella cabeza de oro"], c: "Aquella cabeza de oro"},
+
+{q: "¿Qué se levantará después de ti? (Daniel 2:39)", o: ["Otro reino inferior al tuyo", "Otro reino inferior", "Un reino inferior", "Un reino después de ti"], c: "Otro reino inferior al tuyo"},
+
+{q: "¿Qué será el tercer reino? (Daniel 2:39)", o: ["Un tercer reino de bronce", "Un tercer reino de bronce fino", "Un tercer reino de bronce puro", "Un tercer reino de bronce fundido"], c: "Un tercer reino de bronce"},
+
+{q: "¿Cómo dominará el tercer reino? (Daniel 2:39)", o: ["Dominará sobre toda la tierra", "Dominará toda la tierra", "Tendrá dominio sobre la tierra", "Gobernará sobre toda la tierra"], c: "Dominará sobre toda la tierra"},
+
+{q: "¿Cómo será el cuarto reino? (Daniel 2:40)", o: ["Fuerte como el hierro", "Como hierro fuerte", "Tan fuerte como hierro", "Fuerte como hierro"], c: "Fuerte como el hierro"},
+
+{q: "¿Qué hará el cuarto reino según Daniel 2:40? (Daniel 2:40)", o: ["Desmenuzará y quebrantará todo", "Lo desmenuzará todo", "Lo quebrantará todo", "Lo desmenuzará y lo quebrantará todo"], c: "Lo desmenuzará y lo quebrantará todo"},
+
+{q: "¿Qué sería el reino representado por los pies y los dedos? (Daniel 2:41)", o: ["Un reino dividido", "Un reino que será dividido", "Reino dividido", "Un reino dividido en partes"], c: "Un reino dividido"},
+
+{q: "¿Qué habría en ese reino dividido? (Daniel 2:41)", o: ["Algo de la fuerza del hierro", "Parte de la fuerza del hierro", "Fuerza del hierro", "Algo de fuerza del hierro"], c: "Algo de la fuerza del hierro"},
+
+{q: "¿Cómo serían los dedos de los pies? (Daniel 2:42)", o: ["En parte de hierro y en parte de barro cocido", "En parte hierro y en parte barro cocido", "En parte de hierro y barro cocido", "En parte hierro y barro"], c: "En parte de hierro y en parte de barro cocido"},
+
+{q: "¿Cómo sería ese reino según Daniel 2:42? (Daniel 2:42)", o: ["En parte fuerte y en parte frágil", "Parte fuerte y parte frágil", "En parte fuerte y parte débil", "En parte fuerte y débil"], c: "En parte fuerte y en parte frágil"},
+
+{q: "¿Por medio de qué se mezclarían? (Daniel 2:43)", o: ["Por medio de alianzas humanas", "Por alianzas humanas", "Mediante alianzas humanas", "Por medio de alianza humana"], c: "Por medio de alianzas humanas"},
+
+{q: "¿Qué no se unirán el uno con el otro? (Daniel 2:43)", o: ["No se unirán el uno con el otro", "No se unirán entre sí", "No se unirán uno con otro", "No se unirán uno al otro"], c: "No se unirán el uno con el otro"},
+
+{q: "¿Con qué comparación explica Daniel esa falta de unión? (Daniel 2:43)", o: ["Como el hierro no se mezcla con el barro", "Como hierro no se mezcla con barro", "Como el hierro no se mezcla con barro cocido", "Como el hierro no se mezcla con el barro cocido"], c: "Como el hierro no se mezcla con el barro"},
+
+{q: "¿Quién levantará un reino en los días de estos reyes? (Daniel 2:44)", o: ["El Dios del cielo", "Dios del cielo", "El Dios de los cielos", "El Dios eterno"], c: "El Dios del cielo"},
+
+{q: "¿Cómo será ese reino? (Daniel 2:44)", o: ["No será jamás destruido", "No será destruido jamás", "Jamás será destruido", "No será destruido nunca"], c: "No será jamás destruido"},
+
+{q: "¿A quién no será dejado ese reino? (Daniel 2:44)", o: ["A otro pueblo", "A ningún pueblo", "A pueblo alguno", "A otro reino"], c: "A otro pueblo"},
+
+{q: "¿Qué hará ese reino con todos los otros reinos? (Daniel 2:44)", o: ["Desmenuzará y consumirá a todos estos reinos", "Consumirá y desmenuzará a todos estos reinos", "Destruirá y consumirá todos estos reinos", "Desmenuzará y consumirá todos estos reinos"], c: "Desmenuzará y consumirá a todos estos reinos"},
+
+{q: "¿Cuánto tiempo permanecerá ese reino? (Daniel 2:44)", o: ["Para siempre", "Por siempre", "Eternamente", "Para la eternidad"], c: "Para siempre"},
+
+{q: "¿De dónde se desprendió la piedra? (Daniel 2:45)", o: ["Del monte", "De un monte", "Del gran monte", "De la montaña"], c: "Del monte"},
+
+{q: "¿Cómo se desprendió la piedra? (Daniel 2:45)", o: ["Sin que la cortara mano alguna", "Sin que mano alguna la cortara", "Sin ser cortada por mano", "Sin que la cortara ninguna mano"], c: "Sin que la cortara mano alguna"},
+
+{q: "¿Qué mostró el gran Dios al rey? (Daniel 2:45)", o: ["Lo que ha de acontecer en lo por venir", "Lo que acontecerá en lo por venir", "Lo que ha de suceder en lo por venir", "Lo que acontecerá después"], c: "Lo que ha de acontecer en lo por venir"},
+
+{q: "¿Cómo es el sueño según Daniel 2:45? (Daniel 2:45)", o: ["El sueño es verdadero", "Es verdadero el sueño", "Es sueño verdadero", "Verdadero"], c: "Verdadero"},
+
+{q: "¿Cómo es su interpretación? (Daniel 2:45)", o: ["Fiel su interpretación", "Es fiel su interpretación", "Su interpretación es fiel", "Interpretación fiel"], c: "Fiel su interpretación"},
+
+{q: "¿Qué hizo Nabucodonosor delante de Daniel? (Daniel 2:46)", o: ["Se postró sobre su rostro y se humilló ante Daniel", "Se postró y se humilló ante Daniel", "Se postró sobre su rostro", "Se humilló delante de Daniel"], c: "Se postró sobre su rostro y se humilló ante Daniel"},
+
+{q: "¿Qué mandó que ofrecieran a Daniel? (Daniel 2:46)", o: ["Presentes e incienso", "Presentes y ofrendas", "Ofrendas e incienso", "Dones e incienso"], c: "Presentes e incienso"},
+
+{q: "¿Qué posición recibió Daniel? (Daniel 2:48)", o: ["Gobernador de toda la provincia de Babilonia y jefe supremo de todos los sabios de Babilonia", "Gobernador de Babilonia y jefe de los sabios", "Gobernador de la provincia y jefe supremo", "Gobernador y jefe de todos los sabios"], c: "Gobernador de toda la provincia de Babilonia y jefe supremo de todos los sabios de Babilonia"}
+
+        ];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
