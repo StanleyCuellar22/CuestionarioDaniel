@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulo 4 Asociacion (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulo 4 Asociacion</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulo 4 Asociacion (Reina Valera 1995) Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            // ── NIVEL 1 ──────────────────────────────────────────────────────────────
+
+            {q: "81. ¿Cómo se identifica Nabucodonosor al inicio del capítulo? Daniel 4:1", o: ["Nabucodonosor, rey", "Nabucodonosor, gobernante", "Nabucodonosor soberano", "Nabucodonosor monarca"], c: "Nabucodonosor, rey"},
+            {q: "82. ¿Qué afirma Nabucodonosor que es conveniente declarar? Daniel 4:2", o: ["Conviene que yo declare las señales y milagros", "Conviene declarar las señales y milagros", "Es conveniente declarar señales y milagros", "Conviene declarar señales y milagros"], c: "Conviene que yo declare las señales y milagros"},
+            {q: "83. ¿Cómo califica Nabucodonosor el señorío de Dios? Daniel 4:3", o: ["Su señorío, de generación en generación", "Su señorío es de generación en generación", "Su señorío por generaciones", "Su señorío entre generaciones"], c: "Su señorío, de generación en generación"},
+            {q: "84. ¿Cómo describe Nabucodonosor su estado antes del sueño? Daniel 4:4", o: ["Estaba tranquilo en mi casa", "Estaba tranquilo en casa", "Me encontraba tranquilo en mi casa", "Estaba en tranquilidad en mi casa"], c: "Estaba tranquilo en mi casa"},
+            {q: "85. ¿Qué provocaron las imaginaciones y visiones del sueño? Daniel 4:5", o: ["Me turbaron", "Me inquietaron", "Me alteraron", "Me sorprendieron"], c: "Me turbaron"},
+            {q: "86. ¿Qué pidió Nabucodonosor a los sabios? Daniel 4:6", o: ["Que me dieran la interpretación del sueño", "Que me dieran interpretación del sueño", "Que dieran la interpretación del sueño", "Que explicaran el sueño"], c: "Que me dieran la interpretación del sueño"},
+            {q: "87. ¿Qué no pudieron hacer los sabios del reino? Daniel 4:7", o: ["No me pudieron dar su interpretación", "No pudieron dar interpretación", "No lograron interpretar", "No supieron interpretar"], c: "No me pudieron dar su interpretación"},
+            {q: "88. ¿Qué reconoce el rey que mora en Daniel? Daniel 4:8", o: ["El espíritu de los dioses santos", "El espíritu de los dioses", "El espíritu santo de los dioses", "El espíritu de dioses santos"], c: "El espíritu de los dioses santos"},
+            {q: "89. ¿Cómo llama el rey a Daniel según su dios? Daniel 4:8", o: ["Beltsasar, como el nombre de mi dios", "Beltsasar, nombre de mi dios", "Beltsasar según mi dios", "Beltsasar por el nombre del dios"], c: "Beltsasar, como el nombre de mi dios"},
+            {q: "90. ¿Qué afirma el rey acerca de Daniel? Daniel 4:9", o: ["Que ningún misterio se le esconde", "Que no se le esconden misterios", "Que ningún misterio se oculta", "Que no hay misterio oculto"], c: "Que ningún misterio se le esconde"},
+            {q: "91. ¿Cómo quedó Daniel antes de responder? Daniel 4:19", o: ["Quedó atónito casi una hora", "Quedó atónito una hora", "Quedó atónito por una hora", "Quedó atónito durante una hora"], c: "Quedó atónito casi una hora"},
+            {q: "92. ¿Cómo inicia Daniel su respuesta al rey? Daniel 4:19", o: ["Señor mío", "Mi señor", "Oh señor", "Señor"], c: "Señor mío"},
+            {q: "93. ¿Qué dijo Daniel sobre el sueño? Daniel 4:19", o: ["El sueño sea para tus enemigos", "El sueño sea para los enemigos", "Sea el sueño para tus enemigos", "El sueño sea contra tus enemigos"], c: "El sueño sea para tus enemigos"},
+            {q: "94. ¿Qué declara Daniel sobre el decreto? Daniel 4:24", o: ["Es la sentencia del Altísimo", "Es sentencia del Altísimo", "Es la sentencia del Dios Altísimo", "Es sentencia del Dios Altísimo"], c: "Es la sentencia del Altísimo"},
+            {q: "95. ¿Qué debía reconocer el rey después del castigo? Daniel 4:26", o: ["Que es el cielo el que gobierna", "Que el cielo gobierna", "Que gobierna el cielo", "Que el cielo es quien gobierna"], c: "Que es el cielo el que gobierna"},
+            {q: "96. ¿Qué sucedió cuando terminó el tiempo señalado? Daniel 4:34", o: ["Mi razón me fue devuelta", "Mi razón volvió a mí", "La razón me fue devuelta", "Recobré la razón"], c: "Mi razón me fue devuelta"},
+            {q: "97. ¿Qué hizo Nabucodonosor al recuperar la razón? Daniel 4:34", o: ["Bendije al Altísimo", "Bendije al Dios Altísimo", "Alabé al Altísimo", "Glorifiqué al Altísimo"], c: "Bendije al Altísimo"},
+            {q: "98. ¿Cómo considera Nabucodonosor a los habitantes de la tierra? Daniel 4:35", o: ["Considerados como nada", "Son considerados como nada", "Considerados en nada", "Tenidos como nada"], c: "Considerados como nada"},
+            {q: "99. ¿Quién puede detener la mano de Dios? Daniel 4:35", o: ["No hay quien detenga su mano", "Nadie detiene su mano", "No existe quien detenga su mano", "No hay nadie que detenga su mano"], c: "No hay quien detenga su mano"},
+            {q: "100. ¿Cómo describe Nabucodonosor los caminos de Dios? Daniel 4:37", o: ["Sus caminos justos", "Sus caminos son justos", "Caminos justos", "Caminos de justicia"], c: "Sus caminos justos"},
+
+            // ── NIVEL 2 ──────────────────────────────────────────────────────────────
+
+            {q: "61. ¿Cuándo vino todo esto sobre el rey Nabucodonosor? Daniel 4:28", o: ["Todo esto vino sobre el rey Nabucodonosor", "Todo esto vino al rey Nabucodonosor", "Todo vino sobre Nabucodonosor", "Esto vino sobre el rey Nabucodonosor"], c: "Todo esto vino sobre el rey Nabucodonosor"},
+            {q: "62. ¿Después de cuánto tiempo ocurrió el cumplimiento? Daniel 4:29", o: ["Al cabo de doce meses", "Después de doce meses", "Tras doce meses", "Pasados doce meses"], c: "Al cabo de doce meses"},
+            {q: "63. ¿Dónde paseaba el rey cuando habló con soberbia? Daniel 4:29", o: ["Paseando por el palacio real de Babilonia", "Paseando en el palacio real de Babilonia", "Caminando por el palacio real de Babilonia", "Andando por el palacio real de Babilonia"], c: "Paseando por el palacio real de Babilonia"},
+            {q: "64. ¿Qué dijo el rey acerca de Babilonia? Daniel 4:30", o: ["¿No es ésta la gran Babilonia que yo edifiqué?", "¿No es ésta la gran Babilonia que edifiqué?", "¿No es la gran Babilonia que yo edifiqué?", "¿No es ésta Babilonia la grande que edifiqué?"], c: "¿No es ésta la gran Babilonia que yo edifiqué?"},
+            {q: "65. ¿Con qué propósito dijo haber edificado Babilonia? Daniel 4:30", o: ["Para casa real y para gloria de mi majestad", "Para casa real y gloria de mi majestad", "Como casa real y gloria de mi majestad", "Para la casa real y gloria de mi majestad"], c: "Para casa real y para gloria de mi majestad"},
+            {q: "66. ¿Qué ocurrió mientras aún estaba la palabra en la boca del rey? Daniel 4:31", o: ["Vino una voz del cielo", "Llegó una voz del cielo", "Se oyó una voz del cielo", "Descendió una voz del cielo"], c: "Vino una voz del cielo"},
+            {q: "67. ¿Qué anunció la voz celestial al rey? Daniel 4:31", o: ["El reino te ha sido quitado", "Tu reino te ha sido quitado", "El reino te fue quitado", "El reino será quitado"], c: "El reino te ha sido quitado"},
+            {q: "68. ¿De dónde sería arrojado el rey? Daniel 4:32", o: ["De entre los hombres", "De entre los hombres del reino", "De entre los hombres de la tierra", "De entre los hombres del campo"], c: "De entre los hombres"},
+            {q: "69. ¿Con quién sería su habitación? Daniel 4:32", o: ["Con las bestias del campo", "Con las bestias", "Con las bestias de la tierra", "Con los animales del campo"], c: "Con las bestias del campo"},
+            {q: "70. ¿Cómo sería alimentado durante ese tiempo? Daniel 4:32", o: ["Como a los bueyes te apacentarán", "Como a los bueyes te alimentarán", "Como a los bueyes te darán de comer", "Como a los bueyes te harán pastar"], c: "Como a los bueyes te apacentarán"},
+            {q: "71. ¿Cuántos tiempos pasarían sobre él? Daniel 4:32", o: ["Siete tiempos", "Siete tiempos completos", "Siete largos tiempos", "Siete tiempos determinados"], c: "Siete tiempos"},
+            {q: "72. ¿Hasta cuándo duraría ese estado? Daniel 4:32", o: ["Hasta que reconozcas que el Altísimo tiene dominio", "Hasta que reconozcas el dominio del Altísimo", "Hasta que conozcas que el Altísimo gobierna", "Hasta que reconozcas el gobierno del Altísimo"], c: "Hasta que reconozcas que el Altísimo tiene dominio"},
+            {q: "73. ¿Cuándo se cumplió la palabra sobre Nabucodonosor? Daniel 4:33", o: ["En la misma hora", "En aquella hora", "En ese mismo momento", "En la hora señalada"], c: "En la misma hora"},
+            {q: "74. ¿Qué comía Nabucodonosor durante su humillación? Daniel 4:33", o: ["Hierba como los bueyes", "Hierba como bueyes", "Hierba del campo como bueyes", "Hierba como la de los bueyes"], c: "Hierba como los bueyes"},
+            {q: "75. ¿Con qué se empapaba su cuerpo? Daniel 4:33", o: ["Con el rocío del cielo", "Con rocío del cielo", "Con el rocío celestial", "Con el rocío del firmamento"], c: "Con el rocío del cielo"},
+            {q: "76. ¿Cómo creció su cabello? Daniel 4:33", o: ["Como plumas de águila", "Como plumas de un águila", "Como plumas de águilas", "Como plumas semejantes al águila"], c: "Como plumas de águila"},
+            {q: "77. ¿Cómo crecieron sus uñas? Daniel 4:33", o: ["Como las de las aves", "Como uñas de aves", "Como las uñas de las aves", "Como uñas semejantes a aves"], c: "Como las de las aves"},
+            {q: "78. ¿Qué hizo Nabucodonosor al fin del tiempo? Daniel 4:34", o: ["Alcé mis ojos al cielo", "Levanté mis ojos al cielo", "Alcé los ojos al cielo", "Levanté mis ojos hacia el cielo"], c: "Alcé mis ojos al cielo"},
+            {q: "79. ¿Qué le fue devuelta al rey? Daniel 4:34", o: ["Mi razón me fue devuelta", "Mi razón volvió a mí", "La razón me fue devuelta", "Recobré mi razón"], c: "Mi razón me fue devuelta"},
+            {q: "80. ¿Qué declara Nabucodonosor acerca de Dios al final? Daniel 4:37", o: ["Él puede humillar a los que andan con soberbia", "Puede humillar a los que caminan con soberbia", "Puede humillar a quienes andan con soberbia", "Él humilla a los que andan con soberbia"], c: "Él puede humillar a los que andan con soberbia"},
+
+            // ── NIVEL 3 ──────────────────────────────────────────────────────────────
+
+            {q: "1. ¿Quién emite el decreto al inicio del capítulo 4? Daniel 4:1", o: ["Nabucodonosor, rey", "Nabucodonosor, gobernante", "Nabucodonosor de Babilonia", "Nabucodonosor el grande"], c: "Nabucodonosor, rey"},
+            {q: "2. ¿A quiénes dirige Nabucodonosor su mensaje? Daniel 4:1", o: ["A todos los pueblos, naciones y lenguas", "A todos los pueblos y naciones", "A todos los pueblos y lenguas", "A las naciones y lenguas"], c: "A todos los pueblos, naciones y lenguas"},
+            {q: "3. ¿Qué desea Nabucodonosor que sea multiplicada? Daniel 4:1", o: ["Paz os sea multiplicada", "La paz os sea multiplicada", "Paz sea multiplicada", "Paz os sea aumentada"], c: "Paz os sea multiplicada"},
+            {q: "4. ¿Qué declara conveniente Nabucodonosor anunciar? Daniel 4:2", o: ["Las señales y milagros que el Dios Altísimo ha hecho conmigo", "Las señales que el Dios Altísimo ha hecho conmigo", "Los milagros que Dios ha hecho conmigo", "Las señales y milagros del Altísimo"], c: "Las señales y milagros que el Dios Altísimo ha hecho conmigo"},
+            {q: "5. ¿Cómo describe Nabucodonosor las señales de Dios? Daniel 4:3", o: ["Cuán grandes son sus señales", "Cuán grandes fueron sus señales", "Cuán poderosas son sus señales", "Cuán notorias son sus señales"], c: "Cuán grandes son sus señales"},
+            {q: "6. ¿Cómo describe Nabucodonosor las maravillas de Dios? Daniel 4:3", o: ["Cuán potentes son sus maravillas", "Cuán grandes son sus maravillas", "Cuán eternas son sus maravillas", "Cuán gloriosas son sus maravillas"], c: "Cuán potentes son sus maravillas"},
+            {q: "7. ¿Cómo describe Nabucodonosor el reino de Dios? Daniel 4:3", o: ["Su reino, reino sempiterno", "Su reino es sempiterno", "Reino sempiterno es su reino", "Su reino es eterno"], c: "Su reino, reino sempiterno"},
+            {q: "8. ¿Cómo describe Nabucodonosor el señorío de Dios? Daniel 4:3", o: ["De generación en generación", "Por todas las generaciones", "En todas las generaciones", "De una generación a otra"], c: "De generación en generación"},
+            {q: "9. ¿Cómo se encontraba Nabucodonosor antes del sueño? Daniel 4:4", o: ["Tranquilo en su casa", "Tranquilo en el palacio", "Seguro en su casa", "Confiado en su palacio"], c: "Tranquilo en su casa"},
+            {q: "10. ¿Cómo estaba Nabucodonosor en su palacio? Daniel 4:4", o: ["Floreciente en mi palacio", "Floreciente en el palacio", "Prosperando en mi palacio", "Establecido en mi palacio"], c: "Floreciente en mi palacio"},
+            {q: "11. ¿Qué tuvo Nabucodonosor que lo espantó? Daniel 4:5", o: ["Un sueño", "Un sueño nocturno", "Un sueño terrible", "Un sueño profundo"], c: "Un sueño"},
+            {q: "12. ¿Dónde estaba Nabucodonosor cuando tuvo el sueño? Daniel 4:5", o: ["Tendido en la cama", "Acostado en su cama", "Reposando en la cama", "Descansando en su cama"], c: "Tendido en la cama"},
+            {q: "13. ¿Qué le causaron las visiones del sueño? Daniel 4:5", o: ["Me turbaron", "Me inquietaron", "Me asombraron", "Me alteraron"], c: "Me turbaron"},
+            {q: "14. ¿Qué orden dio Nabucodonosor después del sueño? Daniel 4:6", o: ["Mandé que vinieran todos los sabios de Babilonia", "Mandé llamar a los sabios de Babilonia", "Ordené traer a los sabios de Babilonia", "Hice venir a los sabios de Babilonia"], c: "Mandé que vinieran todos los sabios de Babilonia"},
+            {q: "15. ¿Para qué mandó llamar a los sabios? Daniel 4:6", o: ["Para que me dieran la interpretación del sueño", "Para que interpretaran el sueño", "Para que explicaran el sueño", "Para conocer el significado del sueño"], c: "Para que me dieran la interpretación del sueño"},
+            {q: "16. ¿Quiénes vinieron ante el rey? Daniel 4:7", o: ["Magos, astrólogos, caldeos y adivinos", "Astrólogos, magos, caldeos y adivinos", "Magos y astrólogos, caldeos y adivinos", "Caldeos, magos, astrólogos y adivinos"], c: "Magos, astrólogos, caldeos y adivinos"},
+            {q: "17. ¿Qué hizo el rey con ellos? Daniel 4:7", o: ["Les conté el sueño", "Les relaté el sueño", "Les dije el sueño", "Les declaré el sueño"], c: "Les conté el sueño"},
+            {q: "18. ¿Qué no pudieron hacer los sabios? Daniel 4:7", o: ["Dar la interpretación", "Explicar la visión", "Entender el sueño", "Comprender el sueño"], c: "Dar la interpretación"},
+            {q: "19. ¿Quién entró finalmente ante el rey? Daniel 4:8", o: ["Daniel", "Daniel, el hebreo", "Daniel, el profeta", "Daniel, el cautivo"], c: "Daniel"},
+            {q: "20. ¿Qué otro nombre tenía Daniel? Daniel 4:8", o: ["Beltsasar", "Baltasar", "Beltsasar el mago", "Beltsasar de Babilonia"], c: "Beltsasar"},
+
+            // ── NIVEL 4 ──────────────────────────────────────────────────────────────
+
+            {q: "41. ¿Cómo quedó Daniel al oír el sueño del rey? Daniel 4:19", o: ["Quedó atónito casi una hora", "Quedó atónito por una hora", "Quedó atónito una hora", "Quedó turbado casi una hora"], c: "Quedó atónito casi una hora"},
+            {q: "42. ¿Qué le sucedió a Daniel mientras pensaba? Daniel 4:19", o: ["Sus pensamientos lo turbaron", "Sus pensamientos lo inquietaron", "Sus pensamientos lo alteraron", "Sus pensamientos lo confundieron"], c: "Sus pensamientos lo turbaron"},
+            {q: "43. ¿Qué dijo el rey a Beltsasar? Daniel 4:19", o: ["No te turben ni el sueño ni su interpretación", "No te turbe el sueño ni su interpretación", "No te turbe el sueño o su interpretación", "No te turbe ni el sueño ni interpretación"], c: "No te turben ni el sueño ni su interpretación"},
+            {q: "44. ¿Cómo respondió Daniel al rey? Daniel 4:19", o: ["El sueño sea para tus enemigos", "El sueño sea para tus adversarios", "El sueño sea contra tus enemigos", "El sueño sea para los que te odian"], c: "El sueño sea para tus enemigos"},
+            {q: "45. ¿A quién deseó Daniel la interpretación del sueño? Daniel 4:19", o: ["Para los que mal te quieren", "Para los que te quieren mal", "Para quienes te quieren mal", "Para los que no te quieren bien"], c: "Para los que mal te quieren"},
+            {q: "46. ¿Hasta dónde llegaba la copa del árbol? Daniel 4:20", o: ["Hasta el cielo", "Hasta los cielos", "Al cielo", "Hacia el cielo"], c: "Hasta el cielo"},
+            {q: "47. ¿Desde dónde se veía el árbol? Daniel 4:20", o: ["Desde todos los confines de la tierra", "Desde los confines de la tierra", "Desde toda la tierra", "Desde los extremos de la tierra"], c: "Desde todos los confines de la tierra"},
+            {q: "48. ¿A quién identifica Daniel como el árbol? Daniel 4:22", o: ["Tú mismo eres, oh rey", "Tú eres el rey", "Tú mismo eres el rey", "Ese árbol eres tú"], c: "Tú mismo eres, oh rey"},
+            {q: "49. ¿Qué había crecido del rey según Daniel? Daniel 4:22", o: ["Creció tu grandeza", "Aumentó tu grandeza", "Se elevó tu grandeza", "Fue grande tu grandeza"], c: "Creció tu grandeza"},
+            {q: "50. ¿Hasta dónde llegó su dominio? Daniel 4:22", o: ["Hasta los confines de la tierra", "Hasta toda la tierra", "Hasta el fin de la tierra", "Hasta los extremos del reino"], c: "Hasta los confines de la tierra"},
+            {q: "51. ¿Quién descendía del cielo según la visión? Daniel 4:23", o: ["Un vigilante y santo", "Un vigilante santo", "Un santo vigilante", "Un vigilante celestial"], c: "Un vigilante y santo"},
+            {q: "52. ¿Qué orden dio el vigilante respecto al árbol? Daniel 4:23", o: ["Cortad el árbol y destruidlo", "Cortad el árbol y derribadlo", "Cortad el árbol y acabándolo", "Cortad el árbol y quitadlo"], c: "Cortad el árbol y destruidlo"},
+            {q: "53. ¿Qué debía dejarse del árbol? Daniel 4:23", o: ["La cepa de sus raíces", "La cepa de las raíces", "La cepa de sus raíces en tierra", "La cepa de las raíces del árbol"], c: "La cepa de sus raíces"},
+            {q: "54. ¿Con qué debía quedar atada la cepa? Daniel 4:23", o: ["Con atadura de hierro y de bronce", "Con hierro y bronce", "Con ataduras de hierro y bronce", "Con atadura de hierro y bronce"], c: "Con atadura de hierro y de bronce"},
+            {q: "55. ¿Qué le sucedería al rey según la sentencia? Daniel 4:25", o: ["Te echarán de entre los hombres", "Serás echado de entre los hombres", "Te arrojarán de entre los hombres", "Serás apartado de los hombres"], c: "Te echarán de entre los hombres"},
+            {q: "56. ¿Con quién sería su habitación? Daniel 4:25", o: ["Con las bestias del campo", "Con las bestias", "Con las bestias de la tierra", "Con los animales del campo"], c: "Con las bestias del campo"},
+            {q: "57. ¿Qué comería el rey durante el castigo? Daniel 4:25", o: ["Hierba del campo", "Hierba del campo como los bueyes", "Hierba como los bueyes", "Hierba del campo para comer"], c: "Hierba del campo"},
+            {q: "58. ¿Qué lo bañaría durante ese tiempo? Daniel 4:25", o: ["Con el rocío del cielo serás bañado", "Con rocío del cielo serás bañado", "Con el rocío celestial serás bañado", "Con el rocío del cielo serás mojado"], c: "Con el rocío del cielo serás bañado"},
+            {q: "59. ¿Hasta cuándo pasarían los siete tiempos sobre él? Daniel 4:25", o: ["Hasta que conozcas que el Altísimo tiene dominio", "Hasta que reconozcas el dominio del Altísimo", "Hasta que conozcas el dominio del Altísimo", "Hasta que entiendas que el Altísimo gobierna"], c: "Hasta que conozcas que el Altísimo tiene dominio"},
+            {q: "60. ¿Con quién sería su parte entre la hierba? Daniel 4:15", o: ["Con las bestias", "Con las bestias del campo", "Con las bestias de la tierra", "Con los animales del campo"], c: "Con las bestias"},
+
+            // ── NIVEL 5 ──────────────────────────────────────────────────────────────
+
+            {q: "21. ¿Qué parecía ver el rey en medio de la tierra? Daniel 4:10", o: ["Un árbol cuya altura era grande", "Un árbol de gran altura", "Un árbol de altura grande", "Un árbol muy alto"], c: "Un árbol cuya altura era grande"},
+            {q: "22. ¿Qué sucedía con el árbol al crecer? Daniel 4:11", o: ["Crecía y se hacía fuerte", "Crecía y se fortalecía", "Crecía y se volvía fuerte", "Crecía y se hacía poderoso"], c: "Crecía y se hacía fuerte"},
+            {q: "23. ¿Hasta dónde llegaba la copa del árbol? Daniel 4:11", o: ["Llegaba hasta el cielo", "Alcanzaba el cielo", "Se elevaba al cielo", "Subía hasta el cielo"], c: "Llegaba hasta el cielo"},
+            {q: "24. ¿Desde dónde podía verse el árbol? Daniel 4:11", o: ["Desde todos los confines de la tierra", "Desde los confines de la tierra", "Desde toda la tierra", "Desde los extremos de la tierra"], c: "Desde todos los confines de la tierra"},
+            {q: "25. ¿Cómo era el follaje del árbol? Daniel 4:12", o: ["Su follaje era hermoso", "Su follaje era muy hermoso", "El follaje era hermoso", "Hermoso era su follaje"], c: "Su follaje era hermoso"},
+            {q: "26. ¿Cómo era el fruto del árbol? Daniel 4:12", o: ["Su fruto abundante", "Su fruto era abundante", "Fruto abundante tenía", "Abundante era su fruto"], c: "Su fruto abundante"},
+            {q: "27. ¿Qué había en el árbol para todos? Daniel 4:12", o: ["Había en él alimento para todos", "Había alimento para todos", "En él había alimento", "Alimento había para todos"], c: "Había en él alimento para todos"},
+            {q: "28. ¿Quiénes se ponían a la sombra del árbol? Daniel 4:12", o: ["Las bestias del campo", "Las bestias del campo allí", "Bestias del campo", "Las bestias que había"], c: "Las bestias del campo"},
+            {q: "29. ¿Dónde anidaban las aves del cielo? Daniel 4:12", o: ["En sus ramas", "Sobre sus ramas", "En las ramas", "En las mismas ramas"], c: "En sus ramas"},
+            {q: "30. ¿Quién descendía del cielo en la visión? Daniel 4:13", o: ["Un vigilante y santo", "Un vigilante santo", "Un santo vigilante", "Un vigilante celestial"], c: "Un vigilante y santo"},
+            {q: "31. ¿Cómo clamaba el vigilante? Daniel 4:14", o: ["Clamaba fuertemente", "Clamaba en voz fuerte", "Clamaba con fuerza", "Clamaba en alta voz"], c: "Clamaba fuertemente"},
+            {q: "32. ¿Qué orden dio el vigilante respecto al árbol? Daniel 4:14", o: ["Derribad el árbol", "Derriben el árbol", "Derribar el árbol", "Que derriben el árbol"], c: "Derribad el árbol"},
+            {q: "33. ¿Qué debían hacer con las ramas del árbol? Daniel 4:14", o: ["Cortad sus ramas", "Corten sus ramas", "Cortar las ramas", "Que corten sus ramas"], c: "Cortad sus ramas"},
+            {q: "34. ¿Qué debían hacer con el follaje? Daniel 4:14", o: ["Quitadle el follaje", "Quítenle el follaje", "Quitar el follaje", "Que quiten el follaje"], c: "Quitadle el follaje"},
+            {q: "35. ¿Qué debían hacer con el fruto? Daniel 4:14", o: ["Dispersad su fruto", "Dispersen su fruto", "Dispersar el fruto", "Que dispersen el fruto"], c: "Dispersad su fruto"},
+            {q: "36. ¿Qué debía quedar del árbol? Daniel 4:15", o: ["La cepa de sus raíces", "La cepa de las raíces", "La cepa de sus raíces en tierra", "La cepa de las raíces del árbol"], c: "La cepa de sus raíces"},
+            {q: "37. ¿Con qué debía quedar atada la cepa? Daniel 4:15", o: ["Con atadura de hierro y de bronce", "Con ataduras de hierro y bronce", "Con hierro y bronce", "Con atadura de hierro y bronce"], c: "Con atadura de hierro y de bronce"},
+            {q: "38. ¿Dónde debía quedar la cepa? Daniel 4:15", o: ["En la tierra", "Sobre la tierra", "En tierra", "Dentro de la tierra"], c: "En la tierra"},
+            {q: "39. ¿Con qué debía ser empapado? Daniel 4:15", o: ["Con el rocío del cielo", "Con rocío del cielo", "Con el rocío del cielo de arriba", "Con el rocío celestial"], c: "Con el rocío del cielo"},
+            {q: "40. ¿Con quién sería su parte entre la hierba? Daniel 4:15", o: ["Con las bestias", "Con las bestias del campo", "Con las bestias de la tierra", "Con los animales del campo"], c: "Con las bestias"},
+
+
+        ];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
