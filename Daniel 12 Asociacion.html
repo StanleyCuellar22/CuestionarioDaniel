@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulo 12 Asociacion (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulo 12 Asociacion</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulo 12 Asociacion (Reina Valera 1995) Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            {q: "1. ¿Quién se levantará en aquel tiempo? Daniel 12:1", o: ["Miguel", "Gabriel", "El Hijo del Hombre", "El Anciano de días"], c: "Miguel"},
+            {q: "2. ¿Cómo es llamado Miguel? Daniel 12:1", o: ["El gran príncipe", "El sumo sacerdote", "El arcángel poderoso", "El profeta mayor"], c: "El gran príncipe"},
+            {q: "3. ¿De parte de quién está Miguel? Daniel 12:1", o: ["De los hijos de tu pueblo", "De los ángeles del cielo", "De los reyes de la tierra", "De las naciones"], c: "De los hijos de tu pueblo"},
+            {q: "4. ¿Cómo será el tiempo mencionado? Daniel 12:1", o: ["Tiempo de angustia cual nunca fue desde que hubo gente hasta entonces", "Tiempo de guerra universal", "Tiempo de tribulación leve", "Tiempo de prueba breve"], c: "Tiempo de angustia cual nunca fue desde que hubo gente hasta entonces"},
+            {q: "5. ¿Quién será libertado en aquel tiempo? Daniel 12:1", o: ["Tu pueblo, todos los que se hallen inscritos en el libro", "Todos los pueblos", "Solo los sacerdotes", "Los gobernantes"], c: "Tu pueblo, todos los que se hallen inscritos en el libro"},
+            {q: "6. ¿Dónde duermen los que serán despertados? Daniel 12:2", o: ["En el polvo de la tierra", "En el Hades", "En el cielo", "En el mar"], c: "En el polvo de la tierra"},
+            {q: "7. Algunos serán despertados para: Daniel 12:2", o: ["Vida eterna", "Reino terrenal", "Juicio temporal", "Mil años"], c: "Vida eterna"},
+            {q: "8. Otros serán despertados para: Daniel 12:2", o: ["Vergüenza y confusión perpetua", "Castigo temporal", "Prueba eterna", "Destierro"], c: "Vergüenza y confusión perpetua"},
+            {q: "9. ¿Cómo resplandecerán los entendidos? Daniel 12:3", o: ["Como el resplandor del firmamento", "Como el sol", "Como lámparas", "Como antorchas"], c: "Como el resplandor del firmamento"},
+            {q: "10. ¿Cómo brillarán los que enseñan la justicia? Daniel 12:3", o: ["Como las estrellas, a perpetua eternidad", "Como el sol naciente", "Como antorchas encendidas", "Como fuego ardiente"], c: "Como las estrellas, a perpetua eternidad"},
+            {q: "11. ¿Qué debía hacer Daniel con las palabras? Daniel 12:4", o: ["Cerrar las palabras y sellar el libro", "Publicar las palabras inmediatamente", "Entregar el libro al rey", "Traducir el libro a otras lenguas"], c: "Cerrar las palabras y sellar el libro"},
+            {q: "12. ¿Hasta cuándo debía sellar el libro? Daniel 12:4", o: ["Hasta el tiempo del fin", "Hasta su muerte", "Hasta la restauración", "Hasta el juicio"], c: "Hasta el tiempo del fin"},
+            {q: "13. Muchos correrán: Daniel 12:4", o: ["De aquí para allá", "A Jerusalén", "Al templo", "Al desierto"], c: "De aquí para allá"},
+            {q: "14. ¿Qué aumentará según el versículo 4? Daniel 12:4", o: ["La ciencia", "La fe", "La justicia", "La guerra"], c: "La ciencia"},
+            {q: "15. ¿Qué hizo Daniel después de escuchar esto? Daniel 12:5", o: ["Miré y vi a otros dos que estaban en pie", "Escribí la visión", "Caí postrado", "Oré en silencio"], c: "Miré y vi a otros dos que estaban en pie"},
+            {q: "16. ¿Dónde estaba uno de los que estaban en pie? Daniel 12:5", o: ["A este lado del río", "En el templo", "En el cielo", "En Jerusalén"], c: "A este lado del río"},
+            {q: "17. ¿Dónde estaba el otro? Daniel 12:5", o: ["Al otro lado del río", "En el monte", "En el palacio", "En el desierto"], c: "Al otro lado del río"},
+            {q: "18. ¿Qué preguntó uno al varón vestido de lino? Daniel 12:6", o: ["¿Cuándo será el fin de estas maravillas?", "¿Cuándo vendrá el Mesías?", "¿Cuándo terminará el exilio?", "¿Cuándo será el juicio?"], c: "¿Cuándo será el fin de estas maravillas?"},
+            {q: "19. ¿Dónde estaba el varón vestido de lino? Daniel 12:6", o: ["Sobre las aguas del río", "En el templo", "En el cielo", "En la montaña"], c: "Sobre las aguas del río"},
+            {q: "20. ¿Qué hizo el varón vestido de lino? Daniel 12:7", o: ["Alzó su mano derecha y su mano izquierda al cielo y juró", "Se postró en tierra", "Escribió en un libro", "Guardó silencio"], c: "Alzó su mano derecha y su mano izquierda al cielo y juró"},
+            
+            // ── NIVEL 2 ──────────────────────────────────────────────────────────────
+            
+            {q: "21. ¿Por quién juró el varón vestido de lino? Daniel 12:7", o: ["Por el que vive por los siglos", "Por el Dios de Israel", "Por el cielo y la tierra", "Por el templo santo"], c: "Por el que vive por los siglos"},
+            {q: "22. ¿Por cuánto tiempo sería lo anunciado? Daniel 12:7", o: ["Por tiempo, tiempos y la mitad de un tiempo", "Por mil días", "Por setenta semanas", "Por cuarenta años"], c: "Por tiempo, tiempos y la mitad de un tiempo"},
+            {q: "23. ¿Qué se acabaría antes de cumplirse todas estas cosas? Daniel 12:7", o: ["La dispersión del poder del pueblo santo", "El reino de Babilonia", "La guerra entre naciones", "El templo terrenal"], c: "La dispersión del poder del pueblo santo"},
+            {q: "24. ¿Qué dijo Daniel después de oír? Daniel 12:8", o: ["Yo oí, pero no entendí", "Yo comprendí todo", "Yo escribí la visión", "Yo guardé silencio"], c: "Yo oí, pero no entendí"},
+            {q: "25. ¿Qué preguntó Daniel? Daniel 12:8", o: ["Señor mío, ¿cuál será el fin de estas cosas?", "¿Cuándo vendrá el Mesías?", "¿Cuándo será el juicio final?", "¿Quién reinará después?"], c: "Señor mío, ¿cuál será el fin de estas cosas?"},
+            {q: "26. ¿Qué respondió el mensajero a Daniel? Daniel 12:9", o: ["Anda, Daniel", "Escribe la visión", "Levántate y camina", "Publica el mensaje"], c: "Anda, Daniel"},
+            {q: "27. ¿Cómo estaban las palabras según el versículo 9? Daniel 12:9", o: ["Cerradas y selladas hasta el tiempo del fin", "Abiertas y claras", "Escritas en piedra", "Guardadas en el templo"], c: "Cerradas y selladas hasta el tiempo del fin"},
+            {q: "28. Muchos serán: Daniel 12:10", o: ["Limpios, emblanquecidos y purificados", "Juzgados inmediatamente", "Trasladados al cielo", "Condenados sin juicio"], c: "Limpios, emblanquecidos y purificados"},
+            {q: "29. ¿Cómo procederán los impíos? Daniel 12:10", o: ["Impíamente", "Justamente", "Con temor", "En silencio"], c: "Impíamente"},
+            {q: "30. ¿Quiénes no entenderán? Daniel 12:10", o: ["Ninguno de los impíos", "Los sacerdotes", "Los reyes", "Los profetas"], c: "Ninguno de los impíos"},
+            {q: "31. ¿Quiénes comprenderán? Daniel 12:10", o: ["Los entendidos", "Los poderosos", "Los ricos", "Los gobernantes"], c: "Los entendidos"},
+            {q: "32. ¿Desde cuándo se contarán los 1290 días? Daniel 12:11", o: ["Desde el tiempo en que sea quitado el sacrificio continuo", "Desde la caída de Babilonia", "Desde el nacimiento del Mesías", "Desde la destrucción del templo"], c: "Desde el tiempo en que sea quitado el sacrificio continuo"},
+            {q: "33. ¿Hasta qué evento se cuentan los 1290 días? Daniel 12:11", o: ["Hasta la abominación desoladora", "Hasta el juicio final", "Hasta la restauración", "Hasta la resurrección"], c: "Hasta la abominación desoladora"},
+            {q: "34. ¿Cuántos días habrá en ese período? Daniel 12:11", o: ["Mil doscientos noventa días", "Mil doscientos sesenta días", "Mil trescientos treinta y cinco días", "Mil días"], c: "Mil doscientos noventa días"},
+            {q: "35. ¿Quién es bienaventurado? Daniel 12:12", o: ["El que espere y llegue a mil trescientos treinta y cinco días", "El que predique", "El que gobierne", "El que conquiste"], c: "El que espere y llegue a mil trescientos treinta y cinco días"},
+            {q: "36. ¿A cuántos días debe llegar el bienaventurado? Daniel 12:12", o: ["Mil trescientos treinta y cinco días", "Mil doscientos noventa días", "Mil doscientos sesenta días", "Mil días"], c: "Mil trescientos treinta y cinco días"},
+            {q: "37. ¿Qué haría Daniel al final? Daniel 12:13", o: ["Irás hasta el fin", "Reinarás en Jerusalén", "Predicarás a las naciones", "Volverás a Babilonia"], c: "Irás hasta el fin"},
+            {q: "38. ¿Qué más se le dijo a Daniel que haría? Daniel 12:13", o: ["Reposarás", "Gobernarás", "Viajarás", "Combatirás"], c: "Reposarás"},
+            {q: "39. ¿Para qué se levantaría Daniel? Daniel 12:13", o: ["Para recibir tu heredad", "Para juzgar a las naciones", "Para escribir otro libro", "Para predicar"], c: "Para recibir tu heredad"},
+            {q: "40. ¿Cuándo recibiría Daniel su heredad? Daniel 12:13", o: ["Al fin de los días", "En el exilio", "En el reino de Persia", "En el templo"], c: "Al fin de los días"},
+            
+            // ── NIVEL 3 ──────────────────────────────────────────────────────────────
+            
+            {q: "41. ¿Quién está de parte de los hijos de tu pueblo? Daniel 12:1", o: ["Miguel, el gran príncipe", "Gabriel, el mensajero", "El sumo sacerdote", "El profeta Daniel"], c: "Miguel, el gran príncipe"},
+            {q: "42. ¿Desde cuándo no hubo un tiempo como el de angustia mencionado? Daniel 12:1", o: ["Desde que hubo gente hasta entonces", "Desde el diluvio", "Desde la salida de Egipto", "Desde el reino de David"], c: "Desde que hubo gente hasta entonces"},
+            {q: "43. ¿Dónde están inscritos los que serán libertados? Daniel 12:1", o: ["En el libro", "En el templo", "En el cielo visible", "En Jerusalén"], c: "En el libro"},
+            {q: "44. ¿Qué serán muchos de los que duermen en el polvo? Daniel 12:2", o: ["Despertados", "Trasladados", "Escondidos", "Sellados"], c: "Despertados"},
+            {q: "45. ¿Cómo es descrita la vida de algunos resucitados? Daniel 12:2", o: ["Vida eterna", "Vida temporal", "Vida restaurada", "Vida terrenal"], c: "Vida eterna"},
+            {q: "46. ¿Cómo es descrita la condición de otros resucitados? Daniel 12:2", o: ["Vergüenza y confusión perpetua", "Juicio breve", "Castigo momentáneo", "Disciplina eterna"], c: "Vergüenza y confusión perpetua"},
+            {q: "47. ¿Quiénes resplandecerán como el firmamento? Daniel 12:3", o: ["Los entendidos", "Los sacerdotes", "Los reyes", "Los escribas"], c: "Los entendidos"},
+            {q: "48. ¿Qué harán los que enseñan la justicia? Daniel 12:3", o: ["Resplandecerán como las estrellas", "Reinarán en la tierra", "Juzgarán naciones", "Predicarán en el templo"], c: "Resplandecerán como las estrellas"},
+            {q: "49. ¿Qué debía sellar Daniel? Daniel 12:4", o: ["El libro", "El templo", "La visión del rey", "Las tablas de piedra"], c: "El libro"},
+            {q: "50. ¿Qué aumentará según el texto? Daniel 12:4", o: ["La ciencia", "La fe", "La justicia", "La guerra"], c: "La ciencia"},
+            {q: "51. ¿Cuántos estaban en pie junto al río? Daniel 12:5", o: ["Dos", "Tres", "Cuatro", "Uno"], c: "Dos"},
+            {q: "52. ¿Sobre qué estaba el varón vestido de lino? Daniel 12:6", o: ["Sobre las aguas del río", "Sobre la tierra", "Sobre el monte", "Sobre el templo"], c: "Sobre las aguas del río"},
+            {q: "53. ¿Qué hizo el varón vestido de lino al jurar? Daniel 12:7", o: ["Alzó su mano derecha y su mano izquierda al cielo", "Se postró en tierra", "Escribió en un libro", "Guardó silencio"], c: "Alzó su mano derecha y su mano izquierda al cielo"},
+            {q: "54. ¿Qué se acabaría antes del cumplimiento de todas estas cosas? Daniel 12:7", o: ["La dispersión del poder del pueblo santo", "El reino de Persia", "La guerra universal", "El templo terrenal"], c: "La dispersión del poder del pueblo santo"},
+            {q: "55. ¿Qué dijo Daniel sobre su comprensión? Daniel 12:8", o: ["Oí, pero no entendí", "Entendí claramente", "Escribí la visión", "Callé sin preguntar"], c: "Oí, pero no entendí"},
+            {q: "56. ¿Cómo estaban las palabras según la respuesta dada a Daniel? Daniel 12:9", o: ["Cerradas y selladas hasta el tiempo del fin", "Abiertas y claras", "Escritas en piedra", "Guardadas en el templo"], c: "Cerradas y selladas hasta el tiempo del fin"},
+            {q: "57. ¿Qué harán los impíos? Daniel 12:10", o: ["Procederán impíamente", "Serán purificados", "Comprenderán", "Enseñarán justicia"], c: "Procederán impíamente"},
+            {q: "58. ¿Quiénes comprenderán en el tiempo del fin? Daniel 12:10", o: ["Los entendidos", "Los impíos", "Los reyes", "Los poderosos"], c: "Los entendidos"},
+            {q: "59. ¿Cuántos días habrá desde que sea quitado el sacrificio continuo hasta la abominación desoladora? Daniel 12:11", o: ["Mil doscientos noventa días", "Mil doscientos sesenta días", "Mil trescientos treinta y cinco días", "Mil días"], c: "Mil doscientos noventa días"},
+            {q: "60. ¿Qué recibirá Daniel al fin de los días? Daniel 12:13", o: ["Su heredad", "Un reino terrenal", "Una corona temporal", "Un libro nuevo"], c: "Su heredad"}
+];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>

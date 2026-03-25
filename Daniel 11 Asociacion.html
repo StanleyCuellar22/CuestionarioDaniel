@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulo 11 Asociacion (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulo 11 Asociacion</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulo 11 Asociacion (Reina Valera 1995) Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            {q: "1. ¿Quién hará su voluntad y se ensoberbecerá sobre todo dios? (Daniel 11:36)", o: ["El rey", "El príncipe", "El gobernante", "El poderoso"], c: "El rey"},
+            {q: "2. ¿Qué honrará el rey en su lugar? (Daniel 11:38)", o: ["Al dios de las fortalezas", "Al dios de la guerra", "Al dios del poder", "Al dios del reino"], c: "Al dios de las fortalezas"},
+            {q: "3. ¿Qué profanarán las tropas que se levantarán? (Daniel 11:31)", o: ["El santuario y la fortaleza", "El templo y el altar", "El santuario y el altar", "El templo y la fortaleza"], c: "El santuario y la fortaleza"},
+            {q: "4. ¿Qué quitarán según la profecía? (Daniel 11:31)", o: ["El sacrificio continuo", "El sacrificio santo", "El sacrificio diario", "El sacrificio del templo"], c: "El sacrificio continuo"},
+            {q: "5. ¿Qué pondrán en su lugar? (Daniel 11:31)", o: ["La abominación desoladora", "La abominación terrible", "La abominación del templo", "La abominación del altar"], c: "La abominación desoladora"},
+            {q: "6. ¿Quiénes se esforzarán y actuarán? (Daniel 11:32)", o: ["El pueblo que conoce a su Dios", "El pueblo fiel", "El pueblo santo", "El pueblo escogido"], c: "El pueblo que conoce a su Dios"},
+            {q: "7. ¿Quiénes instruirán a muchos? (Daniel 11:33)", o: ["Los sabios del pueblo", "Los sabios de Israel", "Los sabios del reino", "Los sabios del templo"], c: "Los sabios del pueblo"},
+            {q: "8. ¿Con qué caerán durante algunos días? (Daniel 11:33)", o: ["A espada y a fuego", "A espada y cautiverio", "A espada y persecución", "A espada y muerte"], c: "A espada y a fuego"},
+            {q: "9. ¿Con qué también caerán según el texto? (Daniel 11:33)", o: ["En cautividad y despojo", "En cautiverio y tribulación", "En cautividad y guerra", "En cautividad y destrucción"], c: "En cautividad y despojo"},
+            {q: "10. ¿Con qué serán ayudados en su caída? (Daniel 11:34)", o: ["Con un pequeño socorro", "Con un gran socorro", "Con un socorro poderoso", "Con un socorro repentino"], c: "Con un pequeño socorro"},
+            {q: "11. ¿Quiénes se juntarán a ellos con lisonjas? (Daniel 11:34)", o: ["Muchos", "Algunos", "Pocos", "Multitudes"], c: "Muchos"},
+            {q: "12. ¿Para qué caerán algunos de los sabios? (Daniel 11:35)", o: ["Para ser depurados, limpiados y emblanquecidos", "Para ser probados y purificados", "Para ser depurados y purificados", "Para ser probados y limpiados"], c: "Para ser depurados, limpiados y emblanquecidos"},
+            {q: "13. ¿Hasta cuándo ocurrirá esto? (Daniel 11:35)", o: ["Hasta el tiempo determinado", "Hasta el tiempo señalado", "Hasta el tiempo final", "Hasta el tiempo de la visión"], c: "Hasta el tiempo determinado"},
+            {q: "14. ¿Contra quién hablará maravillas el rey? (Daniel 11:36)", o: ["Contra el Dios de los dioses", "Contra el Dios del cielo", "Contra el Dios eterno", "Contra el Dios santo"], c: "Contra el Dios de los dioses"},
+            {q: "15. ¿Hasta cuándo prosperará el rey? (Daniel 11:36)", o: ["Hasta que sea consumada la ira", "Hasta que termine la guerra", "Hasta que se cumpla el tiempo", "Hasta que llegue el juicio"], c: "Hasta que sea consumada la ira"},
+            {q: "16. ¿De qué no hará caso el rey? (Daniel 11:37)", o: ["Del Dios de sus padres", "Del Dios del cielo", "Del Dios de Israel", "Del Dios eterno"], c: "Del Dios de sus padres"},
+            {q: "17. ¿Qué tampoco respetará? (Daniel 11:37)", o: ["Ni respetará a dios alguno", "Ni respetará a ningún dios", "Ni respetará a los dioses", "Ni respetará a dios"], c: "Ni respetará a dios alguno"},
+            {q: "18. ¿Contra quién contenderá el rey del sur al cabo del tiempo? (Daniel 11:40)", o: ["Contra él", "Contra el rey del norte", "Contra el rey poderoso", "Contra el rey enemigo"], c: "Contra él"},
+            {q: "19. ¿Cómo se levantará el rey del norte contra él? (Daniel 11:40)", o: ["Como una tempestad", "Como un torbellino", "Como un huracán", "Como un viento fuerte"], c: "Como una tempestad"},
+            {q: "20. ¿Con qué vendrá el rey del norte? (Daniel 11:40)", o: ["Con carros, gente de a caballo y muchas naves", "Con carros, caballos y soldados", "Con carros, caballos y ejércitos", "Con carros, soldados y naves"], c: "Con carros, gente de a caballo y muchas naves"},
+            {q: "21. ¿Quién ocupará el lugar del que hará pasar un cobrador de tributos? (Daniel 11:21)", o: ["Un hombre despreciable", "Un rey poderoso", "Un príncipe valiente", "Un gobernante fuerte"], c: "Un hombre despreciable"},
+            {q: "22. ¿Cómo tomará el reino el hombre despreciable? (Daniel 11:21)", o: ["Con halagos", "Con engaños", "Con amenazas", "Con astucia"], c: "Con halagos"},
+            {q: "23. ¿Cómo serán barridas las fuerzas enemigas delante de él? (Daniel 11:22)", o: ["Como por inundación de aguas", "Como por un río fuerte", "Como por una gran tempestad", "Como por una tormenta"], c: "Como por inundación de aguas"},
+            {q: "24. ¿Quién será destruido junto con las fuerzas enemigas? (Daniel 11:22)", o: ["El príncipe del pacto", "El príncipe del reino", "El príncipe del norte", "El príncipe poderoso"], c: "El príncipe del pacto"},
+            {q: "25. ¿Qué hará él después del pacto? (Daniel 11:23)", o: ["Engañará", "Traicionará", "Romperá", "Destruirá"], c: "Engañará"},
+            {q: "26. ¿Cómo saldrá vencedor? (Daniel 11:23)", o: ["Con poca gente", "Con pocos soldados", "Con pequeño ejército", "Con pocos hombres"], c: "Con poca gente"},
+            {q: "27. ¿Qué repartirá entre sus soldados? (Daniel 11:24)", o: ["Botín, despojos y riquezas", "Botín y riquezas", "Despojos y tesoros", "Botín y tesoros"], c: "Botín, despojos y riquezas"},
+            {q: "28. ¿Contra qué formará sus designios? (Daniel 11:24)", o: ["Contra las fortalezas", "Contra las ciudades", "Contra los reinos", "Contra los muros"], c: "Contra las fortalezas"},
+            {q: "29. ¿Con qué despertará sus fuerzas y su ardor? (Daniel 11:25)", o: ["Con un gran ejército", "Con un poderoso ejército", "Con un numeroso ejército", "Con un ejército fuerte"], c: "Con un gran ejército"},
+            {q: "30. ¿Quién se empeñará en la guerra con un ejército grande y muy fuerte? (Daniel 11:25)", o: ["El rey del sur", "El rey del norte", "El príncipe del sur", "El gobernante del sur"], c: "El rey del sur"},
+            {q: "31. ¿Por qué no prevalecerá el rey del sur? (Daniel 11:25)", o: ["Porque le harán traición", "Porque será vencido", "Porque será engañado", "Porque será derrotado"], c: "Porque le harán traición"},
+            {q: "32. ¿Quiénes lo quebrantarán según el texto? (Daniel 11:26)", o: ["Los que coman de sus manjares", "Los que estén en su mesa", "Los que vivan en su casa", "Los que coman con él"], c: "Los que coman de sus manjares"},
+            {q: "33. ¿Qué ocurrirá con su ejército? (Daniel 11:26)", o: ["Será destruido", "Será derrotado", "Será dispersado", "Será vencido"], c: "Será destruido"},
+            {q: "34. ¿Qué tramarán en su corazón estos dos reyes? (Daniel 11:27)", o: ["Hacer mal", "Hacer guerra", "Hacer engaño", "Hacer traición"], c: "Hacer mal"},
+            {q: "35. ¿Dónde se mentirán el uno al otro? (Daniel 11:27)", o: ["Sentados a una misma mesa", "Sentados en el trono", "Sentados en el palacio", "Sentados en el consejo"], c: "Sentados a una misma mesa"},
+            {q: "36. ¿Por qué no servirá de nada su engaño? (Daniel 11:27)", o: ["Porque el plazo aún no habrá llegado", "Porque el tiempo no será cumplido", "Porque el fin no será aún", "Porque el día no será llegado"], c: "Porque el plazo aún no habrá llegado"},
+            {q: "37. ¿Con qué volverá a su tierra? (Daniel 11:28)", o: ["Con gran riqueza", "Con muchas riquezas", "Con grandes tesoros", "Con gran botín"], c: "Con gran riqueza"},
+            {q: "38. ¿Contra qué pondrá su corazón? (Daniel 11:28)", o: ["Contra el pacto santo", "Contra el pacto de Dios", "Contra el pacto eterno", "Contra el pacto divino"], c: "Contra el pacto santo"},
+            {q: "39. ¿Quién vendrá contra él según el versículo 30? (Daniel 11:30)", o: ["Las naves de Quitim", "Las naves del mar", "Las naves del norte", "Las naves del reino"], c: "Las naves de Quitim"},
+            {q: "40. ¿Qué hará él cuando vengan las naves de Quitim? (Daniel 11:30)", o: ["Se contristará y retrocederá", "Se entristecerá y huirá", "Se turbará y volverá", "Se afligirá y regresará"], c: "Se contristará y retrocederá"},
+            {q: "41. ¿A quién se entenderá el rey con los que abandonen el santo pacto? (Daniel 11:30)", o: ["Con los que abandonen el santo pacto", "Con los que rompan el pacto santo", "Con los que olviden el pacto santo", "Con los que desprecien el pacto santo"], c: "Con los que abandonen el santo pacto"},
+            {q: "42. ¿Qué se levantarán según el versículo 31? (Daniel 11:31)", o: ["Sus tropas", "Sus ejércitos", "Sus soldados", "Sus guerreros"], c: "Sus tropas"},
+            {q: "43. ¿Qué pondrán después de quitar el sacrificio continuo? (Daniel 11:31)", o: ["La abominación desoladora", "La abominación terrible", "La abominación del templo", "La abominación del santuario"], c: "La abominación desoladora"},
+            {q: "44. ¿Con qué seducirá a los violadores del pacto? (Daniel 11:32)", o: ["Con lisonjas", "Con halagos", "Con palabras suaves", "Con engaños"], c: "Con lisonjas"},
+            {q: "45. ¿Quiénes se esforzarán y actuarán? (Daniel 11:32)", o: ["El pueblo que conoce a su Dios", "El pueblo fiel", "El pueblo escogido", "El pueblo santo"], c: "El pueblo que conoce a su Dios"},
+            {q: "46. ¿Qué harán los sabios del pueblo? (Daniel 11:33)", o: ["Instruirán a muchos", "Enseñarán a muchos", "Guiarán a muchos", "Advertirán a muchos"], c: "Instruirán a muchos"},
+            {q: "47. ¿Durante qué caerán los sabios? (Daniel 11:33)", o: ["Durante algunos días", "Durante muchos días", "Durante varios días", "Durante largos días"], c: "Durante algunos días"},
+            {q: "48. ¿Con qué caerán los sabios según el texto? (Daniel 11:33)", o: ["A espada y a fuego", "A espada y persecución", "A espada y cautiverio", "A espada y guerra"], c: "A espada y a fuego"},
+            {q: "49. ¿En qué también caerán? (Daniel 11:33)", o: ["En cautividad y despojo", "En cautiverio y guerra", "En cautividad y persecución", "En cautividad y destrucción"], c: "En cautividad y despojo"},
+            {q: "50. ¿Con qué serán ayudados en su caída? (Daniel 11:34)", o: ["Con un pequeño socorro", "Con un socorro pequeño", "Con un gran socorro", "Con un socorro breve"], c: "Con un pequeño socorro"},
+            {q: "51. ¿Quiénes se juntarán a ellos con lisonjas? (Daniel 11:34)", o: ["Muchos", "Algunos", "Pocos", "Multitudes"], c: "Muchos"},
+            {q: "52. ¿Qué ocurrirá con algunos de los sabios? (Daniel 11:35)", o: ["Caerán", "Serán perseguidos", "Serán destruidos", "Serán vencidos"], c: "Caerán"},
+            {q: "53. ¿Para qué caerán algunos de los sabios? (Daniel 11:35)", o: ["Para ser depurados, limpiados y emblanquecidos", "Para ser probados y purificados", "Para ser depurados y purificados", "Para ser limpiados y probados"], c: "Para ser depurados, limpiados y emblanquecidos"},
+            {q: "54. ¿Hasta cuándo será esto? (Daniel 11:35)", o: ["Hasta el tiempo determinado", "Hasta el tiempo señalado", "Hasta el tiempo final", "Hasta el tiempo de la visión"], c: "Hasta el tiempo determinado"},
+            {q: "55. ¿Qué hará el rey según el versículo 36? (Daniel 11:36)", o: ["Hará su voluntad", "Hará su deseo", "Hará su propósito", "Hará su designio"], c: "Hará su voluntad"},
+            {q: "56. ¿Sobre qué se engrandecerá el rey? (Daniel 11:36)", o: ["Sobre todo dios", "Sobre todos los dioses", "Sobre todo poder", "Sobre todo reino"], c: "Sobre todo dios"},
+            {q: "57. ¿Contra quién hablará maravillas? (Daniel 11:36)", o: ["Contra el Dios de los dioses", "Contra el Dios eterno", "Contra el Dios del cielo", "Contra el Dios santo"], c: "Contra el Dios de los dioses"},
+            {q: "58. ¿Hasta cuándo prosperará el rey? (Daniel 11:36)", o: ["Hasta que sea consumada la ira", "Hasta que termine la guerra", "Hasta que se cumpla el tiempo", "Hasta que llegue el juicio"], c: "Hasta que sea consumada la ira"},
+            {q: "59. ¿De qué no hará caso el rey? (Daniel 11:37)", o: ["Del Dios de sus padres", "Del Dios de Israel", "Del Dios eterno", "Del Dios del cielo"], c: "Del Dios de sus padres"},
+            {q: "60. ¿Qué tampoco respetará? (Daniel 11:37)", o: ["Ni respetará a dios alguno", "Ni respetará a ningún dios", "Ni respetará a los dioses", "Ni respetará a dios"], c: "Ni respetará a dios alguno"},
+            {q: "61. ¿Qué no hará caso el rey según el texto? (Daniel 11:37)", o: ["Del amor de las mujeres", "Del amor de su pueblo", "Del amor de su nación", "Del amor de sus súbditos"], c: "Del amor de las mujeres"},
+            {q: "62. ¿Qué honrará en lugar de los dioses de sus padres? (Daniel 11:38)", o: ["Al dios de las fortalezas", "Al dios de la guerra", "Al dios del poder", "Al dios del reino"], c: "Al dios de las fortalezas"},
+            {q: "63. ¿Con qué honrará al dios de las fortalezas? (Daniel 11:38)", o: ["Con oro y plata, con piedras preciosas y cosas de gran precio", "Con oro y plata y grandes riquezas", "Con piedras preciosas y oro", "Con plata y piedras preciosas"], c: "Con oro y plata, con piedras preciosas y cosas de gran precio"},
+            {q: "64. ¿Con qué dios se hará de las fortalezas más inexpugnables? (Daniel 11:39)", o: ["Con un dios ajeno", "Con un dios extraño", "Con un dios poderoso", "Con un dios extranjero"], c: "Con un dios ajeno"},
+            {q: "65. ¿Qué hará con los que lo reconozcan? (Daniel 11:39)", o: ["Los colmará de honores", "Les dará riquezas", "Les dará poder", "Les dará autoridad"], c: "Los colmará de honores"},
+            {q: "66. ¿Sobre qué los hará gobernar? (Daniel 11:39)", o: ["Sobre muchos", "Sobre pueblos", "Sobre naciones", "Sobre ciudades"], c: "Sobre muchos"},
+            {q: "67. ¿Qué repartirá como recompensa? (Daniel 11:39)", o: ["Tierras", "Ciudades", "Riquezas", "Provincias"], c: "Tierras"},
+            {q: "68. ¿¿Quién contenderá con él al cabo del tiempo?(Daniel 11:40)", o: ["El rey del sur", "El rey del norte", "El principe del sur", "El gobernate del sur"], c: "El rey del sur"},
+            {q: "69. ¿Cómo se levantara el rey del norte contra él? (Daniel 11:40)", o: ["Como una tempestad", "Con furia", "En silencio", "Despacio"], c: "Como una tempestad"},
+            {q: "70. ¿Qué hará el rey del norte en las tierras? (Daniel 11:40)", o: ["Las invadira y pasará", "Las destruirá", "Las quemará", "Las venderá"], c: "Las invadira y pasará"},
+            {q: "71. ¿A qué tierra entrará el rey del norte? (Daniel 11:41)", o: ["En la tierra gloriosa", "A Egipto", "A Babilonia", "A Edom"], c: "En la tierra gloriosa"},
+            {q: "72. ¿Que pueblos escaparan de sus manos? (Daniel 11:41)", o: ["Edom, Moab y la mayoría de los hijos de Amón", "Edom, Moab y los amonitas", "Edom y Moab", "Edom, Moab y Amon"], c: "Edom, Moab y la mayoría de los hijos de Amón"},
+            {q: "73. ¿Que caeran cuando entre en la tierra gloriosa? (Daniel 11:41)", o: ["Muchas provincias", "Pocas", "Ninguna", "Todas"], c: "Muchas provincias"},
+            {q: "74. ¿Contra que extenderá su mano? (Daniel 11:42)", o: ["Contra las tierras", "Contra los reinos", "Contra las provincias", "Contra las naciones"], c: "Contra las tierras"},
+            {q: "75. ¿Qué país no escapará? (Daniel 11:42)", o: ["Egipto", "Libia", "Etiopía", "Moab"], c: "Egipto"},
+            {q: "76. ¿De qué se apoderará en Egipto? (Daniel 11:43)", o: ["De los tesoros de oro y plata", "De los tesoros del reino", "De los tesoros preciosos", "De los tesoros del templo"], c: "De los tesoros de oro y plata"},
+            {q: "77. ¿De qué más se apoderará? (Daniel 11:43)", o: ["De todas las cosas preciosas de Egipto", "De muchas riquezas de Egipto", "De grandes tesoros de Egipto", "De muchas riquezas preciosas"], c: "De todas las cosas preciosas de Egipto"},
+            {q: "78. ¿Quiénes lo seguirán en sus pasos? (Daniel 11:43)", o: ["Los de Libia y de Etiopía", "Los de Libia y de Egipto", "Los de Etiopía y de Egipto", "Los de Libia y de Arabia"], c: "Los de Libia y de Etiopía"},
+            {q: "79. ¿Qué lo atemorizará? (Daniel 11:44)", o: ["Noticias del oriente y del norte", "Noticias del norte y del sur", "Rumores de guerra", "Señales del cielo"], c: "Noticias del oriente y del norte"},
+            {q: "80. ¿Qué hará cuando sea atemorizado por las noticias del oriente y del norte? (Daniel 11:44)", o: ["Saldrá con gran ira para destruir y matar a muchos", "Saldrá con gran poder para destruir", "Entre los mares y el monte glorioso", "Entre los mares y el monte del templo"], c: "Saldrá con gran ira para destruir y matar a muchos"},
+            {q: "82. ¿Dónde plantará las tiendas de su palacio? (Daniel 11:45)", o: ["Entre los mares y el monte glorioso y santo", "En Jerusalén", "En el valle", "Junto al río"], c: "Entre los mares y el monte glorioso y santo"},
+            {q: "83. ¿Qué ocurrirá con el finalmente? (Daniel 11:45)", o: ["Llegará a su fin", "Gobernará para siempre", "Huirá", "Se arrepentirá"], c: "Llegará a su fin"},
+            {q: "84. ¿Que no tendra cuando llegue a su fin? (Daniel 11:45)", o: ["Quien le ayude", "Quien lo socorra", "Quien lo acompañe", "Sus tropas"], c: "Quien le ayude"},
+            {q: "86. ¿Que se levantara luego de los reyes de persia? (Daniel 11:3)", o: ["Un rey valiente", "Un rey poderoso", "Un rey fuerte", "Un rey grande"], c: "Un rey valiente"},
+            {q: "94. ¿Como dominara ese rey? (Daniel 11:3)", o: ["Con gran poder", "Con gran ejército", "Con gran fuerza", "Con gran autoridad"], c: "Con gran poder"},
+            {q: "95. ¿Que hara ese rey segun el texto? (Daniel 11:3)", o: ["UHará su voluntad", "Hará su proposito", "Sera Dividido", "Sera deshecho"], c: "Hará su voluntad"},
+            {q: "95. ¿Quién se levantará sobre su trono? (Daniel 11:7)", o: ["Un renuevo de sus raíces", "Un heredero del reino", "Un príncipe poderoso", "Un hijo del rey"], c: "Un renuevo de sus raíces"},
+            {q: "96. ¿Contra quién vendrá con un ejército? (Daniel 11:7)", o: ["Contra el rey del norte", "Contra el rey del sur", "Contra el rey poderoso", "Contra el rey enemigo"], c: "Contra el rey del norte"},
+            {q: "97. ¿Dónde entrará ese renuevo? (Daniel 11:7)", o: ["En la fortaleza", "En la ciudad", "En el templo", "En el palacio"], c: "En la fortaleza"},
+            {q: "98. ¿Qué hará con ellos? (Daniel 11:7)", o: ["Hará en ellos a su arbitrio", "Hará con ellos pacto", "Hará con ellos guerra", "Hará con ellos alianza"], c: "Hará en ellos a su arbitrio"},
+            {q: "99. ¿Qué llevará cautivo a Egipto? (Daniel 11:8)", o: ["Sus dioses, sus imágenes fundidas y sus objetos preciosos de plata y de oro", "A los reyes", "A las mujeres", "A los niños"], c: "Sus dioses, sus imágenes fundidas y sus objetos preciosos de plata y de oro"}
+];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>

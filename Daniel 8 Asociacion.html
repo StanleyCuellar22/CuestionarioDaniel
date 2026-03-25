@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulo 8 Asociacion (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulo 8 Asociacion</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulo 8 Asociacion (Reina Valera 1995) Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            {q: "1. ¿En qué año del reinado de Belsasar tuvo Daniel la visión del carnero y el macho cabrío? Daniel 8:1", o: ["En el año tercero del reinado del rey Belsasar", "En el primer año del reinado del rey Belsasar", "En el segundo año del reinado del rey Darío", "En el primer año del reinado de Ciro"], c: "En el año tercero del reinado del rey Belsasar"},
+            {q: "2. ¿Qué había tenido Daniel antes de esta visión? Daniel 8:1", o: ["Otra visión anterior", "Un sueño sin interpretación", "Una profecía escrita", "Un mensaje del rey"], c: "Otra visión anterior"},
+            {q: "3. ¿En qué ciudad se veía Daniel durante la visión? Daniel 8:2", o: ["En Susa, capital del reino", "En Babilonia", "En Jerusalén", "En Nínive"], c: "En Susa, capital del reino"},
+            {q: "4. ¿En qué provincia estaba Susa? Daniel 8:2", o: ["En la provincia de Elam", "En la provincia de Judá", "En la provincia de Babilonia", "En la provincia de Media"], c: "En la provincia de Elam"},
+            {q: "5. ¿Junto a qué río se veía Daniel en la visión? Daniel 8:2", o: ["Junto al río Ulai", "Junto al río Eufrates", "Junto al río Tigris", "Junto al río Jordán"], c: "Junto al río Ulai"},
+            {q: "6. ¿Qué animal vio Daniel delante del río? Daniel 8:3", o: ["Un carnero", "Un macho cabrío", "Un león", "Un oso"], c: "Un carnero"},
+            {q: "7. ¿Cuántos cuernos tenía el carnero? Daniel 8:3", o: ["Dos cuernos", "Un cuerno", "Tres cuernos", "Cuatro cuernos"], c: "Dos cuernos"},
+            {q: "8. ¿Cómo eran los cuernos del carnero? Daniel 8:3", o: ["Altos", "Pequeños", "Torcidos", "Iguales en tamaño"], c: "Altos"},
+            {q: "9. ¿Cuál de los cuernos del carnero era más alto? Daniel 8:3", o: ["El que creció después", "El primero que apareció", "Ambos eran iguales", "El más antiguo"], c: "El que creció después"},
+            {q: "10. ¿Hacia qué direcciones hería el carnero con sus cuernos? Daniel 8:4", o: ["Al poniente, al norte y al sur", "Al oriente, al sur y al norte", "Al oriente, al occidente y al norte", "A los cuatro puntos cardinales"], c: "Al poniente, al norte y al sur"},
+            {q: "11. ¿Qué podía hacer frente al carnero? Daniel 8:4", o: ["Ninguna bestia podía parar delante de él", "Solo las bestias fuertes", "Los reyes del oriente", "Los ejércitos del norte"], c: "Ninguna bestia podía parar delante de él"},
+            {q: "12. ¿Cómo actuaba el carnero según la visión? Daniel 8:4", o: ["Conforme a su voluntad", "Según mandato divino", "Con temor", "Con prudencia"], c: "Conforme a su voluntad"},
+            {q: "13. ¿Qué sucedía con el carnero mientras actuaba? Daniel 8:4", o: ["Se engrandecía", "Se debilitaba", "Se escondía", "Se destruía"], c: "Se engrandecía"},
+            {q: "14. ¿Desde dónde venía el macho cabrío? Daniel 8:5", o: ["Del lado del poniente", "Del lado del oriente", "Del norte", "Del sur"], c: "Del lado del poniente"},
+            {q: "15. ¿Cómo se desplazaba el macho cabrío? Daniel 8:5", o: ["Sin tocar tierra", "Arrastrándose", "Volando lentamente", "Saltando con dificultad"], c: "Sin tocar tierra"},
+            {q: "16. ¿Qué tenía el macho cabrío entre sus ojos? Daniel 8:5", o: ["Un cuerno notable", "Dos cuernos", "Un cuerno pequeño", "Cuatro cuernos"], c: "Un cuerno notable"},
+            {q: "17. ¿Contra quién corrió el macho cabrío? Daniel 8:6", o: ["Contra el carnero de dos cuernos", "Contra las bestias del mar", "Contra los reyes", "Contra Daniel"], c: "Contra el carnero de dos cuernos"},
+            {q: "18. ¿Con qué actitud corrió el macho cabrío contra el carnero? Daniel 8:6", o: ["Con la furia de su fuerza", "Con temor", "Con cautela", "Con debilidad"], c: "Con la furia de su fuerza"},
+            {q: "19. ¿Qué hizo el macho cabrío al llegar junto al carnero? Daniel 8:7", o: ["Lo hirió y le quebró sus dos cuernos", "Lo esquivó", "Huyó de él", "Lo ignoró"], c: "Lo hirió y le quebró sus dos cuernos"},
+            {q: "20. ¿Qué le ocurrió al carnero frente al macho cabrío? Daniel 8:7", o: ["No tenía fuerzas para hacerle frente", "Se fortaleció", "Lo venció", "Lo dominó"], c: "No tenía fuerzas para hacerle frente"},
+            {q: "21. ¿Qué hizo el macho cabrío con el carnero? Daniel 8:7", o: ["Lo derribó y lo pisoteó", "Lo perdonó", "Lo dejó escapar", "Lo encerró"], c: "Lo derribó y lo pisoteó"},
+            {q: "22. ¿Quién libró al carnero del poder del macho cabrío? Daniel 8:7", o: ["Nadie lo libró", "Un ángel", "Daniel", "El rey"], c: "Nadie lo libró"},
+            {q: "23. ¿Qué ocurrió con el macho cabrío después? Daniel 8:8", o: ["Creció en gran manera", "Se debilitó", "Desapareció", "Fue destruido"], c: "Creció en gran manera"},
+            {q: "24. ¿Cuándo fue quebrado el gran cuerno del macho cabrío? Daniel 8:8", o: ["Cuando estaba en su mayor fuerza", "Cuando era pequeño", "Al inicio de su poder", "Después de mucho tiempo"], c: "Cuando estaba en su mayor fuerza"},
+            {q: "25. ¿Cuántos cuernos salieron en lugar del cuerno grande? Daniel 8:8", o: ["Cuatro cuernos notables", "Dos cuernos", "Diez cuernos", "Un cuerno pequeño"], c: "Cuatro cuernos notables"},
+            {q: "26. ¿Hacia dónde se dirigían los cuatro cuernos? Daniel 8:8", o: ["Hacia los cuatro vientos del cielo", "Hacia Jerusalén", "Hacia Babilonia", "Hacia el mar"], c: "Hacia los cuatro vientos del cielo"},
+            {q: "27. ¿Qué salió de uno de esos cuernos? Daniel 8:9", o: ["Un cuerno pequeño", "Un ejército", "Un rey justo", "Una estrella"], c: "Un cuerno pequeño"},
+            {q: "28. ¿Hacia dónde creció el cuerno pequeño? Daniel 8:9", o: ["Hacia el sur, el oriente y la tierra gloriosa", "Solo hacia el norte", "Solo hacia el occidente", "Hacia el mar"], c: "Hacia el sur, el oriente y la tierra gloriosa"},
+            {q: "29. ¿Hasta dónde creció el cuerno pequeño? Daniel 8:10", o: ["Hasta el ejército del cielo", "Hasta el mar", "Hasta Babilonia", "Hasta Persia"], c: "Hasta el ejército del cielo"},
+            {q: "30. ¿Qué hizo con parte del ejército y las estrellas? Daniel 8:10", o: ["Las echó por tierra y las pisoteó", "Las exaltó", "Las protegió", "Las reunió"], c: "Las echó por tierra y las pisoteó"},
+            {q: "31. ¿Contra quién se engrandeció el cuerno pequeño? Daniel 8:11", o: ["Contra el Príncipe de los ejércitos", "Contra Daniel", "Contra el rey de Persia", "Contra Gabriel"], c: "Contra el Príncipe de los ejércitos"},
+            {q: "32. ¿Qué fue quitado por causa del cuerno pequeño? Daniel 8:11", o: ["El sacrificio continuo", "El templo", "La ciudad", "El reino"], c: "El sacrificio continuo"},
+            {q: "33. ¿Qué pasó con el lugar del santuario? Daniel 8:11", o: ["Fue echado por tierra", "Fue exaltado", "Fue restaurado", "Fue escondido"], c: "Fue echado por tierra"},
+            {q: "34. ¿Por qué fue entregado el ejército? Daniel 8:12", o: ["A causa de la prevaricación", "Por obediencia", "Por justicia", "Por restauración"], c: "A causa de la prevaricación"},
+            {q: "35. ¿Qué hizo el cuerno pequeño con la verdad? Daniel 8:12", o: ["La echó por tierra", "La exaltó", "La defendió", "La proclamó"], c: "La echó por tierra"},
+            {q: "36. ¿Qué hacía el cuerno pequeño en todo lo que emprendía? Daniel 8:12", o: ["Prosperaba", "Fracasaba", "Se detenía", "Se arrepentía"], c: "Prosperaba"},
+            {q: "37. ¿Quiénes conversaban en la visión? Daniel 8:13", o: ["Dos santos", "Dos reyes", "Dos profetas", "Dos bestias"], c: "Dos santos"},
+            {q: "38. ¿Qué preguntó uno de los santos? Daniel 8:13", o: ["¿Hasta cuándo durará la visión?", "¿Quién es Daniel?", "¿Cuándo vendrá el Mesías?", "¿Dónde está Babilonia?"], c: "¿Hasta cuándo durará la visión?"},
+            {q: "39. ¿Qué incluía esa visión? Daniel 8:13", o: ["El sacrificio continuo y la prevaricación asoladora", "Solo el carnero", "Solo el macho cabrío", "El juicio final"], c: "El sacrificio continuo y la prevaricación asoladora"},
+            {q: "40. ¿Qué era pisoteado según la pregunta? Daniel 8:13", o: ["El santuario y el ejército", "La ciudad", "El reino", "El mar"], c: "El santuario y el ejército"},
+            {q: "41. ¿Hasta cuántas tardes y mañanas duraría la visión? Daniel 8:14", o: ["Hasta dos mil trescientas tardes y mañanas", "Hasta mil doscientas tardes y mañanas", "Hasta setecientas tardes y mañanas", "Hasta tres mil tardes y mañanas"], c: "Hasta dos mil trescientas tardes y mañanas"},
+            {q: "42. ¿Qué sucedería después de las dos mil trescientas tardes y mañanas? Daniel 8:14", o: ["El santuario sería purificado", "El santuario sería destruido", "El sacrificio sería restaurado", "El reino sería entregado"], c: "El santuario sería purificado"},
+            {q: "43. ¿Qué hacía Daniel mientras consideraba la visión? Daniel 8:15", o: ["Procuraba comprenderla", "La escribía", "La proclamaba", "La olvidaba"], c: "Procuraba comprenderla"},
+            {q: "44. ¿Quién se puso delante de Daniel con apariencia de hombre? Daniel 8:15", o: ["Uno con apariencia de hombre", "El rey", "Un sacerdote", "Un profeta"], c: "Uno con apariencia de hombre"},
+            {q: "45. ¿Qué oyó Daniel entre las riberas del Ulai? Daniel 8:16", o: ["Una voz de hombre", "El sonido del viento", "El clamor del ejército", "Un canto celestial"], c: "Una voz de hombre"},
+            {q: "46. ¿A quién ordenó la voz que enseñara la visión? Daniel 8:16", o: ["A Gabriel", "A Miguel", "A Daniel", "A un santo"], c: "A Gabriel"},
+            {q: "47. ¿Qué debía hacer Gabriel con Daniel? Daniel 8:16", o: ["Enseñarle la visión", "Coronarlo rey", "Sanarlo", "Protegerlo"], c: "Enseñarle la visión"},
+            {q: "48. ¿Cómo reaccionó Daniel cuando Gabriel se acercó? Daniel 8:17", o: ["Se asustó y se postró sobre su rostro", "Se alegró", "Corrió", "Habló con valentía"], c: "Se asustó y se postró sobre su rostro"},
+            {q: "49. ¿Cómo llamó Gabriel a Daniel? Daniel 8:17", o: ["Hijo de hombre", "Profeta del Altísimo", "Siervo fiel", "Varón escogido"], c: "Hijo de hombre"},
+            {q: "50. ¿Para qué tiempo es la visión según Gabriel? Daniel 8:17", o: ["Para el tiempo del fin", "Para el tiempo pasado", "Para los días de Babilonia", "Para el reinado de Persia"], c: "Para el tiempo del fin"},
+            {q: "51. ¿Qué le ocurrió a Daniel mientras Gabriel hablaba? Daniel 8:18", o: ["Cayó dormido en tierra sobre su rostro", "Huyó", "Se puso a escribir", "Clamó en voz alta"], c: "Cayó dormido en tierra sobre su rostro"},
+            {q: "52. ¿Qué hizo Gabriel con Daniel cuando cayó? Daniel 8:18", o: ["Lo tocó y lo hizo estar en pie", "Lo dejó en tierra", "Lo reprendió", "Lo ignoró"], c: "Lo tocó y lo hizo estar en pie"},
+            {q: "53. ¿Qué prometió enseñarle Gabriel? Daniel 8:19", o: ["Lo que ha de venir al fin de la ira", "El nombre de los reyes", "El día del juicio", "La duración del exilio"], c: "Lo que ha de venir al fin de la ira"},
+            {q: "54. ¿Para cuándo es lo que se le enseñaría a Daniel? Daniel 8:19", o: ["Para el tiempo del fin", "Para el tiempo presente", "Para los días de Daniel", "Para el reinado de Grecia"], c: "Para el tiempo del fin"},
+            {q: "55. ¿Qué representan los dos cuernos del carnero? Daniel 8:20", o: ["Los reyes de Media y de Persia", "Dos reyes de Babilonia", "Dos naciones del oriente", "Dos profetas"], c: "Los reyes de Media y de Persia"},
+            {q: "56. ¿Qué representa el macho cabrío? Daniel 8:21", o: ["El rey de Grecia", "El rey de Babilonia", "El rey de Roma", "El rey de Siria"], c: "El rey de Grecia"},
+            {q: "57. ¿Qué es el cuerno grande entre sus ojos? Daniel 8:21", o: ["El primer rey", "El rey final", "Un ángel", "Una nación"], c: "El primer rey"},
+            {q: "58. ¿Qué representan los cuatro cuernos que se levantaron en su lugar? Daniel 8:22", o: ["Cuatro reinos de esa nación", "Cuatro reyes extranjeros", "Cuatro ángeles", "Cuatro profetas"], c: "Cuatro reinos de esa nación"},
+            {q: "59. ¿Tendrán estos reinos la misma fuerza que el primero? Daniel 8:22", o: ["No con la fuerza de él", "Serán más fuertes", "Serán invencibles", "Tendrán igual poder"], c: "No con la fuerza de él"},
+            {q: "60. ¿Cuándo se levantaría el rey altivo de rostro? Daniel 8:23", o: ["Al fin del reinado de ellos", "Al principio de su reinado", "En tiempos de paz", "En la época de Babilonia"], c: "Al fin del reinado de ellos"},
+            {q: "61. ¿Cómo se describe ese rey? Daniel 8:23", o: ["Altivo de rostro y entendido en enigmas", "Humilde y sabio", "Justo y misericordioso", "Débil y temeroso"], c: "Altivo de rostro y entendido en enigmas"},
+            {q: "62. ¿Cómo se fortalecería su poder? Daniel 8:24", o: ["No con fuerza propia", "Con un gran ejército", "Por la riqueza", "Con ayuda extranjera"], c: "No con fuerza propia"},
+            {q: "63. ¿Qué causaría ese rey? Daniel 8:24", o: ["Grandes ruinas", "Paz", "Prosperidad", "Alegria"], c: "Grandes ruinas"},
+            {q: "64. ¿En qué prosperará este rey? Daniel 8:24", o: ["En todo lo que emprenda", "Solo en la guerra", "En el comercio", "En la construcción"], c: "En todo lo que emprenda"},
+            {q: "65. ¿A quiénes destruirá? Daniel 8:24", o: ["A los fuertes y al pueblo de los santos", "A los débiles", "A los pecadores", "A sus aliados"], c: "A los fuertes y al pueblo de los santos"},
+            {q: "66. ¿Qué hará con su sagacidad? Daniel 8:25", o: ["Hará prosperar el engaño en su mano", "Traerá justicia", "Gobernará sabiamente", "Unificará reinos"], c: "Hará prosperar el engaño en su mano"},
+            {q: "67. ¿Qué pensará en su corazón? Daniel 8:25", o: ["Se engrandecerá", "Se humillará", "Buscará la paz", "Adorará a Dios"], c: "Se engrandecerá"},
+            {q: "68. ¿Qué hará con muchos? Daniel 8:25", o: ["Sin aviso destruirá a muchos", "Los salvará", "Los guiará", "Los enriquecerá"], c: "Sin aviso destruirá a muchos"},
+            {q: "69. ¿Contra quién se levantará? Daniel 8:25", o: ["Contra el Príncipe de los príncipes", "Contra el rey del sur", "Contra el rey del norte", "Contra los ángeles"], c: "Contra el Príncipe de los príncipes"},
+            {q: "70. ¿Cómo será quebrantado ese rey? Daniel 8:25", o: ["No por mano humana", "Por ejércitos humanos", "Por fuego", "Por hambre"], c: "No por mano humana"},
+            {q: "71. ¿Qué se dice de la visión de las tardes y mañanas? Daniel 8:26", o: ["Que es verdadera", "Que es simbólica solamente", "Que es confusa", "Que es incompleta"], c: "Que es verdadera"},
+            {q: "72. ¿Qué debía hacer Daniel con la visión? Daniel 8:26", o: ["Guardarla", "Publicarla", "Olvidarla", "Explicarla al rey"], c: "Guardarla"},
+            {q: "73. ¿Para cuántos días era la visión? Daniel 8:26", o: ["Para muchos días", "Para pocos días", "Para siete días", "Para cuarenta días"], c: "Para muchos días"},
+            {q: "74. ¿Cómo quedó Daniel después de la visión? Daniel 8:27", o: ["Quebrantado", "Fortalecido", "Confiado", "Glorificado"], c: "Quebrantado"},
+            {q: "75. ¿Qué estado físico tuvo Daniel? Daniel 8:27", o: ["Estuvo enfermo algunos días", "Murió", "Quedó ciego", "Fue sanado inmediatamente"], c: "Estuvo enfermo algunos días"},
+            {q: "76. ¿Qué hizo Daniel después de levantarse? Daniel 8:27", o: ["Atendió los negocios del rey", "Huyó", "Se escondió", "Predicó públicamente"], c: "Atendió los negocios del rey"},
+            {q: "77. ¿Cómo estaba Daniel a causa de la visión? Daniel 8:27", o: ["Estaba espantado a causa de la visión", "Alegre", "Indiferente", "Confiado"], c: "Estaba espantado a causa de la visión"},
+            {q: "78. ¿Qué no entendía Daniel? Daniel 8:27", o: ["Y no la entendía (la visión)", "El sueño", "El mensaje", "La profecía"], c: "Y no la entendía (la visión)"}
+            
+];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>

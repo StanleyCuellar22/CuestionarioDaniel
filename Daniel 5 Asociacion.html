@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulo 5 Asociacion (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulo 5 Asociacion</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulo 5 Asociacion (Reina Valera 1995) Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            {q: "1. ¿Quién hizo un gran banquete? Daniel 5:1", o: ["El rey Belsasar", "El rey Baltasar", "El rey Belsasar de Babilonia", "El rey de los caldeos"], c: "El rey Belsasar"}, // [cite: 4]
+            {q: "2. ¿A cuántos de sus príncipes hizo el banquete? Daniel 5:1", o: ["A mil de sus príncipes", "A mil príncipes", "A muchos de sus príncipes", "A mil de los príncipes"], c: "A mil de sus príncipes"}, // [cite: 4]
+            {q: "3. ¿Qué hacía el rey en presencia de los mil? Daniel 5:1", o: ["Bebía vino", "Tomaba vino", "Bebía del vino", "Bebía mucho vino"], c: "Bebía vino"}, // [cite: 4]
+            {q: "4. ¿Qué orden dio Belsasar con el gusto del vino? Daniel 5:2", o: ["Mandó que trajeran los vasos de oro y de plata", "Mandó traer los vasos de oro y plata", "Ordenó traer vasos de oro y de plata", "Hizo traer vasos de oro y plata"], c: "Mandó que trajeran los vasos de oro y de plata"}, // [cite: 4]
+            {q: "5. ¿De dónde provenían los vasos? Daniel 5:2", o: ["Del templo de Jerusalén", "Del templo en Jerusalén", "De la casa de Dios en Jerusalén", "Del templo que estaba en Jerusalén"], c: "Del templo de Jerusalén"}, // [cite: 5]
+            {q: "6. ¿Quién había traído esos vasos originalmente? Daniel 5:2", o: ["Nabucodonosor, su padre", "Nabucodonosor su padre", "El rey Nabucodonosor", "Nabucodonosor rey"], c: "Nabucodonosor, su padre"}, // [cite: 5]
+            {q: "7. ¿Para qué mandó traer los vasos? Daniel 5:2", o: ["Para que bebieran de ellos", "Para beber de ellos", "Para que bebiesen de ellos", "Para que tomaran de ellos"], c: "Para que bebieran de ellos"}, // [cite: 5]
+            {q: "8. ¿Quiénes bebieron de los vasos? Daniel 5:2", o: ["El rey y sus grandes, sus mujeres y sus concubinas", "El rey, sus mujeres y concubinas", "El rey y sus príncipes con mujeres", "El rey con sus mujeres y grandes"], c: "El rey y sus grandes, sus mujeres y sus concubinas"}, // [cite: 5]
+            {q: "9. ¿Qué vasos trajeron primero? Daniel 5:3", o: ["Los vasos de oro", "Vasos de oro del templo", "Vasos de oro de Jerusalén", "Los vasos de oro traídos"], c: "Los vasos de oro"}, // [cite: 5]
+            {q: "10. ¿De qué casa eran los vasos? Daniel 5:3", o: ["De la casa de Dios", "De la casa del Dios", "De la casa de su Dios", "De la casa santa"], c: "De la casa de Dios"}, // [cite: 6]
+            {q: "11. ¿Qué hicieron con los vasos? Daniel 5:3", o: ["Bebieron de ellos", "Bebieron con ellos", "Tomaron de ellos", "Usaron los vasos"], c: "Bebieron de ellos"}, // [cite: 6]
+            {q: "12. ¿Qué hicieron mientras bebían vino? Daniel 5:4", o: ["Alabaron a los dioses", "Honraron a los dioses", "Invocaron a los dioses", "Celebraron a los dioses"], c: "Alabaron a los dioses"}, // [cite: 6]
+            {q: "13. ¿A qué dioses alabaron primero? Daniel 5:4", o: ["Dioses de oro y plata", "Dioses de oro", "Dioses de plata", "Dioses de metales"], c: "Dioses de oro y plata"}, // [cite: 6]
+            {q: "14. ¿Qué otros dioses menciona el texto? Daniel 5:4", o: ["De bronce, de hierro, de madera y de piedra", "De bronce y hierro", "De madera y piedra", "De metales y piedra"], c: "De bronce, de hierro, de madera y de piedra"}, // [cite: 6]
+            {q: "15. ¿Cuándo aparecieron los dedos de la mano? Daniel 5:5", o: ["En aquella misma hora", "En esa misma hora", "En la misma hora", "En aquella hora"], c: "En aquella misma hora"}, // [cite: 7]
+            {q: "16. ¿Qué aparecieron escribiendo? Daniel 5:5", o: ["Los dedos de una mano de hombre", "Los dedos de una mano", "Una mano de hombre", "Los dedos de una mano humana"], c: "Los dedos de una mano de hombre"}, // [cite: 7]
+            {q: "17. ¿Dónde escribía la mano? Daniel 5:5", o: ["Sobre lo encalado de la pared del palacio real", "Sobre la pared del palacio real", "En la pared encalada del palacio", "Sobre la pared del palacio"], c: "Sobre lo encalado de la pared del palacio real"}, // [cite: 7]
+            {q: "18. ¿Delante de qué escribía la mano? Daniel 5:5", o: ["Delante del candelabro", "Frente al candelabro", "Junto al candelabro", "Cerca del candelabro"], c: "Delante del candelabro"}, // [cite: 7]
+            {q: "19. ¿Qué veía el rey? Daniel 5:5", o: ["La mano que escribía", "La escritura en la pared", "Los dedos escribiendo", "La pared escrita"], c: "La mano que escribía"}, // [cite: 7]
+            {q: "20. ¿Qué le sucedió al rey al ver esto? Daniel 5:6", o: ["El rey palideció", "El rey se puso pálido", "El rey perdió el color", "El rey se estremeció"], c: "El rey palideció"}, // [cite: 8]
+            {q: "21. ¿Qué pasó con sus pensamientos? Daniel 5:6", o: ["Sus pensamientos lo turbaron", "Sus pensamientos se turbaron", "Sus pensamientos lo inquietaron", "Sus pensamientos lo alteraron"], c: "Sus pensamientos lo turbaron"}, // [cite: 14]
+            {q: "22. ¿Qué ocurrió con sus caderas? Daniel 5:6", o: ["Se debilitaron sus caderas", "Sus caderas se debilitaron", "Se aflojaron sus caderas", "Sus caderas fallaron"], c: "Se debilitaron sus caderas"}, // [cite: 14]
+            {q: "23. ¿Qué hacían sus rodillas? Daniel 5:6", o: ["Daban la una contra la otra", "Chocaban una contra otra", "Golpeaban una a otra", "Temblaban una con otra"], c: "Daban la una contra la otra"}, // [cite: 14]
+            {q: "24. ¿Qué hizo el rey en alta voz? Daniel 5:7", o: ["Gritó que hicieran venir magos, caldeos y adivinos", "Gritó llamando a magos y caldeos", "Mandó traer magos y adivinos", "Ordenó llamar a los sabios"], c: "Gritó que hicieran venir magos, caldeos y adivinos"}, // [cite: 14]
+            {q: "25. ¿Qué prometió a quien leyera la escritura? Daniel 5:7", o: ["Ser vestido de púrpura", "Vestirse de púrpura", "Ser cubierto de púrpura", "Recibir vestidura púrpura"], c: "Ser vestido de púrpura"}, // [cite: 15]
+            {q: "26. ¿Qué recompensa adicional prometió el rey al intérprete? Daniel 5:7", o: ["Llevar en su cuello un collar de oro", "Llevar un collar de oro en su cuello", "Un collar de oro en el cuello", "Un collar de oro alrededor del cuello"], c: "Llevar en su cuello un collar de oro"}, // [cite: 15]
+            {q: "27. ¿Qué posición recibiría quien interpretara la escritura? Daniel 5:7", o: ["Ser el tercer señor en el reino", "Ser tercer señor del reino", "Ser el tercero en el reino", "Ser señor tercero del reino"], c: "Ser el tercer señor en el reino"}, // [cite: 15]
+            {q: "28. ¿Qué no pudieron hacer los sabios del rey? Daniel 5:8", o: ["Leer la escritura", "Leer la inscripción", "Leer la escritura escrita", "Leer la escritura en la pared"], c: "Leer la escritura"}, // [cite: 15]
+            {q: "29. ¿Qué más no pudieron hacer los sabios? Daniel 5:8", o: ["Dar al rey su interpretación", "Dar su interpretación al rey", "Interpretar la escritura al rey", "Dar interpretación de la escritura"], c: "Dar al rey su interpretación"}, // [cite: 15]
+            {q: "30. ¿Cómo se turbó el rey al ver esto? Daniel 5:9", o: ["Se turbó sobremanera", "Se turbó en gran manera", "Se turbó mucho", "Se turbó intensamente"], c: "Se turbó sobremanera"}, // [cite: 16]
+            {q: "31. ¿Qué le ocurrió al rostro del rey? Daniel 5:9", o: ["Palideció", "Se puso pálido", "Perdió el color", "Se tornó pálido"], c: "Palideció"}, // [cite: 16]
+            {q: "32. ¿Cómo estaban los príncipes del rey? Daniel 5:9", o: ["Estaban perplejos", "Quedaron perplejos", "Se hallaban perplejos", "Estaban confundidos"], c: "Estaban perplejos"}, // [cite: 16]
+            {q: "33. ¿Quién entró a la sala del banquete? Daniel 5:10", o: ["La reina", "La reina madre", "La esposa del rey", "La mujer del rey"], c: "La reina"}, // [cite: 16]
+            {q: "34. ¿Por qué entró la reina? Daniel 5:10", o: ["Por las palabras del rey y de sus príncipes", "Por las palabras del rey", "Por las palabras de los príncipes", "Por lo que decían en la sala"], c: "Por las palabras del rey y de sus príncipes"}, // [cite: 16]
+            {q: "35. ¿Qué deseo expresó la reina al rey? Daniel 5:10", o: ["¡Rey, vive para siempre!", "¡Oh rey, vive para siempre!", "¡Rey, que vivas para siempre!", "¡Vive para siempre, oh rey!"], c: "¡Rey, vive para siempre!"}, // [cite: 17]
+            {q: "36. ¿Qué pidió la reina que no sucediera? Daniel 5:10", o: ["No te turben tus pensamientos", "Que no se turben tus pensamientos", "No se turben tus pensamientos", "Que tus pensamientos no se turben"], c: "No te turben tus pensamientos"}, // [cite: 17]
+            {q: "37. ¿Qué más pidió la reina al rey? Daniel 5:10", o: ["Ni palidezca tu rostro", "Que no palidezca tu rostro", "No palidezca tu rostro", "Ni se palidezca tu rostro"], c: "Ni palidezca tu rostro"}, // [cite: 17]
+            {q: "38. ¿Qué afirmó la reina que había en el reino? Daniel 5:11", o: ["Un hombre en el que mora el espíritu de los dioses santos", "Un hombre con el espíritu de los dioses santos", "Un hombre en quien está el espíritu santo", "Un hombre con espíritu de dioses"], c: "Un hombre en el que mora el espíritu de los dioses santos"}, // [cite: 17]
+            {q: "39. ¿En qué tiempo se halló en él luz y sabiduría? Daniel 5:11", o: ["En los días de tu padre", "En los días de tu padre el rey", "En los días de tu padre Nabucodonosor", "En los días del rey anterior"], c: "En los días de tu padre"}, // [cite: 17]
+            {q: "40. ¿Qué cualidades se hallaron en él? Daniel 5:11", o: ["Luz, inteligencia y sabiduría", "Luz, entendimiento y sabiduría", "Luz, inteligencia y entendimiento", "Sabiduría, inteligencia y luz"], c: "Luz, inteligencia y sabiduría"}, // [cite: 18]
+            {q: "41. ¿Con qué se comparó su sabiduría? Daniel 5:11", o: ["Como la sabiduría de los dioses", "Como sabiduría de dioses", "Como la sabiduría divina", "Como la sabiduría celestial"], c: "Como la sabiduría de los dioses"}, // [cite: 21, 22]
+            {q: "42. ¿Quién lo constituyó jefe? Daniel 5:11", o: ["El rey Nabucodonosor, tu padre", "El rey Nabucodonosor", "Nabucodonosor, rey", "Tu padre Nabucodonosor"], c: "El rey Nabucodonosor, tu padre"}, // [cite: 23]
+            {q: "43. ¿Sobre quiénes fue constituido jefe? Daniel 5:11", o: ["Sobre todos los magos, astrólogos, caldeos y adivinos", "Sobre magos, astrólogos, caldeos y adivinos", "Sobre todos los magos y astrólogos", "Sobre los sabios del reino"], c: "Sobre todos los magos, astrólogos, caldeos y adivinos"}, // [cite: 24]
+            {q: "44. ¿Qué más se halló en él según la reina? Daniel 5:12", o: ["Más espíritu, ciencia y entendimiento", "Espíritu, ciencia y entendimiento", "Más espíritu y entendimiento", "Espíritu, ciencia y sabiduría"], c: "Más espíritu, ciencia y entendimiento"}, // [cite: 25]
+            {q: "45. ¿Para qué tenía capacidad Daniel? Daniel 5:12", o: ["Para interpretar sueños", "Para interpretar los sueños", "Para explicar sueños", "Para entender sueños"], c: "Para interpretar sueños"}, // [cite: 26, 27]
+            {q: "46. ¿Qué más podía hacer Daniel? Daniel 5:12", o: ["Descifrar enigmas", "Resolver enigmas", "Explicar enigmas", "Descubrir enigmas"], c: "Descifrar enigmas"}, // [cite: 28]
+            {q: "47. ¿Qué otra habilidad tenía Daniel? Daniel 5:12", o: ["Resolver dudas", "Aclarar dudas", "Explicar dudas", "Quitar dudas"], c: "Resolver dudas"}, // [cite: 29]
+            {q: "48. ¿Qué nombre le había puesto el rey a Daniel? Daniel 5:12", o: ["Beltsasar", "Baltasar", "Beltsasar el mago", "Beltsasar de Judá"], c: "Beltsasar"}, // [cite: 30]
+            {q: "49. ¿Qué instrucción dio la reina finalmente? Daniel 5:12", o: ["Llámese ahora a Daniel", "Que llamen a Daniel", "Llamen ahora a Daniel", "Hagan venir a Daniel"], c: "Llámese ahora a Daniel"}, // [cite: 31]
+            {q: "50. ¿Qué haría Daniel según la reina? Daniel 5:12", o: ["Él te dará la interpretación", "Él dará la interpretación", "Él dará su interpretación", "Te dará interpretación"], c: "Él te dará la interpretación"}, // [cite: 32, 33]
+            {q: "51. ¿A quién trajeron ante el rey? Daniel 5:13", o: ["A Daniel", "Al profeta Daniel", "A Daniel el hebreo", "A Daniel cautivo"], c: "A Daniel"}, // [cite: 34]
+            {q: "52. ¿Cómo se dirige el rey a Daniel al inicio? Daniel 5:13", o: ["¿Eres tú aquel Daniel?", "¿Eres tú Daniel?", "¿Tú eres Daniel?", "¿Eres tú ese Daniel?"], c: "¿Eres tú aquel Daniel?"}, // [cite: 35]
+            {q: "53. ¿De dónde dice el rey que es Daniel? Daniel 5:13", o: ["De los hijos de la cautividad de Judá", "De los cautivos de Judá", "De la cautividad de Judá", "De los hijos de Judá"], c: "De los hijos de la cautividad de Judá"}, // [cite: 36, 37]
+            {q: "54. ¿Quién había traído a Daniel de Judá? Daniel 5:13", o: ["Mi padre", "Mi padre el rey", "Nabucodonosor mi padre", "El rey mi padre"], c: "Mi padre"}, // [cite: 38, 39]
+            {q: "55. ¿Qué había oído el rey acerca de Daniel? Daniel 5:14", o: ["Que el espíritu de los dioses santos está en ti", "Que el espíritu santo está en ti", "Que el espíritu de los dioses está en ti", "Que tienes espíritu santo"], c: "Que el espíritu de los dioses santos está en ti"}, // [cite: 40, 41]
+            {q: "56. ¿Qué más se halló en Daniel según el rey? Daniel 5:14", o: ["Luz, entendimiento y mayor sabiduría", "Luz, inteligencia y sabiduría", "Luz, entendimiento y sabiduría", "Luz, entendimiento y mucha sabiduría"], c: "Luz, entendimiento y mayor sabiduría"}, // [cite: 42]
+            {q: "57. ¿A quiénes trajeron antes que a Daniel? Daniel 5:15", o: ["Sabios y astrólogos", "Magos y astrólogos", "Sabios y magos", "Astrólogos y caldeos"], c: "Sabios y astrólogos"}, // [cite: 43]
+            {q: "58. ¿Para qué fueron traídos esos sabios? Daniel 5:15", o: ["Para que leyeran la escritura", "Para leer la escritura", "Para leer la escritura escrita", "Para leer la inscripción"], c: "Para que leyeran la escritura"}, // [cite: 44]
+            {q: "59. ¿Qué no pudieron hacer esos sabios? Daniel 5:15", o: ["Interpretarme el asunto", "Interpretar el asunto", "Dar interpretación del asunto", "Explicar el asunto"], c: "Interpretarme el asunto"}, // [cite: 45]
+            {q: "60. ¿Qué había oído el rey sobre Daniel? Daniel 5:16", o: ["Que puedes interpretar y resolver dificultades", "Que puedes interpretar", "Que resuelves dificultades", "Que interpretas dificultades"], c: "Que puedes interpretar y resolver dificultades"}, // [cite: 46, 47]
+            {q: "61. ¿Qué debía hacer Daniel para recibir recompensa? Daniel 5:16", o: ["Leer la escritura y dar su interpretación", "Leer la escritura y explicar", "Leer la escritura e interpretarla", "Dar interpretación de la escritura"], c: "Leer la escritura y dar su interpretación"}, // [cite: 48, 49]
+            {q: "62. ¿Con qué sería vestido Daniel? Daniel 5:16", o: ["Con ropa púrpura", "De vestidura púrpura", "Con púrpura", "De púrpura"], c: "De púrpura"}, // [cite: 50]
+            {q: "63. ¿Qué llevaría Daniel en su cuello? Daniel 5:16", o: ["Un collar de oro", "Collar de oro", "Un collar de oro fino", "Un collar de oro en el cuello"], c: "Un collar de oro"}, // [cite: 51]
+            {q: "64. ¿Qué cargo recibiría Daniel? Daniel 5:16", o: ["Ser el tercer señor en el reino", "Ser tercer señor del reino", "Ser el tercero del reino", "Ser señor tercero del reino"], c: "Ser el tercer señor en el reino"}, // [cite: 52]
+            {q: "65. ¿Qué respondió Daniel acerca de los dones? Daniel 5:17", o: ["Tus dones sean para ti", "Que tus dones sean para ti", "Guarda tus dones para ti", "Tus dones queden contigo"], c: "Tus dones sean para ti"}, // [cite: 53, 54]
+            {q: "66. ¿A quién pidió Daniel que dieran las recompensas? Daniel 5:17", o: ["A otros", "A alguien más", "A los demás", "A otros hombres"], c: "A otros"}, // [cite: 55]
+            {q: "67. ¿Qué prometió Daniel hacer? Daniel 5:17", o: ["Leeré la escritura al rey", "Leeré la escritura", "Leeré la escritura escrita", "Leeré la inscripción"], c: "Leeré la escritura al rey"}, // [cite: 56]
+            {q: "68. ¿Qué más dijo Daniel que haría? Daniel 5:17", o: ["Le daré la interpretación", "Daré la interpretación", "Le explicaré la interpretación", "Interpretaré la escritura"], c: "Le daré la interpretación"}, // [cite: 57]
+            {q: "69. ¿Quién dio a Nabucodonosor el reino? Daniel 5:18", o: ["El Altísimo Dios", "Dios Altísimo", "El Dios Altísimo", "El Altísimo"], c: "El Altísimo Dios"}, // [cite: 58]
+            {q: "70. ¿Qué cosas le dio Dios a Nabucodonosor? Daniel 5:18", o: ["El reino, la grandeza, la gloria y la majestad", "El reino y la grandeza", "La gloria y la majestad", "La grandeza y la majestad"], c: "El reino, la grandeza, la gloria y la majestad"}, // [cite: 59, 60]
+            {q: "71. ¿Qué provocaba la grandeza que Dios le dio? Daniel 5:19", o: ["Todos los pueblos temblaban y temían", "Todos los pueblos temían", "Los pueblos temblaban", "Las naciones temían"], c: "Todos los pueblos temblaban y temían"}, // [cite: 61]
+            {q: "72. ¿A quién mataba Nabucodonosor cuando le placía? Daniel 5:19", o: ["A quien le placía", "A quien quería", "A quien deseaba", "A quien decidía"], c: "A quien le placía"}, // [cite: 62]
+            {q: "73. ¿Qué hacía con quien le placía engrandecer? Daniel 5:19", o: ["Lo engrandecía", "Lo exaltaba", "Lo levantaba", "Lo hacía grande"], c: "Lo engrandecía"}, // [cite: 63]
+            {q: "74. ¿Qué hizo Dios cuando su corazón se ensoberbeció? Daniel 5:20", o: ["Fue depuesto del trono de su reino", "Fue quitado del trono", "Fue depuesto de su trono", "Fue removido del trono"], c: "Fue depuesto del trono de su reino"}, // [cite: 64]
+            {q: "75. ¿De qué fue despojado Nabucodonosor? Daniel 5:20", o: ["De su gloria", "De la gloria", "De su majestad", "De su grandeza"], c: "De su gloria"}, // [cite: 65, 66]
+            {q: "76. ¿Qué ocurrió cuando el corazón de Nabucodonosor se ensoberbeció? Daniel 5:20", o: ["Su espíritu se endureció en su orgullo", "Su espíritu se endureció por orgullo", "Su espíritu se llenó de orgullo", "Su corazón se endureció en orgullo"], c: "Su espíritu se endureció en su orgullo"}, // [cite: 67]
+            {q: "77. ¿Qué le sucedió después de ser depuesto del trono? Daniel 5:21", o: ["Fue echado de entre los hijos de los hombres", "Fue echado de entre los hombres", "Fue apartado de los hombres", "Fue quitado de entre los hombres"], c: "Fue echado de entre los hijos de los hombres"}, // [cite: 68]
+            {q: "78. ¿A qué se hizo semejante su mente? Daniel 5:21", o: ["A la de las bestias", "A la de las bestias del campo", "A la de los animales", "A la de las fieras"], c: "A la de las bestias"}, // [cite: 69]
+            {q: "79. ¿Con quién fue su habitación? Daniel 5:21", o: ["Con los asnos monteses", "Con los asnos del campo", "Con los animales monteses", "Con las bestias monteses"], c: "Con los asnos monteses"}, // [cite: 70]
+            {q: "80. ¿Qué le hicieron comer? Daniel 5:21", o: ["Hierba, como al buey", "Hierba como buey", "Hierba del campo como buey", "Hierba como a los bueyes"], c: "Hierba, como al buey"}, // [cite: 71, 72]
+            {q: "81. ¿Con qué se empapó su cuerpo? Daniel 5:21", o: ["Con el rocío del cielo", "Con rocío del cielo", "Con el rocío celestial", "Con el rocío de los cielos"], c: "Con el rocío del cielo"}, // [cite: 73, 74]
+            {q: "82. ¿Hasta cuándo permaneció en ese estado? Daniel 5:21", o: ["Hasta que reconoció que el Altísimo Dios tiene dominio", "Hasta que reconoció el dominio del Altísimo", "Hasta que conoció que Dios tiene dominio", "Hasta que reconoció el poder del Altísimo"], c: "Hasta que reconoció que el Altísimo Dios tiene dominio"}, // [cite: 75]
+            {q: "83. ¿Sobre qué tiene dominio el Altísimo Dios? Daniel 5:21", o: ["Sobre el reino de los hombres", "Sobre los reinos de los hombres", "Sobre el reino humano", "Sobre los hombres"], c: "Sobre el reino de los hombres"}, // [cite: 76]
+            {q: "84. ¿A quién pone Dios sobre el reino? Daniel 5:21", o: ["Al que le place", "Al que él quiere", "Al que desea", "Al que decide"], c: "Al que le place"}, // [cite: 77]
+            {q: "85. ¿Qué no hizo Belsasar sabiendo todo esto? Daniel 5:22", o: ["No humilló su corazón", "No humilló su espíritu", "No humilló su alma", "No se humilló"], c: "No humilló su corazón"}, // [cite: 78, 79]
+            {q: "86. ¿Contra quién se ensoberbeció Belsasar? Daniel 5:23", o: ["Contra el Señor del cielo", "Contra el Dios del cielo", "Contra el Señor celestial", "Contra el Dios Altísimo"], c: "Contra el Señor del cielo"}, // [cite: 80]
+            {q: "87. ¿Qué mandó traer Belsasar ante sí? Daniel 5:23", o: ["Los vasos de su Casa", "Los vasos de la Casa", "Los vasos del templo", "Los vasos de la casa"], c: "Los vasos de su Casa"}, // [cite: 81]
+            {q: "88. ¿Quiénes bebieron vino de esos vasos? Daniel 5:23", o: ["Tú y tus grandes, tus mujeres y tus concubinas", "Tú y tus mujeres y concubinas", "Tú y tus grandes y mujeres", "Tú y tus concubinas"], c: "Tú y tus grandes, tus mujeres y tus concubinas"}, // [cite: 82]
+            {q: "89. ¿A qué dioses dio alabanza Belsasar? Daniel 5:23", o: ["A dioses de plata y oro, de bronce, de hierro, de madera y de piedra", "A dioses de oro y plata", "A dioses de metales y piedra", "A dioses de madera y piedra"], c: "A dioses de plata y oro, de bronce, de hierro, de madera y de piedra"}, // [cite: 83]
+            {q: "90. ¿Qué no hacen esos dioses? Daniel 5:23", o: ["Ni ven ni oyen ni saben", "No ven ni oyen", "No oyen ni saben", "Ni ven ni saben"], c: "Ni ven ni oyen ni saben"}, // [cite: 84, 85]
+            {q: "91. ¿A quién no honró Belsasar? Daniel 5:23", o: ["Al Dios en cuya mano está tu vida", "Al Dios que te dio la vida", "Al Dios que tiene tu vida", "Al Dios de tu vida"], c: "Al Dios en cuya mano está tu vida"}, // [cite: 86]
+            {q: "92. ¿De quién son todos tus caminos? Daniel 5:23", o: ["De quien son todos tus caminos", "De quien son tus caminos", "De quien pertenecen tus caminos", "De quien vienen tus caminos"], c: "De quien son todos tus caminos"}, // [cite: 87]
+            {q: "93. ¿Qué envió Dios por causa de esto? Daniel 5:24", o: ["La mano que trazó esta escritura", "Una mano que escribió", "La mano que escribió", "La mano que trazó la escritura"], c: "La mano que trazó esta escritura"}, // [cite: 88]
+            {q: "94. ¿Qué palabras trazó la escritura? Daniel 5:25", o: ["Mene, Mene, Tekel, Uparsin", "Mene, Tekel, Uparsin", "Mene, Mene, Tekel, Peres", "Mene, Tekel y Peres"], c: "Mene, Mene, Tekel, Uparsin"}, // [cite: 89]
+            {q: "95. ¿Qué significa \"Mene\"? Daniel 5:26", o: ["Contó Dios tu reino y le ha puesto fin", "Dios contó tu reino y lo terminó", "Contó Dios tu reino y lo acabó", "Dios contó tu reino y lo cerró"], c: "Contó Dios tu reino y le ha puesto fin"}, // [cite: 90, 91]
+            {q: "96. ¿Qué significa \"Tekel\"? Daniel 5:27", o: ["Pesado has sido en balanza y hallado falto", "Has sido pesado en balanza y hallado falto", "Pesado fuiste en balanza y hallado falto", "Pesado has sido y hallado falto"], c: "Pesado has sido en balanza y hallado falto"}, // [cite: 92]
+            {q: "97. ¿Qué significa \"Peres\"? Daniel 5:28", o: ["Tu reino ha sido roto y dado a los medos y a los persas", "Tu reino fue roto y dado a medos y persas", "Tu reino ha sido dividido y dado a medos y persas", "Tu reino fue dado a los medos y persas"], c: "Tu reino ha sido roto y dado a los medos y a los persas"}, // [cite: 93]
+            {q: "98. ¿Qué mandó hacer Belsasar con Daniel? Daniel 5:29", o: ["Mandó vestir a Daniel de púrpura", "Mandó vestir a Daniel con púrpura", "Ordenó vestir a Daniel de púrpura", "Hizo vestir a Daniel de púrpura"], c: "Mandó vestir a Daniel de púrpura"}, // [cite: 94]
+            {q: "99. ¿Qué proclamó el rey acerca de Daniel? Daniel 5:29", o: ["Que era el tercer señor del reino", "Que era señor tercero del reino", "Que sería tercero en el reino", "Que sería el tercer gobernante"], c: "Que era el tercer señor del reino"}, // [cite: 95]
+            {q: "100. ¿Qué ocurrió la misma noche? Daniel 5:30", o: ["Fue muerto Belsasar, rey de los caldeos", "Murió Belsasar, rey de los caldeos", "Belsasar fue muerto esa noche", "Murió el rey Belsasar"], c: "Fue muerto Belsasar, rey de los caldeos"} // [cite: 96, 97]
+                    
+        ];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulo 10 Asociacion (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulo 10 Asociacion</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulo 10 Asociacion (Reina Valera 1995) Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            {q: "1. ¿En qué año fue revelada palabra a Daniel según Daniel 10? Daniel 10:1", o: ["En el tercer año de Ciro, rey de Persia", "En el primer año de Darío", "En el segundo año de Nabucodonosor", "En el cuarto año de Belsasar"], c: "En el tercer año de Ciro, rey de Persia"},
+            {q: "2. ¿Cómo es llamado Daniel en Daniel 10:1? Daniel 10:1", o: ["Beltsasar", "Sadrac", "Abed-nego", "Mesac"], c: "Beltsasar"},
+            {q: "3. ¿Cómo era la palabra revelada a Daniel? Daniel 10:1", o: ["Verdadera", "Oscura", "Difícil", "Sellada"], c: "Verdadera"},
+            {q: "4. ¿Qué tan grande era el conflicto mencionado en la visión? Daniel 10:1", o: ["Grande", "Pequeño", "Temporal", "Limitado"], c: "Grande"},
+            {q: "5. ¿Qué hizo Daniel con respecto a la palabra revelada? Daniel 10:1", o: ["La comprendió", "La escribió", "La anunció", "La selló"], c: "La comprendió"},
+            {q: "6. ¿Qué tuvo Daniel en la visión? Daniel 10:1", o: ["Inteligencia", "Fuerza", "Autoridad", "Valor"], c: "Inteligencia"},
+            {q: "7. ¿Durante cuánto tiempo estuvo afligido Daniel? Daniel 10:2", o: ["Por espacio de tres semanas", "Por siete días", "Por diez días", "Por un mes"], c: "Por espacio de tres semanas"},
+            {q: "8. ¿Qué no comió Daniel durante ese tiempo? Daniel 10:3", o: ["Manjar delicado", "Pan", "Legumbres", "Fruta"], c: "Manjar delicado"},
+            {q: "9. ¿Qué no entró en la boca de Daniel? Daniel 10:3", o: ["Carne ni vino", "Agua ni pan", "Miel ni leche", "Aceite ni sal"], c: "Carne ni vino"},
+            {q: "10. ¿Qué no hizo Daniel con perfume? Daniel 10:3", o: ["No se ungió", "Se ungió poco", "Se ungió al final", "Se ungió una vez"], c: "No se ungió"},
+            {q: "11. ¿Hasta cuándo se abstuvo Daniel de estas cosas? Daniel 10:3", o: ["Hasta que se cumplieron las tres semanas", "Hasta el séptimo día", "Hasta el ayuno", "Hasta la visión"], c: "Hasta que se cumplieron las tres semanas"},
+            {q: "12. ¿Qué día del mes estaba Daniel junto al río? Daniel 10:4", o: ["El día veinticuatro del primer mes", "El día diez del primer mes", "El día quince del mes", "El día primero del mes"], c: "El día veinticuatro del primer mes"},
+            {q: "13. ¿A la orilla de qué río estaba Daniel? Daniel 10:4", o: ["Del gran río Hidekel", "Del río Eufrates", "Del río Jordán", "Del río Tigris"], c: "Del gran río Hidekel"},
+            {q: "14. ¿Qué hizo Daniel al inicio de la visión? Daniel 10:5", o: ["Alzó sus ojos y miró", "Cayó al suelo", "Oró en silencio", "Ayunó"], c: "Alzó sus ojos y miró"},
+            {q: "15. ¿A quién vio Daniel en la visión? Daniel 10:5", o: ["A un varón vestido de lino", "A un ángel con alas", "A cuatro seres vivientes", "A un anciano"], c: "A un varón vestido de lino"},
+            {q: "16. ¿Con qué estaba ceñida la cintura del varón? Daniel 10:5", o: ["Con oro de Ufaz", "Con plata", "Con bronce", "Con lino"], c: "Con oro de Ufaz"},
+            {q: "17. ¿Cómo era el cuerpo del varón visto por Daniel? Daniel 10:6", o: ["Como de berilo", "Como de bronce", "Como de hierro", "Como de oro"], c: "Como de berilo"},
+            {q: "18. ¿Cómo parecía el rostro del varón? Daniel 10:6", o: ["Como un relámpago", "Como el sol", "Como fuego", "Como bronce"], c: "Como un relámpago"},
+            {q: "19. ¿Cómo eran los ojos del varón? Daniel 10:6", o: ["Como antorchas de fuego", "Como estrellas", "Como carbones", "Como relámpagos"], c: "Como antorchas de fuego"},
+            {q: "20. ¿Cómo era el sonido de sus palabras? Daniel 10:6", o: ["Como el estruendo de una multitud", "Como trueno", "Como trompeta", "Como viento fuerte"], c: "Como el estruendo de una multitud"},
+            {q: "21. ¿Quiénes no vieron la visión que Daniel vio? Daniel 10:7", o: ["Los hombres que estaban con Daniel", "Los príncipes de Persia", "Los sacerdotes", "Los mensajeros"], c: "Los hombres que estaban con Daniel"},
+            {q: "22. ¿Qué se apoderó de los hombres que estaban con Daniel? Daniel 10:7", o: ["Un gran temor", "Una gran alegría", "Un profundo sueño", "Un fuerte temblor"], c: "Un gran temor"},
+            {q: "23. ¿Qué hicieron los hombres que estaban con Daniel al sentir temor? Daniel 10:7", o: ["Huyeron y se escondieron", "Clamaron en voz alta", "Cayeron al suelo", "Se postraron"], c: "Huyeron y se escondieron"},
+            {q: "24. ¿Cómo quedó Daniel después que los otros huyeron? Daniel 10:8", o: ["Solo ante la gran visión", "Acompañado por los hombres", "Rodeado de ángeles", "Protegido por guardias"], c: "Solo ante la gran visión"},
+            {q: "25. ¿Qué ocurrió con las fuerzas de Daniel ante la visión? Daniel 10:8", o: ["No quedaron fuerzas en él", "Se fortalecieron", "Aumentaron", "Se renovaron"], c: "No quedaron fuerzas en él"},
+            {q: "26. ¿En qué se cambiaron las fuerzas de Daniel? Daniel 10:8", o: ["En desfallecimiento", "En vigor", "En temor", "En gozo"], c: "En desfallecimiento"},
+            {q: "27. ¿Qué oyó Daniel mientras estaba sin fuerzas? Daniel 10:9", o: ["El sonido de sus palabras", "Un canto", "Un estruendo de trueno", "Una trompeta"], c: "El sonido de sus palabras"},
+            {q: "28. ¿Qué le ocurrió a Daniel al oír el sonido de las palabras? Daniel 10:9", o: ["Cayó sobre su rostro en un profundo sueño", "Se puso en pie", "Clamó", "Corrió"], c: "Cayó sobre su rostro en un profundo sueño"},
+            {q: "29. ¿Cómo estaba el rostro de Daniel al caer en sueño profundo? Daniel 10:9", o: ["En tierra", "Mirando al cielo", "Cubierto", "Levantado"], c: "En tierra"},
+            {q: "30. ¿Qué tocó a Daniel después de caer en sueño? Daniel 10:10", o: ["Una mano", "Un ángel con alas", "Un rayo", "Una voz"], c: "Una mano"},
+            {q: "31. ¿Qué hizo la mano que tocó a Daniel? Daniel 10:10", o: ["Hizo que se pusiera sobre sus rodillas y palmas", "Lo levantó completamente", "Lo dejó en tierra", "Lo llevó al río"], c: "Hizo que se pusiera sobre sus rodillas y palmas"},
+            {q: "32. ¿Cómo llamó el mensajero a Daniel? Daniel 10:11", o: ["Varón muy amado", "Príncipe escogido", "Siervo fiel", "Hijo de Israel"], c: "Varón muy amado"},
+            {q: "33. ¿A qué debía estar atento Daniel según el mensajero? Daniel 10:11", o: ["A las palabras que había de decirle", "A la visión", "Al río", "Al pueblo"], c: "A las palabras que había de decirle"},
+            {q: "34. ¿Qué orden recibió Daniel inmediatamente? Daniel 10:11", o: ["Ponte en pie", "Permanece postrado", "Alza tus manos", "Clama"], c: "Ponte en pie"},
+            {q: "35. ¿Por qué fue enviado el mensajero a Daniel? Daniel 10:11", o: ["Porque a él había sido enviado", "Por causa del pueblo", "Por mandato del rey", "Por la visión"], c: "Porque a él había sido enviado"},
+            {q: "36. ¿Cómo se puso Daniel en pie al oír estas palabras? Daniel 10:11", o: ["Temblando", "Con valentía", "Con gozo", "Con fuerza"], c: "Temblando"},
+            {q: "37. ¿Qué exhortación recibió Daniel respecto al temor? Daniel 10:12", o: ["No temas", "Permanece callado", "Corre", "Esconde tu rostro"], c: "No temas"},
+            {q: "38. ¿Desde cuándo fueron oídas las palabras de Daniel? Daniel 10:12", o: ["Desde el primer día", "Desde la última semana", "Desde el ayuno", "Desde la visión"], c: "Desde el primer día"},
+            {q: "39. ¿Qué dispuso Daniel en su corazón según el texto? Daniel 10:12", o: ["Entender y humillarse en la presencia de su Dios", "Ayunar completamente", "Salir del lugar", "Hablar al pueblo"], c: "Entender y humillarse en la presencia de su Dios"},
+            {q: "40. ¿Por causa de qué vino el mensajero a Daniel? Daniel 10:12", o: ["A causa de tus palabras", "A causa del ayuno", "A causa del pueblo", "A causa del rey"], c: "A causa de tus palabras"},
+            {q: "41. ¿Qué se opuso al mensajero durante veintiún días? Daniel 10:13", o: ["El príncipe del reino de Persia", "El príncipe de Grecia", "Los reyes de Media", "Los magos de Babilonia"], c: "El príncipe del reino de Persia"},
+            {q: "42. ¿Durante cuántos días se opuso el príncipe del reino de Persia? Daniel 10:13", o: ["Veintiún días", "Diez días", "Tres semanas y media", "Siete días"], c: "Veintiún días"},
+            {q: "43. ¿Quién vino para ayudar al mensajero? Daniel 10:13", o: ["Miguel", "Gabriel", "Rafael", "Uriel"], c: "Miguel"},
+            {q: "44. ¿Cómo se describe a Miguel en Daniel 10:13? Daniel 10:13", o: ["Uno de los principales príncipes", "El príncipe del pueblo", "El mensajero del pacto", "El ángel del Señor"], c: "Uno de los principales príncipes"},
+            {q: "45. ¿Con quién quedó el mensajero después de recibir ayuda? Daniel 10:13", o: ["Con los reyes de Persia", "Con el pueblo de Judá", "Con los príncipes de Media", "Con los ángeles del cielo"], c: "Con los reyes de Persia"},
+            {q: "46. ¿Para qué vino el mensajero a Daniel según sus palabras? Daniel 10:14", o: ["Para hacerle saber lo que ha de sucederle a su pueblo", "Para reprenderlo", "Para cambiar la visión", "Para anunciar el juicio"], c: "Para hacerle saber lo que ha de sucederle a su pueblo"},
+            {q: "47. ¿En qué tiempo sucederían las cosas anunciadas? Daniel 10:14", o: ["En los últimos días", "En los días de Ciro", "En el tiempo presente", "En la próxima semana"], c: "En los últimos días"},
+            {q: "48. ¿Para qué días es la visión según el mensajero? Daniel 10:14", o: ["Para esos días", "Para el tiempo de Daniel", "Para el pasado", "Para el exilio"], c: "Para esos días"},
+            {q: "49. ¿Cómo tenía Daniel los ojos mientras oía estas palabras? Daniel 10:15", o: ["Puestos en tierra", "Alzados al cielo", "Cerrados", "Llorando"], c: "Puestos en tierra"},
+            {q: "50. ¿Qué le ocurrió a Daniel mientras escuchaba? Daniel 10:15", o: ["Había enmudecido", "Clamó en voz alta", "Cayó dormido", "Huyó"], c: "Había enmudecido"},
+            {q: "51. ¿Quién tocó los labios de Daniel? Daniel 10:16", o: ["Uno con semejanza de hijo de hombre", "El príncipe de Persia", "Miguel", "Un varón vestido de lino"], c: "Uno con semejanza de hijo de hombre"},
+            {q: "52. ¿Qué hizo Daniel después de que tocaron sus labios? Daniel 10:16", o: ["Abrió la boca y habló", "Cayó al suelo", "Huyó", "Calló"], c: "Abrió la boca y habló"},
+            {q: "53. ¿Qué dijo Daniel que le había sobrevenido con la visión? Daniel 10:16", o: ["Dolores", "Alegría", "Paz", "Gozo"], c: "Dolores"},
+            {q: "54. ¿Qué declaró Daniel acerca de sus fuerzas? Daniel 10:16", o: ["No me quedan fuerzas", "Me han sido renovadas", "Se multiplicaron", "Me fueron dadas"], c: "No me quedan fuerzas"},
+            {q: "55. ¿Qué dijo Daniel que no le quedó al instante? Daniel 10:17", o: ["Aliento", "Esperanza", "Valor", "Entendimiento"], c: "Aliento"},
+            {q: "56. ¿Quién tocó nuevamente a Daniel? Daniel 10:18", o: ["El que tenía semejanza de hombre", "Miguel", "El príncipe de Persia", "Los hombres que estaban con él"], c: "El que tenía semejanza de hombre"},
+            {q: "57. ¿Qué efecto tuvo ese toque en Daniel? Daniel 10:18", o: ["Lo fortaleció", "Lo hizo caer", "Lo dejó inmóvil", "Lo hizo dormir"], c: "Lo fortaleció"},
+            {q: "58. ¿Cómo volvió a llamar el mensajero a Daniel? Daniel 10:19", o: ["Muy amado", "Siervo fiel", "Príncipe escogido", "Varón fuerte"], c: "Muy amado"},
+            {q: "59. ¿Qué saludo de paz recibió Daniel? Daniel 10:19", o: ["La paz sea contigo", "El Señor te guarde", "No temas", "Sé fuerte"], c: "La paz sea contigo"},
+            {q: "60. ¿Qué exhortación recibió Daniel junto con la paz? Daniel 10:19", o: ["Esfuérzate y cobra aliento", "Permanece en silencio", "Postra tu rostro", "Retírate"], c: "Esfuérzate y cobra aliento"},
+            {q: "61. ¿Qué efecto tuvo en Daniel cuando el mensajero le habló? Daniel 10:19", o: ["Recobró las fuerzas", "Cayó en sueño", "Huyó", "Enmudeció"], c: "Recobró las fuerzas"},
+            {q: "62. ¿Qué dijo Daniel después de recobrar las fuerzas? Daniel 10:19", o: ["Hable mi señor, porque me has fortalecido", "No temas", "La paz sea contigo", "Estoy listo"], c: "Hable mi señor, porque me has fortalecido"},
+            {q: "63. ¿Qué pregunta hizo el mensajero a Daniel al comenzar a hablar? Daniel 10:20", o: ["¿Sabes por qué he venido a ti?", "¿Entendiste la visión?", "¿Tienes temor?", "¿Has ayunado?"], c: "¿Sabes por qué he venido a ti?"},
+            {q: "64. ¿Contra quién debía volver a pelear el mensajero? Daniel 10:20", o: ["Contra el príncipe de Persia", "Contra el príncipe de Grecia", "Contra los reyes de Media", "Contra Babilonia"], c: "Contra el príncipe de Persia"},
+            {q: "65. ¿Qué sucedería al terminar con el príncipe de Persia? Daniel 10:20", o: ["El príncipe de Grecia vendría", "Vendría Miguel", "Terminaría la visión", "Cesará el conflicto"], c: "El príncipe de Grecia vendría"},
+            {q: "66. ¿Qué prometió declarar el mensajero a Daniel? Daniel 10:21", o: ["Lo que está escrito en el libro de la verdad", "Las palabras selladas", "Los sueños del rey", "Las profecías pasadas"], c: "Lo que está escrito en el libro de la verdad"},
+            {q: "67. ¿En qué libro dijo el mensajero que estaba escrito lo que declararía? Daniel 10:21", o: ["En el libro de la verdad", "En el libro de la ley", "En el libro de las visiones", "En el libro del pacto"], c: "En el libro de la verdad"},
+            {q: "68. ¿Quién dijo el mensajero que no lo ayudaba contra ellos? Daniel 10:21", o: ["Nadie", "Los ángeles", "Los hombres", "Los príncipes"], c: "Nadie"},
+            {q: "69. ¿Quién es mencionado como ayuda contra ellos? Daniel 10:21", o: ["Miguel vuestro príncipe", "Gabriel vuestro mensajero", "El príncipe de Persia", "El príncipe de Grecia"], c: "Miguel vuestro príncipe"},
+            {q: "70. ¿Cómo es llamado Miguel en Daniel 10:21? Daniel 10:21", o: ["Vuestro príncipe", "El príncipe del cielo", "El ángel del pacto", "El mensajero fiel"], c: "Vuestro príncipe"},
+            {q: "71. ¿En qué año se sitúa toda la visión de Daniel 10? Daniel 10:1", o: ["En el tercer año de Ciro, rey de Persia", "En el primer año de Darío", "En el segundo año de Nabucodonosor", "En el último año de Babilonia"], c: "En el tercer año de Ciro, rey de Persia"},
+            {q: "72. ¿Qué nombre adicional se da a Daniel en este capítulo? Daniel 10:1", o: ["Beltsasar", "Sadrac", "Mesac", "Abed-nego"], c: "Beltsasar"},
+            {q: "73. ¿Qué comprendió Daniel acerca de la palabra revelada? Daniel 10:1", o: ["La palabra", "El conflicto", "El mensaje sellado", "La interpretación"], c: "La palabra"},
+            {q: "74. ¿Qué tuvo Daniel respecto a la visión? Daniel 10:1", o: ["Inteligencia", "Autoridad", "Fuerza", "Dominio"], c: "Inteligencia"},
+            {q: "75. ¿Cómo describe Daniel su estado durante tres semanas? Daniel 10:2", o: ["Afligido", "En gozo", "En paz", "En silencio"], c: "Afligido"},
+            {q: "76. ¿Qué cosa específica no entró en la boca de Daniel? Daniel 10:3", o: ["Carne ni vino", "Pan ni agua", "Miel ni leche", "Aceite ni sal"], c: "Carne ni vino"},
+            {q: "77. ¿Qué acción personal dejó de hacer Daniel durante las tres semanas? Daniel 10:3", o: ["Ungirse con perfume", "Vestirse de lino", "Salir al río", "Hablar al pueblo"], c: "Ungirse con perfume"},
+            {q: "78. ¿En qué lugar se encontraba Daniel cuando tuvo la visión? Daniel 10:4", o: ["A la orilla del gran río Hidekel", "En el templo", "En Babilonia", "En Jerusalén"], c: "A la orilla del gran río Hidekel"},
+            {q: "79. ¿Qué reacción tuvieron los hombres que estaban con Daniel? Daniel 10:7", o: ["Huyeron y se escondieron", "Se postraron", "Clamaron", "Quedaron firmes"], c: "Huyeron y se escondieron"},
+            {q: "80. ¿Cómo describe Daniel su condición después de quedar solo? Daniel 10:8", o: ["Mis fuerzas se cambiaron en desfallecimiento", "Me llené de temor", "Me fortalecí", "Recobré ánimo"], c: "Mis fuerzas se cambiaron en desfallecimiento"},
+            {q: "81. ¿Qué oyó Daniel mientras estaba sin fuerzas? Daniel 10:9", o: ["El sonido de sus palabras", "El ruido del río", "Un canto", "Un trueno"], c: "El sonido de sus palabras"},
+            {q: "82. ¿Qué le sucedió a Daniel al oír el sonido de las palabras? Daniel 10:9", o: ["Cayó sobre su rostro en un profundo sueño", "Se puso en pie", "Huyó", "Clamó"], c: "Cayó sobre su rostro en un profundo sueño"},
+            {q: "83. ¿Cómo estaba el rostro de Daniel al caer en profundo sueño? Daniel 10:9", o: ["En tierra", "Alzado al cielo", "Cubierto", "Vuelto al río"], c: "En tierra"},
+            {q: "84. ¿Qué acción realizó una mano sobre Daniel? Daniel 10:10", o: ["Lo tocó", "Lo levantó en el aire", "Lo cubrió", "Lo llevó al río"], c: "Lo tocó"},
+            {q: "85. ¿Sobre qué partes se puso Daniel después del toque? Daniel 10:10", o: ["Sobre sus rodillas y sobre las palmas de sus manos", "Sobre su rostro", "Sobre sus pies", "Sobre una roca"], c: "Sobre sus rodillas y sobre las palmas de sus manos"},
+            {q: "86. ¿Cómo fue llamado Daniel por el mensajero? Daniel 10:11", o: ["Varón muy amado", "Siervo fiel", "Hijo de Judá", "Príncipe"], c: "Varón muy amado"},
+            {q: "87. ¿Qué debía hacer Daniel con respecto a las palabras del mensajero? Daniel 10:11", o: ["Estar atento", "Escribirlas", "Callarlas", "Sellarlas"], c: "Estar atento"},
+            {q: "88. ¿Por qué fue enviado el mensajero a Daniel? Daniel 10:11", o: ["Porque a él había sido enviado", "Por causa del rey", "Por el ayuno", "Por la visión"], c: "Porque a él había sido enviado"},
+            {q: "89. ¿Cómo se puso Daniel en pie mientras hablaba el mensajero? Daniel 10:11", o: ["Temblando", "Con fuerza", "Con gozo", "Con valentía"], c: "Temblando"},
+            {q: "90. ¿Qué mandato recibió Daniel respecto al temor? Daniel 10:12", o: ["No temas", "Calla", "Corre", "Postra tu rostro"], c: "No temas"},
+            {q: "91. ¿Desde cuándo fueron oídas las palabras de Daniel? Daniel 10:12", o: ["Desde el primer día", "Desde la tercera semana", "Desde la visión", "Desde el ayuno"], c: "Desde el primer día"},
+            {q: "92. ¿Qué dispuso Daniel en su corazón según el texto? Daniel 10:12", o: ["Entender y humillarse en la presencia de su Dios", "Ayunar y llorar", "Hablar al pueblo", "Salir del lugar"], c: "Entender y humillarse en la presencia de su Dios"},
+            {q: "93. ¿Por causa de qué vino el mensajero a Daniel? Daniel 10:12", o: ["A causa de tus palabras", "A causa del ayuno", "A causa del pueblo", "A causa del rey"], c: "A causa de tus palabras"},
+            {q: "94. ¿Quién se opuso al mensajero durante veintiún días? Daniel 10:13", o: ["El príncipe del reino de Persia", "El príncipe de Grecia", "Los reyes de Media", "Los caldeos"], c: "El príncipe del reino de Persia"},
+            {q: "95. ¿Durante cuántos días se opuso el príncipe del reino de Persia? Daniel 10:13", o: ["Veintiún días", "Diez días", "Tres semanas y media", "Siete días"], c: "Veintiún días"},
+            {q: "96. ¿Quién vino para ayudar al mensajero? Daniel 10:13", o: ["Miguel", "Gabriel", "Rafael", "Uriel"], c: "Miguel"},
+            {q: "97. ¿Cómo es descrito Miguel en el texto? Daniel 10:13", o: ["Uno de los principales príncipes", "El príncipe del pueblo", "El mensajero del pacto", "El ángel del Señor"], c: "Uno de los principales príncipes"},
+            {q: "98. ¿Con quién quedó el mensajero después de recibir ayuda? Daniel 10:13", o: ["Con los reyes de Persia", "Con el pueblo de Judá", "Con los príncipes de Media", "Con los ángeles"], c: "Con los reyes de Persia"},
+            {q: "99. ¿Para qué vino el mensajero a Daniel según Daniel 10:14? Daniel 10:14", o: ["Para hacerle saber lo que ha de sucederle a su pueblo", "Para reprenderlo", "Para sellar la visión", "Para anunciar el juicio"], c: "Para hacerle saber lo que ha de sucederle a su pueblo"},
+            {q: "100. ¿Para qué tiempo es la visión mencionada? Daniel 10:14", o: ["Para esos días", "Para el tiempo de Daniel", "Para el pasado", "Para el exilio"], c: "Para esos días"},
+            {q: "101. ¿Qué hizo Daniel con sus ojos mientras le hablaban estas palabras? Daniel 10:15", o: ["Los tenía puestos en tierra", "Los alzó al cielo", "Los cerró", "Los volvió al río"], c: "Los tenía puestos en tierra"},
+            {q: "102. ¿Qué condición describe Daniel mientras escuchaba? Daniel 10:15", o: ["Había enmudecido", "Estaba orando", "Estaba clamando", "Estaba temblando"], c: "Había enmudecido"},
+            {q: "103. ¿Quién tocó los labios de Daniel? Daniel 10:16", o: ["Uno con semejanza de hijo de hombre", "Miguel", "El príncipe de Persia", "Un varón vestido de lino"], c: "Uno con semejanza de hijo de hombre"},
+            {q: "104. ¿Qué hizo Daniel después de que tocaron sus labios? Daniel 10:16", o: ["Abrió la boca y habló", "Cayó al suelo", "Guardó silencio", "Huyó"], c: "Abrió la boca y habló"},
+            {q: "105. ¿Qué dijo Daniel que le sobrevino con la visión? Daniel 10:16", o: ["Dolores", "Gozo", "Paz", "Temor"], c: "Dolores"},
+            {q: "106. ¿Qué declaró Daniel acerca de sus fuerzas? Daniel 10:16", o: ["No me quedan fuerzas", "Se renovaron", "Se multiplicaron", "Aumentaron"], c: "No me quedan fuerzas"},
+            {q: "107. ¿Qué dijo Daniel que no le quedó al instante? Daniel 10:17", o: ["Aliento", "Esperanza", "Valor", "Entendimiento"], c: "Aliento"},
+            {q: "108. ¿Quién tocó nuevamente a Daniel para fortalecerlo? Daniel 10:18", o: ["Aquel que tenía semejanza de hombre", "Miguel", "El príncipe de Persia", "Los hombres que estaban con él"], c: "Aquel que tenía semejanza de hombre"},
+            {q: "109. ¿Qué efecto tuvo ese toque en Daniel? Daniel 10:18", o: ["Me fortaleció", "Me hizo caer", "Me dejó inmóvil", "Me hizo dormir"], c: "Me fortaleció"},
+            {q: "110. ¿Cómo volvió a llamar el mensajero a Daniel? Daniel 10:19", o: ["Muy amado", "Siervo fiel", "Príncipe escogido", "Varón fuerte"], c: "Muy amado"},
+            {q: "111. ¿Qué mensaje de ánimo recibió Daniel? Daniel 10:19", o: ["No temas", "Guarda silencio", "Postra tu rostro", "Corre"], c: "No temas"},
+            {q: "112. ¿Qué saludo de paz se le dio a Daniel? Daniel 10:19", o: ["La paz sea contigo", "El Señor te guarde", "Sé fuerte", "No temas"], c: "La paz sea contigo"},
+            {q: "113. ¿Qué exhortación recibió Daniel junto con la paz? Daniel 10:19", o: ["Esfuérzate y cobra aliento", "Permanece en silencio", "Postra tu rostro", "Retírate"], c: "Esfuérzate y cobra aliento"},
+            {q: "114. ¿Qué ocurrió con Daniel mientras le hablaban estas palabras? Daniel 10:19", o: ["Recobré las fuerzas", "Caí en sueño", "Enmudecí", "Huí"], c: "Recobré las fuerzas"},
+            {q: "115. ¿Qué dijo Daniel después de recobrar las fuerzas? Daniel 10:19", o: ["Hable mi señor, porque me has fortalecido", "No temas", "La paz sea contigo", "Estoy listo"], c: "Hable mi señor, porque me has fortalecido"},
+            {q: "116. ¿Qué pregunta hizo el mensajero a Daniel? Daniel 10:20", o: ["¿Sabes por qué he venido a ti?", "¿Has entendido la visión?", "¿Tienes temor?", "¿Has ayunado?"], c: "¿Sabes por qué he venido a ti?"},
+            {q: "117. ¿A dónde dijo el mensajero que debía volver? Daniel 10:20", o: ["A pelear contra el príncipe de Persia", "Al cielo", "A Babilonia", "A Jerusalén"], c: "A pelear contra el príncipe de Persia"},
+            {q: "118. ¿Quién vendría después de terminar con el príncipe de Persia? Daniel 10:20", o: ["El príncipe de Grecia", "Miguel", "El príncipe de Media", "El rey de Babilonia"], c: "El príncipe de Grecia"},
+            {q: "119. ¿Qué prometió declarar el mensajero a Daniel? Daniel 10:21", o: ["Lo que está escrito en el libro de la verdad", "Las palabras selladas", "Los sueños del rey", "Las profecías pasadas"], c: "Lo que está escrito en el libro de la verdad"},
+            {q: "120. ¿Quién es el único que ayuda contra ellos según el texto? Daniel 10:21", o: ["Miguel vuestro príncipe", "Gabriel", "Los ángeles", "Los hombres"], c: "Miguel vuestro príncipe"}
+            
+];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>

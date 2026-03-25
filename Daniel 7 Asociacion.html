@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulo 7 Asociacion (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulo 7 Asociacion</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulo 7 Asociacion (Reina Valera 1995) Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            {q: "1. ¿En qué año tuvo Daniel el sueño y las visiones de su cabeza? Daniel 7:1", o: ["En el primer año de Belsasar rey de Babilonia", "En el segundo año de Nabucodonosor", "En el tercer año de Darío", "En el primer año de Ciro"], c: "En el primer año de Belsasar rey de Babilonia"},
+            {q: "2. ¿Qué estaba haciendo Daniel cuando tuvo las visiones? Daniel 7:1", o: ["Estaba en su lecho", "Estaba orando en el templo", "Estaba ayunando", "Estaba escribiendo en un libro"], c: "Estaba en su lecho"},
+            {q: "3. ¿Qué hizo Daniel después de tener el sueño? Daniel 7:1", o: ["Escribió el sueño y relató lo principal del asunto", "Guardó silencio", "Consultó a los sabios", "Lo contó al rey"], c: "Escribió el sueño y relató lo principal del asunto"},
+            {q: "4. ¿Qué combatían en el gran mar según la visión? Daniel 7:2", o: ["Los cuatro vientos del cielo", "Cuatro ángeles", "Cuatro bestias", "Cuatro ejércitos"], c: "Los cuatro vientos del cielo"},
+            {q: "5. ¿Cuántas bestias grandes subían del mar? Daniel 7:3", o: ["Cuatro", "Tres", "Dos", "Cinco"], c: "Cuatro"},
+            {q: "6. ¿Cómo eran las bestias entre sí? Daniel 7:3", o: ["Diferentes la una de la otra", "Iguales entre sí", "Semejantes en poder", "Unidas entre sí"], c: "Diferentes la una de la otra"},
+            {q: "7. ¿A qué era semejante la primera bestia? Daniel 7:4", o: ["A un león", "A un oso", "A un leopardo", "A una serpiente"], c: "A un león"},
+            {q: "8. ¿Qué tenía la primera bestia? Daniel 7:4", o: ["Alas de águila", "Cuernos de hierro", "Cuatro cabezas", "Dientes de bronce"], c: "Alas de águila"},
+            {q: "9. ¿Qué ocurrió con las alas de la primera bestia? Daniel 7:4", o: ["Le fueron arrancadas", "Crecieron más", "Fueron quemadas", "Se multiplicaron"], c: "Le fueron arrancadas"},
+            {q: "10. ¿Cómo fue puesta la primera bestia después? Daniel 7:4", o: ["Enhiesta sobre los pies a manera de hombre", "Postrada en tierra", "Encadenada", "Sentada en un trono"], c: "Enhiesta sobre los pies a manera de hombre"},
+            {q: "11. ¿Qué se le dio a la primera bestia? Daniel 7:4", o: ["Corazón de hombre", "Espíritu de bestia", "Aliento de vida", "Dominio eterno"], c: "Corazón de hombre"},
+            {q: "12. ¿A qué era semejante la segunda bestia? Daniel 7:5", o: ["A un oso", "A un león", "A un dragón", "A un carnero"], c: "A un oso"},
+            {q: "13. ¿Cómo se alzaba la segunda bestia? Daniel 7:5", o: ["De un costado más que del otro", "En perfecta igualdad", "Hacia los cielos", "Con alas extendidas"], c: "De un costado más que del otro"},
+            {q: "14. ¿Qué tenía la segunda bestia en su boca? Daniel 7:5", o: ["Tres costillas entre los dientes", "Un fuego ardiente", "Una espada", "Un libro"], c: "Tres costillas entre los dientes"},
+            {q: "15. ¿Qué se le dijo a la segunda bestia? Daniel 7:5", o: ["Levántate y devora mucha carne", "Reina con justicia", "Domina la tierra", "Guarda silencio"], c: "Levántate y devora mucha carne"},
+            {q: "16. ¿A qué era semejante la tercera bestia? Daniel 7:6", o: ["A un leopardo", "A un león", "A un oso", "A un cordero"], c: "A un leopardo"},
+            {q: "17. ¿Cuántas alas tenía la tercera bestia? Daniel 7:6", o: ["Cuatro alas de ave", "Dos alas", "Seis alas", "No tenía alas"], c: "Cuatro alas de ave"},
+            {q: "18. ¿Cuántas cabezas tenía la tercera bestia? Daniel 7:6", o: ["Cuatro", "Dos", "Una", "Siete"], c: "Cuatro"},
+            {q: "19. ¿Qué le fue dado a la tercera bestia? Daniel 7:6", o: ["Dominio", "Vida eterna", "Sabiduría", "Fuego"], c: "Dominio"},
+            {q: "20. ¿Cómo describe Daniel a la cuarta bestia? Daniel 7:7", o: ["Espantosa, terrible y en gran manera fuerte", "Hermosa y majestuosa", "Mansa y dócil", "Pequeña y débil"], c: "Espantosa, terrible y en gran manera fuerte"},
+            {q: "21. ¿Qué tipo de dientes tenía la cuarta bestia? Daniel 7:7", o: ["Grandes dientes de hierro", "Dientes de bronce", "Dientes de oro", "Dientes de piedra"], c: "Grandes dientes de hierro"},
+            {q: "22. ¿Qué hacía la cuarta bestia con las sobras? Daniel 7:7", o: ["Las pisoteaba con sus pies", "Las guardaba", "Las ofrecía", "Las destruía con fuego"], c: "Las pisoteaba con sus pies"},
+            {q: "23. ¿Cuántos cuernos tenía la cuarta bestia? Daniel 7:7", o: ["Diez", "Siete", "Cuatro", "Doce"], c: "Diez"},
+            {q: "24. ¿Qué surgió entre los diez cuernos? Daniel 7:8", o: ["Otro cuerno pequeño", "Un trono", "Una bestia nueva", "Una corona"], c: "Otro cuerno pequeño"},
+            {q: "25. ¿Cuántos cuernos fueron arrancados delante del cuerno pequeño? Daniel 7:8", o: ["Tres", "Dos", "Cinco", "Diez"], c: "Tres"},
+            {q: "26. ¿Qué tenía el cuerno pequeño? Daniel 7:8", o: ["Ojos como de hombre y una boca que hablaba con insolencia", "Alas de águila", "Manos humanas", "Una espada"], c: "Ojos como de hombre y una boca que hablaba con insolencia"},
+            {q: "27. ¿Quién se sentó cuando fueron puestos los tronos? Daniel 7:9", o: ["El Anciano de días", "Un ángel poderoso", "El cuerno pequeño", "Daniel"], c: "El Anciano de días"},
+            {q: "28. ¿Cómo era el vestido del Anciano de días? Daniel 7:9", o: ["Blanco como la nieve", "Rojo como fuego", "Azul como el cielo", "Púrpura real"], c: "Blanco como la nieve"},
+            {q: "29. ¿Cómo era el pelo de su cabeza? Daniel 7:9", o: ["Como lana limpia", "Como oro puro", "Como fuego", "Como bronce"], c: "Como lana limpia"},
+            {q: "30. ¿Cómo era su trono? Daniel 7:9", o: ["Llama de fuego", "De mármol", "De hierro", "De madera"], c: "Llama de fuego"},
+            {q: "31. ¿Qué procedía delante del Anciano de días? Daniel 7:10", o: ["Un río de fuego", "Un río de agua", "Una nube espesa", "Un viento fuerte"], c: "Un río de fuego"},
+            {q: "32. ¿Cuántos lo servían según la visión? Daniel 7:10", o: ["Miles de miles", "Cientos de miles", "Doce tribus", "Siete espíritus"], c: "Miles de miles"},
+            {q: "33. ¿Qué se hizo cuando el Juez se sentó? Daniel 7:10", o: ["Los libros fueron abiertos", "El mar se cerró", "Las bestias huyeron", "El templo se llenó"], c: "Los libros fueron abiertos"},
+            {q: "34. ¿Por qué Daniel miraba atentamente? Daniel 7:11", o: ["Por el sonido de las grandes insolencias del cuerno", "Por el fuego del trono", "Por la multitud de ángeles", "Por el temor del juicio"], c: "Por el sonido de las grandes insolencias del cuerno"},
+            {q: "35. ¿Qué ocurrió con la cuarta bestia? Daniel 7:11", o: ["Fue muerta y su cuerpo entregado para quemarlo", "Fue encarcelada", "Fue transformada", "Fue perdonada"], c: "Fue muerta y su cuerpo entregado para quemarlo"},
+            {q: "36. ¿Qué pasó con las otras bestias? Daniel 7:12", o: ["Les fue quitado el dominio", "Fueron destruidas inmediatamente", "Reinaron eternamente", "Se unieron a la cuarta"], c: "Les fue quitado el dominio"},
+            {q: "37. ¿Hasta cuándo se les prolongó la vida? Daniel 7:12", o: ["Hasta cierto tiempo", "Para siempre", "Por mil años", "Hasta el juicio final"], c: "Hasta cierto tiempo"},
+            {q: "38. ¿A quién vio Daniel venir con las nubes del cielo? Daniel 7:13", o: ["Uno como un hijo de hombre", "Un ángel poderoso", "El cuerno pequeño", "Un rey terrenal"], c: "Uno como un hijo de hombre"},
+            {q: "39. ¿Ante quién fue llevado el Hijo de hombre? Daniel 7:13", o: ["Ante el Anciano de días", "Ante Daniel", "Ante los reyes", "Ante las bestias"], c: "Ante el Anciano de días"},
+            {q: "40. ¿Qué le fue dado al Hijo de hombre? Daniel 7:14", o: ["Dominio, gloria y reino", "Espada y corona", "Juicio y castigo", "Riquezas y poder"], c: "Dominio, gloria y reino"},
+            {q: "41. ¿Qué ocurrió con el dominio de las otras bestias? Daniel 7:12", o: ["Les fue quitado su dominio", "Les fue aumentado", "Les fue confirmado", "Les fue restaurado"], c: "Les fue quitado su dominio"},
+            {q: "42. ¿Hasta cuándo se les prolongó la vida a las otras bestias? Daniel 7:12", o: ["Hasta cierto tiempo", "Para siempre", "Hasta mil años", "Hasta el juicio final"], c: "Hasta cierto tiempo"},
+            {q: "43. ¿Qué vio Daniel venir con las nubes del cielo? Daniel 7:13", o: ["Uno como un hijo de hombre", "Un ángel poderoso", "Una bestia gloriosa", "Un rey terrenal"], c: "Uno como un hijo de hombre"},
+            {q: "44. ¿A quién se acercó el Hijo de hombre? Daniel 7:13", o: ["Al Anciano de días", "A Daniel", "A los ángeles", "A los santos"], c: "Al Anciano de días"},
+            {q: "45. ¿Qué le fue dado al Hijo de hombre? Daniel 7:14", o: ["Dominio, gloria y reino", "Espada y poder", "Juicio y castigo", "Sabiduría y riquezas"], c: "Dominio, gloria y reino"},
+            {q: "46. ¿Quiénes servirían al Hijo de hombre? Daniel 7:14", o: ["Todos los pueblos, naciones y lenguas", "Solo Israel", "Los reyes de la tierra", "Los ángeles"], c: "Todos los pueblos, naciones y lenguas"},
+            {q: "47. ¿Cómo es el dominio del Hijo de hombre? Daniel 7:14", o: ["Dominio eterno que nunca pasará", "Dominio temporal", "Dominio limitado", "Dominio condicional"], c: "Dominio eterno que nunca pasará"},
+            {q: "48. ¿Cómo es su reino? Daniel 7:14", o: ["Nunca será destruido", "Será entregado", "Será dividido", "Será reemplazado"], c: "Nunca será destruido"},
+            {q: "49. ¿Cómo se sintió Daniel después de la visión? Daniel 7:15", o: ["Turbado hasta lo más hondo de su ser", "Lleno de gozo", "Confiado", "Fortalecido"], c: "Turbado hasta lo más hondo de su ser"},
+            {q: "50. ¿Qué hicieron las visiones en Daniel? Daniel 7:15", o: ["Lo asombraron", "Lo alegraron", "Lo fortalecieron", "Lo tranquilizaron"], c: "Lo asombraron"},
+            {q: "51. ¿A quién se acercó Daniel para pedir explicación? Daniel 7:16", o: ["A uno de los que allí estaban", "Al rey", "A un sacerdote", "A sus compañeros"], c: "A uno de los que allí estaban"},
+            {q: "52. ¿Qué pidió Daniel? Daniel 7:16", o: ["La verdad acerca de todo aquello", "Sabiduría para gobernar", "Protección divina", "Una nueva visión"], c: "La verdad acerca de todo aquello"},
+            {q: "53. ¿Qué representan las cuatro bestias? Daniel 7:17", o: ["Cuatro reyes que se levantarán en la tierra", "Cuatro ángeles", "Cuatro profetas", "Cuatro imperios espirituales"], c: "Cuatro reyes que se levantarán en la tierra"},
+            {q: "54. ¿Quiénes recibirán el reino después? Daniel 7:18", o: ["Los santos del Altísimo", "Los reyes de la tierra", "Los sacerdotes", "Los sabios"], c: "Los santos del Altísimo"},
+            {q: "55. ¿Por cuánto tiempo poseerán el reino los santos? Daniel 7:18", o: ["Hasta el siglo, eternamente y para siempre", "Por mil años", "Hasta el juicio", "Por un tiempo limitado"], c: "Hasta el siglo, eternamente y para siempre"},
+            {q: "56. ¿Sobre qué deseaba Daniel saber la verdad? Daniel 7:19", o: ["Sobre la cuarta bestia", "Sobre la primera bestia", "Sobre el mar", "Sobre el sueño"], c: "Sobre la cuarta bestia"},
+            {q: "57. ¿Qué tenía la cuarta bestia además de dientes de hierro? Daniel 7:19", o: ["Uñas de bronce", "Alas de águila", "Ojos humanos", "Cabezas múltiples"], c: "Uñas de bronce"},
+            {q: "58. ¿Qué hacía la cuarta bestia con las sobras? Daniel 7:19", o: ["Las pisoteaba con sus pies", "Las guardaba", "Las ofrecía", "Las destruía con agua"], c: "Las pisoteaba con sus pies"},
+            {q: "59. ¿Cuántos cuernos tenía la cabeza de la cuarta bestia? Daniel 7:20", o: ["Diez", "Siete", "Cuatro", "Doce"], c: "Diez"},
+            {q: "60. ¿Qué parecía el cuerno pequeño comparado con los otros? Daniel 7:20", o: ["Más grande que sus compañeros", "Más débil", "Igual a los demás", "Inofensivo"], c: "Más grande que sus compañeros"},
+            {q: "61. ¿Contra quién hacía guerra el cuerno pequeño? Daniel 7:21", o: ["Contra los santos", "Contra los reyes", "Contra Daniel", "Contra las bestias"], c: "Contra los santos"},
+            {q: "62. ¿Qué hacía el cuerno pequeño a los santos? Daniel 7:21", o: ["Los vencía", "Los protegía", "Los ignoraba", "Los exaltaba"], c: "Los vencía"},
+            {q: "63. ¿Hasta cuándo ocurrió esto? Daniel 7:22", o: ["Hasta que vino el Anciano de días", "Hasta el fin del mundo", "Hasta mil años", "Hasta la destrucción de Babilonia"], c: "Hasta que vino el Anciano de días"},
+            {q: "64. ¿Qué se hizo cuando vino el Anciano de días? Daniel 7:22", o: ["Justicia a los santos del Altísimo", "Castigo inmediato a Daniel", "Fin de las visiones", "Nuevo imperio"], c: "Justicia a los santos del Altísimo"},
+            {q: "65. ¿Quiénes recibieron el reino? Daniel 7:22", o: ["Los santos", "Los reyes", "Los sacerdotes", "Los ángeles"], c: "Los santos"},
+            {q: "66. ¿Qué representa la cuarta bestia? Daniel 7:23", o: ["Un cuarto reino en la tierra", "Un ángel caído", "Una nación santa", "Un pueblo fiel"], c: "Un cuarto reino en la tierra"},
+            {q: "67. ¿Cómo sería ese reino? Daniel 7:23", o: ["Diferente de todos los otros", "Más justo", "Más pequeño", "Más pacífico"], c: "Diferente de todos los otros"},
+            {q: "68. ¿Qué haría ese reino a toda la tierra? Daniel 7:23", o: ["La devorará, trillará y despedazará", "La bendecirá", "La restaurará", "La gobernará en paz"], c: "La devorará, trillará y despedazará"},
+            {q: "69. ¿Qué significan los diez cuernos? Daniel 7:24", o: ["Diez reyes que se levantarán", "Diez ángeles", "Diez mandamientos", "Diez generaciones"], c: "Diez reyes que se levantarán"},
+            {q: "70. ¿Qué hará el cuerno que se levanta después? Daniel 7:24", o: ["Derribará a tres reyes", "Restaurará el reino", "Servirá a los santos", "Traerá paz"], c: "Derribará a tres reyes"},
+            {q: "71. ¿Contra quién hablará palabras el cuerno pequeño? Daniel 7:25", o: ["Contra el Altísimo", "Contra Daniel", "Contra los ángeles", "Contra los reyes"], c: "Contra el Altísimo"},
+            {q: "72. ¿Qué hará a los santos del Altísimo? Daniel 7:25", o: ["Los quebrantará", "Los exaltará", "Los protegerá", "Los reunirá"], c: "Los quebrantará"},
+            {q: "73. ¿Qué pensará cambiar el cuerno pequeño? Daniel 7:25", o: ["Los tiempos y la Ley", "El templo y el altar", "El reino y el dominio", "Las visiones"], c: "Los tiempos y la Ley"},
+            {q: "74. ¿Por cuánto tiempo serán entregados en su mano? Daniel 7:25", o: ["Tiempo, tiempos y medio tiempo", "Mil años", "Cuarenta años", "Hasta el fin del mundo"], c: "Tiempo, tiempos y medio tiempo"},
+            {q: "75. ¿Qué hará el Juez finalmente? Daniel 7:26", o: ["Le quitarán su dominio", "Lo exaltarán", "Lo coronarán", "Lo perdonarán"], c: "Le quitarán su dominio"},
+            {q: "76. ¿Qué pasará con su dominio? Daniel 7:26", o: ["Será destruido y arruinado hasta el fin", "Será restaurado", "Será compartido", "Será eterno"], c: "Será destruido y arruinado hasta el fin"},
+            {q: "77. ¿A quién será dado el reino bajo todo el cielo? Daniel 7:27", o: ["Al pueblo de los santos del Altísimo", "A los reyes de la tierra", "A los sacerdotes", "A los ángeles"], c: "Al pueblo de los santos del Altísimo"},
+            {q: "78. ¿Cómo es el reino de los santos? Daniel 7:27", o: ["Reino eterno", "Reino temporal", "Reino terrenal", "Reino limitado"], c: "Reino eterno"},
+            {q: "79. ¿Qué harán todos los dominios? Daniel 7:27", o: ["Servirán y obedecerán", "Se rebelarán", "Desaparecerán", "Serán juzgados"], c: "Servirán y obedecerán"},
+            {q: "80. ¿Qué hizo Daniel con el asunto de la visión? Daniel 7:28", o: ["Lo guardó en su corazón", "Lo proclamó públicamente", "Lo escribió a los reyes", "Lo olvidó"], c: "Lo guardó en su corazón"}
+                
+];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>

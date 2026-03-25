@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulo 6 Asociacion (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulo 6 Asociacion</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulo 6 Asociacion (Reina Valera 1995) Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            {q: "1. ¿Cuántos sátrapas estableció Darío sobre el reino? Daniel 6:1", o: ["Ciento veinte", "Cien veinte", "Ciento y veinte", "Muchos sátrapas"], c: "Ciento veinte"},
+            {q: "2. ¿Sobre qué gobernaban los sátrapas? Daniel 6:1", o: ["En todo el reino", "En Jerusalén", "En Judá", "En Babilonia"], c: "En todo el reino"},
+            {q: "3. ¿Cuántos gobernadores fueron puestos sobre los sátrapas? Daniel 6:2", o: ["Tres", "Dos", "Cuatro", "Cinco"], c: "Tres"},
+            {q: "4. ¿Quién era uno de los tres gobernadores? Daniel 6:2", o: ["Daniel", "Darío", "Ciro", "Nabucodonosor"], c: "Daniel"},
+            {q: "5. ¿Para qué debían dar cuenta los sátrapas a los gobernadores? Daniel 6:2", o: ["Para que el rey no fuera perjudicado", "Para informar al pueblo", "Para cuidar el templo", "Para vigilar Jerusalén"], c: "Para que el rey no fuera perjudicado"},
+            {q: "6. ¿Por qué Daniel era superior a los otros gobernadores y sátrapas? Daniel 6:3", o: ["Porque había en él un espíritu superior", "Porque tenía más poder", "Porque era más rico", "Porque era más anciano"], c: "Porque había en él un espíritu superior"},
+            {q: "7. ¿Qué pensó el rey hacer con Daniel? Daniel 6:3", o: ["Ponerlo sobre todo el reino", "Hacerlo sacerdote", "Desterrarlo", "Retirarlo del cargo"], c: "Ponerlo sobre todo el reino"},
+            {q: "8. ¿Qué buscaban los gobernadores y sátrapas contra Daniel? Daniel 6:4", o: ["Ocasión para acusarlo", "Motivo para premiarlo", "Razón para exaltarlo", "Forma de protegerlo"], c: "Ocasión para acusarlo"},
+            {q: "9. ¿En qué no pudieron hallar motivo contra Daniel? Daniel 6:4", o: ["En lo relacionado con el reino", "En lo familiar", "En lo personal", "En lo económico"], c: "En lo relacionado con el reino"},
+            {q: "10. ¿Qué no hallaron en Daniel? Daniel 6:4", o: ["Ningún error ni falta", "Ninguna debilidad", "Ninguna omisión", "Ninguna excusa"], c: "Ningún error ni falta"},
+            {q: "11. ¿Por qué no hallaron falta en Daniel? Daniel 6:4", o: ["Porque él era fiel", "Porque era anciano", "Porque era extranjero", "Porque era protegido"], c: "Porque él era fiel"},
+            {q: "12. ¿En qué dijeron que hallarían ocasión contra Daniel? Daniel 6:5", o: ["En relación con la ley de su Dios", "En relación con la ley del rey", "En relación con el reino", "En relación con el pueblo"], c: "En relación con la ley de su Dios"},
+            {q: "13. ¿Ante quién se juntaron los gobernadores y sátrapas? Daniel 6:6", o: ["Ante el rey", "Ante Daniel", "Ante el pueblo", "Ante los sacerdotes"], c: "Ante el rey"},
+            {q: "14. ¿Cómo saludaron al rey Darío? Daniel 6:6", o: ["Rey Dario, para siempre vive", "Oh rey poderoso", "Rey de reyes", "Señor del reino"], c: "Rey Dario, para siempre vive"},
+            {q: "15. ¿Qué pidieron que el rey promulgara? Daniel 6:7", o: ["Un edicto real", "Una ley ceremonial", "Una orden militar", "Un decreto del templo"], c: "Un edicto real"},
+            {q: "16. ¿Cuánto tiempo duraría la prohibición del edicto? Daniel 6:7", o: ["Treinta días", "Siete días", "Cuarenta días", "Un año"], c: "Treinta días"},
+            {q: "17. ¿A quién no se podía pedir durante ese tiempo? Daniel 6:7", o: ["A cualquier dios u hombre fuera del rey", "Solo a dioses extranjeros", "Solo a hombres comunes", "Solo a gobernadores"], c: "A cualquier dios u hombre fuera del rey"},
+            {q: "18. ¿Cuál sería el castigo por desobedecer el edicto? Daniel 6:7", o: ["Ser echado al foso de los leones", "Ser encarcelado", "Ser desterrado", "Ser multado"], c: "Ser echado al foso de los leones"},
+            {q: "19. ¿Conforme a qué ley no podía revocarse el edicto? Daniel 6:8", o: ["La ley de Media y de Persia", "La ley de Babilonia", "La ley de Judá", "La ley del templo"], c: "La ley de Media y de Persia"},
+            {q: "20. ¿Qué hizo el rey Darío con el edicto? Daniel 6:9", o: ["Lo firmó", "Lo modificó", "Lo rechazó", "Lo pospuso"], c: "Lo firmó"},
+            {q: "21. ¿Qué hizo Daniel cuando supo que el edicto había sido firmado? Daniel 6:10", o: ["Entró en su casa", "Huyó del reino", "Se escondió", "Guardó silencio"], c: "Entró en su casa"},
+            {q: "22. ¿Hacia dónde daban las ventanas de la habitación de Daniel? Daniel 6:10", o: ["Hacia Jerusalén", "Hacia el palacio", "Hacia el oriente", "Hacia el templo"], c: "Hacia Jerusalén"},
+            {q: "23. ¿Cuántas veces al día se arrodillaba Daniel? Daniel 6:10", o: ["Tres veces", "Dos veces", "Una vez", "Muchas veces"], c: "Tres veces"},
+            {q: "24. ¿Qué hacía Daniel delante de su Dios? Daniel 6:10", o: ["Oraba y daba gracias", "Ayunaba solamente", "Cantaba himnos", "Meditaba en silencio"], c: "Oraba y daba gracias"},
+            {q: "25. ¿Cómo acostumbraba hacer Daniel esto antes? Daniel 6:10", o: ["Como solía hacerlo antes", "Solo de noche", "Solo en secreto", "Solo en el templo"], c: "Como solía hacerlo antes"},
+            {q: "26. ¿Qué hallaron los hombres haciendo a Daniel? Daniel 6:11", o: ["Orando y rogando", "Trabajando", "Descansando", "Enseñando"], c: "Orando y rogando"},
+            {q: "27. ¿En presencia de quién rogaba Daniel? Daniel 6:11", o: ["De su Dios", "Del rey", "Del pueblo", "De los sacerdotes"], c: "De su Dios"},
+            {q: "28. ¿De qué hablaron los acusadores al rey? Daniel 6:12", o: ["Del edicto real", "De la fidelidad de Daniel", "Del pueblo", "Del reino"], c: "Del edicto real"},
+            {q: "29. ¿Qué respondió el rey sobre el edicto? Daniel 6:12", o: ["Que no podía ser abrogado", "Que podía cambiarse", "Que era injusto", "Que era temporal"], c: "Que no podía ser abrogado"},
+            {q: "30. ¿Cómo describieron a Daniel ante el rey? Daniel 6:13", o: ["De los hijos de los cautivos de Judá", "De la nobleza persa", "Del linaje real", "De los sabios del reino"], c: "De los hijos de los cautivos de Judá"},
+            {q: "31. ¿Qué dijeron que Daniel no respetaba? Daniel 6:13", o: ["Al rey", "A los sátrapas", "A los príncipes", "Al pueblo"], c: "Al rey"},
+            {q: "32. ¿Qué hacía Daniel tres veces al día según la acusación? Daniel 6:13", o: ["Hacía su petición", "Ayunaba", "Gobernaba", "Enseñaba"], c: "Hacía su petición"},
+            {q: "33. ¿Cómo se sintió el rey cuando oyó el asunto? Daniel 6:14", o: ["Le pesó en gran manera", "Se alegró", "Se enojó", "Fue indiferente"], c: "Le pesó en gran manera"},
+            {q: "34. ¿Qué resolvió hacer el rey respecto a Daniel? Daniel 6:14", o: ["Librarlo", "Castigarlo", "Ignorarlo", "Desterrarlo"], c: "Librarlo"},
+            {q: "35. ¿Hasta cuándo trabajó el rey para librar a Daniel? Daniel 6:14", o: ["Hasta la puesta del sol", "Hasta la medianoche", "Hasta el amanecer", "Hasta el tercer día"], c: "Hasta la puesta del sol"},
+            {q: "36. ¿Qué hicieron los hombres para presionar al rey? Daniel 6:15", o: ["Rodearon al rey", "Convocaron al pueblo", "Enviaron cartas", "Buscaron testigos"], c: "Rodearon al rey"},
+            {q: "37. ¿Qué recordaron nuevamente al rey? Daniel 6:15", o: ["Que la ley no podía ser abrogada", "Que Daniel era inocente", "Que el pueblo protestaba", "Que el castigo era simbólico"], c: "Que la ley no podía ser abrogada"},
+            {q: "38. ¿Qué ordenó finalmente el rey? Daniel 6:16", o: ["Que trajeran a Daniel", "Que lo escondieran", "Que lo liberaran", "Que lo desterraran"], c: "Que trajeran a Daniel"},
+            {q: "39. ¿Dónde fue echado Daniel? Daniel 6:16", o: ["Al foso de los leones", "A la cárcel", "Al desierto", "Al exilio"], c: "Al foso de los leones"},
+            {q: "40. ¿Qué dijo el rey a Daniel antes de echarlo al foso? Daniel 6:16", o: ["El Dios tuyo, a quien tú continuamente sirves, él te libre", "Buena suerte", "Que los dioses te ayuden", "Confía en la ley"], c: "El Dios tuyo, a quien tú continuamente sirves, él te libre"},
+            {q: "41. ¿Qué pusieron sobre la puerta del foso? Daniel 6:17", o: ["Una piedra", "Una reja", "Una puerta", "Un muro"], c: "Una piedra"},
+            {q: "42. ¿Con qué selló el rey la piedra? Daniel 6:17", o: ["Con su anillo", "Con un documento", "Con testigos", "Con guardias"], c: "Con su anillo"},
+            {q: "43. ¿Con qué más fue sellada la piedra? Daniel 6:17", o: ["Con el anillo de sus príncipes", "Con sellos del pueblo", "Con decretos escritos", "Con juramentos"], c: "Con el anillo de sus príncipes"},
+            {q: "44. ¿Cómo pasó el rey la noche después de echar a Daniel al foso? Daniel 6:18", o: ["En ayuno", "En fiesta", "En consejo", "En descanso"], c: "En ayuno"},
+            {q: "45. ¿Qué no trajeron delante del rey esa noche? Daniel 6:18", o: ["Instrumentos musicales", "Comida", "Bebida", "Mensajeros"], c: "Instrumentos musicales"},
+            {q: "46. ¿Qué se le fue al rey durante la noche? Daniel 6:18", o: ["El sueño", "El apetito", "La voz", "La paciencia"], c: "El sueño"},
+            {q: "47. ¿Cuándo se levantó el rey para ir al foso de los leones? Daniel 6:19", o: ["Muy de mañana", "Al mediodía", "Al anochecer", "Después de tres días"], c: "Muy de mañana"},
+            {q: "48. ¿Con qué voz llamó el rey a Daniel? Daniel 6:20", o: ["Con voz triste", "Con voz fuerte", "Con voz airada", "Con voz alegre"], c: "Con voz triste"},
+            {q: "49. ¿Cómo llamó el rey a Daniel cuando habló con él? Daniel 6:20", o: ["Siervo del Dios viviente", "Gobernador fiel", "Príncipe de Judá", "Varón sabio"], c: "Siervo del Dios viviente"},
+            {q: "50. ¿Qué preguntó el rey a Daniel al acercarse al foso? Daniel 6:20", o: ["Si Dios lo había librado de los leones", "Si se había arrepentido", "Si obedecería la ley", "Si había sufrido daño"], c: "Si Dios lo había librado de los leones"},
+            {q: "51. ¿Qué respondió Daniel al rey al comenzar a hablar? Daniel 6:21", o: ["Rey, vive para siempre", "Gloria a Dios", "Estoy vivo", "El Señor me guardó"], c: "Rey, vive para siempre"},
+            {q: "52. ¿Qué envió Dios para librar a Daniel? Daniel 6:22", o: ["Su ángel", "Un profeta", "Un siervo", "Un guardia"], c: "Su ángel"},
+            {q: "53. ¿Qué hizo el ángel enviado por Dios? Daniel 6:22", o: ["Cerró la boca de los leones", "Rompió el foso", "Movió la piedra", "Alejó a los hombres"], c: "Cerró la boca de los leones"},
+            {q: "54. ¿Por qué no hicieron daño los leones a Daniel? Daniel 6:22", o: ["Porque fue hallado inocente", "Porque dormían", "Porque gritó", "Porque estaba oculto"], c: "Porque fue hallado inocente"},
+            {q: "55. ¿Qué declaró Daniel sobre su conducta delante del rey? Daniel 6:22", o: ["No he hecho nada malo", "Fallé sin intención", "Desobedecí por miedo", "No conocía la ley"], c: "No he hecho nada malo"},
+            {q: "56. ¿Cómo reaccionó el rey cuando supo que Daniel estaba vivo? Daniel 6:23", o: ["Se alegró en gran manera", "Se asustó", "Guardó silencio", "Se retiró"], c: "Se alegró en gran manera"},
+            {q: "57. ¿Qué mandó hacer el rey con Daniel después de sacarlo del foso? Daniel 6:23", o: ["Sacarlo del foso", "Dejarlo allí", "Volverlo a sellar", "Castigarlo"], c: "Sacarlo del foso"},
+            {q: "58. ¿Qué no se halló en Daniel cuando fue sacado del foso? Daniel 6:23", o: ["Ninguna lesión", "Ningún cansancio", "Ningún temor", "Ninguna herida grave"], c: "Ninguna lesión"},
+            {q: "59. ¿Por qué no tuvo lesión Daniel? Daniel 6:23", o: ["Porque había confiado en su Dios", "Porque era fuerte", "Porque fue rápido", "Porque fue protegido por hombres"], c: "Porque había confiado en su Dios"},
+            {q: "60. ¿A quiénes mandó echar el rey al foso de los leones? Daniel 6:24", o: ["A los que habían acusado a Daniel", "A los sátrapas fieles", "A los soldados", "A los sacerdotes"], c: "A los que habían acusado a Daniel"},
+            {q: "61. ¿Quiénes fueron echados con los acusadores al foso de los leones? Daniel 6:24", o: ["Sus hijos y sus mujeres", "Sus amigos", "Sus siervos", "Sus vecinos"], c: "Sus hijos y sus mujeres"},
+            {q: "62. ¿Qué hicieron los leones con los acusadores? Daniel 6:24", o: ["Quebraron todos sus huesos", "Los hirieron", "Los asustaron", "Los encerraron"], c: "Quebraron todos sus huesos"},
+            {q: "63. ¿A quiénes escribió el rey Darío después de estos hechos? Daniel 6:25", o: ["A todos los pueblos, naciones y lenguas", "Solo a Media", "Solo a Persia", "Solo a Judá"], c: "A todos los pueblos, naciones y lenguas"},
+            {q: "64. ¿Qué deseó el rey Darío en su carta? Daniel 6:25", o: ["Paz os sea multiplicada", "Riqueza abundante", "Larga vida", "Victoria militar"], c: "Paz os sea multiplicada"},
+            {q: "65. ¿Qué ordenanza promulgó el rey Darío en todo el dominio de su reino? Daniel 6:26", o: ["Que todos teman y tiemblen ante la presencia del Dios de Daniel", "Que todos adoren al rey", "Que todos ayunen", "Que todos obedezcan a los sátrapas"], c: "Que todos teman y tiemblen ante la presencia del Dios de Daniel"},
+            {q: "66. ¿Cómo describe el rey Darío al Dios de Daniel? Daniel 6:26", o: ["El Dios viviente", "El Dios de Persia", "El Dios de Jerusalén solamente", "El Dios de los cautivos"], c: "El Dios viviente"},
+            {q: "67. ¿Qué afirma el rey Darío sobre el reino de Dios? Daniel 6:26", o: ["Que no será jamás destruido", "Que durará muchos años", "Que dominará Judá", "Que dependerá del rey"], c: "Que no será jamás destruido"},
+            {q: "68. ¿Qué afirma el rey Darío sobre el dominio de Dios? Daniel 6:26", o: ["Que perdurará hasta el fin", "Que terminará pronto", "Que será limitado", "Que será temporal"], c: "Que perdurará hasta el fin"},
+            {q: "69. ¿Qué hace Dios según el decreto del rey Darío? Daniel 6:27", o: ["Salva y libra", "Castiga y juzga", "Calla y observa", "Se esconde"], c: "Salva y libra"},
+            {q: "70. ¿Dónde hace Dios señales y maravillas? Daniel 6:27", o: ["En el cielo y en la tierra", "Solo en el cielo", "Solo en la tierra", "Solo en Jerusalén"], c: "En el cielo y en la tierra"},
+            {q: "71. ¿De qué libró Dios a Daniel? Daniel 6:27", o: ["Del poder de los leones", "Del decreto real", "Del exilio", "De la cárcel"], c: "Del poder de los leones"},
+            {q: "72. ¿Durante los reinados de quién prosperó Daniel? Daniel 6:28", o: ["Darío y Ciro el persa", "Nabucodonosor y Darío", "Belsasar y Ciro", "Darío y Nabucodonosor"], c: "Darío y Ciro el persa"},
+            {q: "73. ¿Qué sucedió con Daniel durante esos reinados? Daniel 6:28", o: ["Prosperó", "Fue desterrado", "Fue olvidado", "Fue castigado"], c: "Prosperó"},
+            {q: "74. ¿Qué escribió el rey Darío a todos los pueblos? Daniel 6:25", o: ["Paz os sea multiplicada", "Un llamado al arrepentimiento", "Una advertencia", "Una orden militar"], c: "Paz os sea multiplicada"},
+            {q: "75. ¿Qué ordenó el rey que hicieran todos en su reino? Daniel 6:26", o: ["Que teman y tiemblen ante el Dios de Daniel", "Que adoren al rey", "Que ayunen treinta días", "Que cambien sus leyes"], c: "Que teman y tiemblen ante el Dios de Daniel"},
+            {q: "76. ¿Cómo permanece el reino de Dios según el decreto del rey? Daniel 6:26", o: ["Por todos los siglos", "Por muchos años", "Hasta Persia", "Hasta Media"], c: "Por todos los siglos"},
+            {q: "77. ¿Qué no será jamás destruido? Daniel 6:26", o: ["El reino de Dios", "El reino de Darío", "El palacio", "El templo"], c: "El reino de Dios"},
+            {q: "78. ¿Qué hace Dios además de salvar y librar? Daniel 6:27", o: ["Hace señales y maravillas", "Envía profetas", "Cambia leyes", "Destruye reinos"], c: "Hace señales y maravillas"},
+            {q: "79. ¿Qué prueba del poder de Dios menciona el rey Darío? Daniel 6:27", o: ["Que libró a Daniel del poder de los leones", "Que cambió la ley", "Que destruyó a Persia", "Que castigó al rey"], c: "Que libró a Daniel del poder de los leones"},
+            {q: "80. ¿Qué dice el texto sobre Daniel al final del capítulo? Daniel 6:28", o: ["Prosperó durante los reinados de Darío y de Ciro el persa", "Murió en Persia", "Regresó a Jerusalén", "Fue desterrado"], c: "Prosperó durante los reinados de Darío y de Ciro el persa"} 
+                    
+];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
