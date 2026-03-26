@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Profetas y reyes Capítulo 40</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Profetas y Reyes Capítulo 40 Asociacion</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Profetas y Reyes - Capítulo 40 Asociacion Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            // ── NIVEL 1 ──────────────────────────────────────────────────────────────
+            {q: "1. ¿Qué revelaron a una nación idólatra los sucesos ocurridos poco después que Daniel entró al servicio del rey? (P. y R. Cap. 40)", o: ["El poder y la fidelidad del Dios de Israel ante una nación idólatra", "La debilidad de los magos y sabios babilónicos ante los misterios del Dios hebreo", "La superioridad de Daniel y sus compañeros sobre todos los sabios del reino de Babilonia", "El plan divino para destruir el imperio babilónico en el futuro cercano y establecer otro reino"], c: "El poder y la fidelidad del Dios de Israel ante una nación idólatra"},
+            {q: "2. ¿Qué le ocurrió a Nabucodonosor cuando despertó después de tener el sueño notable? (P. y R. Cap. 40)", o: ["Aunque el ánimo del rey sufrió una impresión profunda, le resultó imposible recordar los detalles del sueño", "Recordó perfectamente cada detalle del sueño pero no pudo comprender su significado profético", "Quedó tan perturbado que no pudo dormir ni comer durante varios días seguidos en el palacio", "Olvidó completamente el sueño y su espíritu quedó tranquilo como si nada hubiera ocurrido"], c: "Aunque el ánimo del rey sufrió una impresión profunda, le resultó imposible recordar los detalles del sueño"},
+            {q: "3. ¿Qué dijo Nabucodonosor a sus sabios al congregarlos para que lo ayudaran con su sueño? (P. y R. Cap. 40)", o: ["He soñado un sueño, y mi espíritu se ha perturbado por saber el sueño", "Reveladme el sueño que he soñado o todos seréis ejecutados en la plaza del reino", "Venid ante mí porque he visto grandes visiones que ninguno de vosotros puede comprender", "Necesito que interpretéis mi sueño o haré que los dioses de Babilonia os destruyan a todos"], c: "He soñado un sueño, y mi espíritu se ha perturbado por saber el sueño"},
+            {q: "4. ¿Qué respuesta evasiva dieron los sabios cuando Nabucodonosor les pidió que lo ayudaran? (P. y R. Cap. 40)", o: ["Rey para siempre vive : di el sueño a tus siervos y te daremos su declaracion", "Que necesitaban tiempo para consultar los astros y los registros sagrados de los templos babilónicos", "Que podían revelar cualquier misterio si el rey les concedía suficiente tiempo para prepararse", "Que el sueño era tan profundo que necesitaban consultar a los dioses de todos los templos primero"], c: "Rey para siempre vive : di el sueño a tus siervos y te daremos su declaracion"},
+            {q: "5. ¿Qué exigió el rey a sus sabios además de la interpretación del sueño bajo amenaza de muerte? (P. y R. Cap. 40)", o: ["Que le diesen no solo la interpretación sino el sueño mismo", "Que le explicaran el significado de cada símbolo que había visto en el sueño memorable", "Que le garantizaran que la interpretación que dieran sería verdadera y sin ninguna falsedad", "Que le revelaran todos los sueños proféticos que tendría durante el resto de su largo reinado"], c: "Que le diesen no solo la interpretación sino el sueño mismo"},
+            {q: "6. ¿Qué declararon los sabios ante la imposible demanda del rey de revelarles el sueño mismo? (P. y R. Cap. 40)", o: ["Que no había hombre sobre la tierra que pudiera declarar ese negocio, salvo los dioses cuya morada no es con la carne", "Que el rey pedía algo completamente imposible que ningún ser humano podría jamás realizar", "Que si el rey les revelaba aunque fuera una parte del sueño podrían completar el resto ellos", "Que necesitaban más tiempo para consultar los archivos sagrados de los templos babilónicos"], c: "Que no había hombre sobre la tierra que pudiera declarar ese negocio, salvo los dioses cuya morada no es con la carne"},
+            {q: "7. ¿Cuál fue la reacción de Nabucodonosor ante la incapacidad total de sus sabios para ayudarlo? (P. y R. Cap. 40)", o: ["Con ira y grande enojo mandó que matasen a todos los sabios de Babilonia", "Con tristeza y decepción los despidió de su cargo y ordenó buscar más sabios en el reino", "Con serenidad les concedió más tiempo para que pudieran descubrir el sueño y su significado", "Con astucia fingió aceptar su excusa mientras planeaba en secreto otra forma de obtener la respuesta"], c: "Con ira y grande enojo mandó que matasen a todos los sabios de Babilonia"},
+            {q: "8. ¿Qué hizo Daniel cuando supo que según el decreto debía morir junto con los sabios de Babilonia? (P. y R. Cap. 40)", o: ["Avisada y prudentemente preguntó Daniel a Arioc cuál era la causa del mandamiento tan apresurado del rey", "Inmediatamente fue a orar con sus compañeros antes de presentarse ante el capitán de la guardia", "Solicitó directamente una audiencia urgente con el rey para explicarle que él no tenía ninguna culpa", "Pidió a Arioc que le diera solo unas horas para prepararse espiritualmente antes de morir"], c: "Avisada y prudentemente preguntó Daniel a Arioc cuál era la causa del mandamiento tan apresurado del rey"},
+            {q: "9. ¿Qué arriesgó Daniel al atreverse a presentarse ante el rey para solicitar más tiempo? (P. y R. Cap. 40)", o: ["Arriesgando la vida se atrevió a presentarse ante el rey y solicitó que se le concediera tiempo", "Arriesgó la vida de sus tres compañeros al involucrarlos en su petición al poderoso rey babilónico", "Arriesgó su posición de privilegio en el palacio que tanto le había costado ganar con gran esfuerzo", "Arriesgó la credibilidad de todo el pueblo hebreo cautivo ante la corte del rey Nabucodonosor"], c: "Arriesgando la vida se atrevió a presentarse ante el rey y solicitó que se le concediera tiempo"},
+            {q: "10. ¿Qué hizo Daniel inmediatamente después de obtener el tiempo solicitado del rey? (P. y R. Cap. 40)", o: ["Fuése luego Daniel a su casa y declaró el negocio a Ananías, Misael, y Azarías, sus compañeros", "Fue solo a un lugar apartado a pasar la noche en intensa oración y ayuno personal ante Dios", "Consultó los textos sagrados hebreos que guardaba cuidadosamente en su habitación del palacio", "Organizó una reunión de oración entre todos los sabios hebreos que había en la ciudad de Babilonia"], c: "Fuése luego Daniel a su casa y declaró el negocio a Ananías, Misael, y Azarías, sus compañeros"},
+            {q: "11. ¿Qué actitud espiritual manifestaron Daniel y sus compañeros cuando oraron juntos por el misterio? (P. y R. Cap. 40)", o: ["Manifestaron una fe poderosa conscientes de que Dios los había puesto donde estaban y cumplían su deber", "Manifestaron una fe tímida pues no estaban seguros de que Dios les respondería en esa ocasión especial", "Manifestaron una fe basada en sus propias capacidades y en el conocimiento que habían adquirido", "Manifestaron una fe desesperada pues temían que Dios no escuchara su clamor en tierra pagana"], c: "Manifestaron una fe poderosa conscientes de que Dios los había puesto donde estaban y cumplían su deber"},
+            {q: "12. ¿Con qué actitud se sometieron Daniel y sus compañeros a Dios al orar en esa noche de crisis? (P. y R. Cap. 40)", o: ["Con corazón contrito se sometieron de nuevo al Juez de la tierra rogándole que los librase", "Con gran confianza en sí mismos se acercaron a Dios sabiendo que ya merecían tener la respuesta", "Con larga intercesión pasaron días enteros de ayuno antes de recibir alguna respuesta de Dios", "Con oración silenciosa e individual cada uno pidió en privado sin reunirse con sus compañeros"], c: "Con corazón contrito se sometieron de nuevo al Juez de la tierra rogándole que los librase"},
+            {q: "13. ¿De qué manera específica le fue revelado el sueño y su significado a Daniel esa noche? (P. y R. Cap. 40)", o: ["En visión de noche fueron revelados el sueño del rey y su significado a Daniel", "Mediante un ángel que se le apareció físicamente en su habitación durante las primeras horas", "A través de una voz audible del cielo que le describió detalladamente cada elemento del sueño", "Por medio de un sueño propio que tuvo exactamente el mismo contenido que el del rey babilónico"], c: "En visión de noche fueron revelados el sueño del rey y su significado a Daniel"},
+            {q: "14. ¿Cuál fue el primer acto de Daniel después de recibir la revelación divina del sueño del rey? (P. y R. Cap. 40)", o: ["El primer acto de Daniel fué agradecer a Dios la revelación que le había dado", "Despertar a sus compañeros para compartir con ellos inmediatamente todo lo que Dios le había revelado", "Presentarse apresuradamente ante Arioc para que lo llevara lo más pronto posible ante el rey", "Escribir detalladamente todo lo revelado para no olvidar ningún detalle importante antes de ver al rey"], c: "El primer acto de Daniel fué agradecer a Dios la revelación que le había dado"},
+            {q: "15. ¿Qué proclamó Daniel en su oración de gratitud sobre el poder de Dios sobre los reinos del mundo? (P. y R. Cap. 40)", o: ["Que él es el que muda los tiempos y las oportunidades: quita reyes, y pone reyes", "Que Dios destruiría todos los reinos paganos y establecería el reino eterno de Israel muy pronto", "Que la sabiduría de Daniel era un don especial que Dios le había concedido desde su nacimiento", "Que Babilonia sería destruida como castigo por su idolatría y sus crímenes contra el pueblo hebreo"], c: "Que él es el que muda los tiempos y las oportunidades: quita reyes, y pone reyes"},
+            {q: "16. ¿Cómo se presentó Daniel ante el poderoso monarca del mayor imperio del mundo? (P. y R. Cap. 40)", o: ["Sereno y dueño de sí mismo, rehusando aceptar los honores para sí y ensalzando a Dios como fuente de sabiduría", "Con humildad extrema postrándose ante el rey antes de comenzar a hablar sobre el misterio real", "Con autoridad profética declarando que Dios le había ordenado revelar el sueño al rey personalmente", "Con nerviosismo visible pero con determinación de cumplir el encargo que Dios le había confiado"], c: "Sereno y dueño de sí mismo, rehusando aceptar los honores para sí y ensalzando a Dios como fuente de sabiduría"},
+            {q: "17. ¿Qué declaró Daniel sobre la capacidad de los sabios caldeos para revelar el misterio del sueño? (P. y R. Cap. 40)", o: ["Que el misterio que el rey demanda, ni sabios, ni astrólogos, ni magos, ni adivinos lo pueden enseñar al rey", "Que los sabios caldeos sí podían haberlo revelado pero no quisieron hacerlo por temor al rey", "Que los sabios no tenían la capacidad porque Dios les había quitado esa habilidad como castigo", "Que los sabios eran simplemente impostores que nunca habían tenido ningún poder sobrenatural"], c: "Que el misterio que el rey demanda, ni sabios, ni astrólogos, ni magos, ni adivinos lo pueden enseñar al rey"},
+            {q: "18. ¿Cómo explicó Daniel la razón por la que a él le fue revelado el misterio del sueño del rey? (P. y R. Cap. 40)", o: ["Que a él le fue revelado este misterio no por sabiduría que en él hubiera más que en todos los vivientes", "Fue porque Dios lo había escogido desde antes de su nacimiento como el profeta de Babilonia", "Fue porque él y sus compañeros habían orado más intensamente que cualquier otro hebreo cautivo", "Fue porque había estudiado más profundamente que nadie las Escrituras sagradas del pueblo hebreo"], c: "Que a él le fue revelado este misterio no por sabiduría que en él hubiera más que en todos los vivientes"},
+            {q: "19. ¿Qué gran propósito tenía Dios al revelar el sueño a Nabucodonosor según el capítulo? (P. y R. Cap. 40)", o: ["Despertar la atención de Nabucodonosor para que sintiera su responsabilidad para con el Cielo", "Demostrar la superioridad de la religión hebrea sobre todas las religiones paganas de Babilonia", "Advertirle específicamente que su propio reino caería en un tiempo muy cercano al futuro inmediato", "Probar la fidelidad de Daniel para determinar si merecía un cargo más importante en el reino real"], c: "Despertar la atención de Nabucodonosor para que sintiera su responsabilidad para con el Cielo"},
+            {q: "20. ¿Cómo describió Daniel la imagen que vio Nabucodonosor en el sueño de esa noche memorable? (P. y R. Cap. 40)", o: ["Una grande imagen que era muy grande y cuya gloria era muy sublime, estaba en pie y su aspecto era terrible", "Una imagen pequeña pero aterradora que brillaba con una luz sobrenatural e insoportable para los ojos", "Una imagen de tamaño normal que fue creciendo hasta hacerse inmensa ante los ojos asombrados del rey", "Una imagen oscura y amenazante que se movía lentamente hacia el trono del rey babilónico"], c: "Una grande imagen que era muy grande y cuya gloria era muy sublime, estaba en pie y su aspecto era terrible"},
+            
+            // ── NIVEL 2 ──────────────────────────────────────────────────────────────
+            {q: "21. ¿De qué material era la cabeza de la gran imagen que Nabucodonosor vio en el sueño? (P. y R. Cap. 40)", o: ["La cabeza de esta imagen era de fino oro", "La cabeza de esta imagen era de plata pura y reluciente", "La cabeza de esta imagen era de bronce pulido y brillante", "La cabeza de esta imagen era de piedras preciosas engarzadas"], c: "La cabeza de esta imagen era de fino oro"},
+            {q: "22. ¿De qué material eran los pechos y los brazos de la imagen del sueño de Nabucodonosor? (P. y R. Cap. 40)", o: ["Sus pechos y sus brazos, de plata", "Sus pechos y sus brazos, de oro fino y purísimo", "Sus pechos y sus brazos, de metal o bronce resistente", "Sus pechos y sus brazos, de hierro forjado sólido"], c: "Sus pechos y sus brazos, de plata"},
+            {q: "23. ¿De qué material era el vientre y los muslos de la imagen del sueño según la descripción de Daniel? (P. y R. Cap. 40)", o: ["Su vientre y sus muslos, de metal", "Su vientre y sus muslos, de plata reluciente y pura", "Su vientre y sus muslos, de hierro sólido y resistente", "Su vientre y sus muslos, de barro cocido mezclado con plata"], c: "Su vientre y sus muslos, de metal"},
+            {q: "24. ¿De qué material eran las piernas de la imagen y qué representaban en la profecía de Daniel? (P. y R. Cap. 40)", o: ["Sus piernas de hierro, representando un cuarto reino fuerte como el hierro que quebranta todo", "Sus piernas de bronce o metal representando el tercer reino que se enseñorearía de toda la tierra", "Sus piernas de barro cocido mezclado con hierro representando un reino dividido en parte frágil", "Sus piernas de piedra tallada y pulida representando la fundación sólida del reino eterno de Dios"], c: "Sus piernas de hierro, representando un cuarto reino fuerte como el hierro que quebranta todo"},
+            {q: "25. ¿De qué material eran los pies de la imagen y qué característica especial tenían? (P. y R. Cap. 40)", o: ["Sus pies en parte de hierro y en parte de barro cocido haciendo el reino dividido y en parte frágil", "Sus pies completamente de hierro sólido sin ninguna mezcla de otro material que los debilitara", "Sus pies de barro cocido puro sin ninguna mezcla de ningún otro material más resistente ni durable", "Sus pies de plata mezclada con oro en proporciones iguales representando dos reinos aliados"], c: "Sus pies en parte de hierro y en parte de barro cocido haciendo el reino dividido y en parte frágil"},
+            {q: "26. ¿Qué ocurrió con la piedra cortada no con mano cuando hirió los pies de hierro y barro? (P. y R. Cap. 40)", o: ["Se tornaron como tamo de las eras del verano y levantólos el viento y nunca más se les halló lugar", "Solo destruyó los pies de la imagen mientras el resto permaneció completamente en pie sin daño", "Se fragmentó en pedazos después de golpear los pies sin poder destruir completamente la imagen", "Rebotó y cayó lejos sin lograr destruir completamente la poderosa imagen del sueño real"], c: "Se tornaron como tamo de las eras del verano y levantólos el viento y nunca más se les halló lugar"},
+            {q: "27. ¿En qué se convirtió la piedra que golpeó y destruyó la gran imagen del sueño de Nabucodonosor? (P. y R. Cap. 40)", o: ["La piedra que hirió a la imagen fué hecha un gran monte que hinchió toda la tierra", "Se convirtió en polvo que el viento esparció representando la victoria total sobre los reinos paganos", "Se convirtió en agua que llenó toda la tierra representando la purificación del mundo por Dios", "Se convirtió en una multitud de piedras pequeñas que cubrieron toda la superficie de la tierra"], c: "La piedra que hirió a la imagen fué hecha un gran monte que hinchió toda la tierra"},
+            {q: "28. ¿Qué representaba la cabeza de oro de la gran imagen según la interpretación de Daniel? (P. y R. Cap. 40)", o: ["Tú, oh rey, eres aquella cabeza de oro porque el Dios del cielo te ha dado reino, potencia y majestad", "El reino de Babilonia en general considerado el más glorioso y poderoso de todos los imperios", "El ideal de gobierno perfecto que Dios tenía para todos los reinos de la historia humana", "La sabiduría divina depositada en los gobernantes más justos de toda la historia del mundo"], c: "Tú, oh rey, eres aquella cabeza de oro porque el Dios del cielo te ha dado reino, potencia y majestad"},
+            {q: "29. ¿Qué tipo de reino se levantaría después de la caída de Babilonia según la interpretación? (P. y R. Cap. 40)", o: ["Después de ti se levantará otro reino menor que tú", "Un reino igual en poder y gloria pero superior en justicia y en su relación con el Dios del cielo", "Un reino más grande y poderoso que dominaría con más fuerza que todos los anteriores juntos", "Un reino espiritual que no tendría fronteras físicas ni territorio geográfico definido alguno"], c: "Después de ti se levantará otro reino menor que tú"},
+            {q: "30. ¿Cómo describe Daniel el cuarto reino de la imagen representado por el hierro? (P. y R. Cap. 40)", o: ["El reino cuarto será fuerte como hierro; y como el hierro desmenuza y doma todas las cosas, desmenuzará y quebrantará", "Glorioso como el oro pero frágil como el barro, mezcla de fortaleza y debilidad en extremo", "Pacífico y justo como ningún reino anterior que gobernará con sabiduría y misericordia", "Breve en duración pero intenso en gloria dejando una huella imborrable en toda la historia"], c: "El reino cuarto será fuerte como hierro; y como el hierro desmenuza y doma todas las cosas, desmenuzará y quebrantará"},
+            {q: "31. ¿Qué característica especial tenía el reino representado por los pies de hierro y barro? (P. y R. Cap. 40)", o: ["El reino será dividido; en parte será el reino fuerte y en parte será frágil", "El reino sería indestructible precisamente porque combina dos materiales de diferente naturaleza", "El reino se uniría eventualmente con todos los demás reinos para formar uno solo y poderoso", "El reino superaría a todos sus predecesores en gloria y en duración sobre la tierra completa"], c: "El reino será dividido; en parte será el reino fuerte y en parte será frágil"},
+            {q: "32. ¿Qué afirmó Daniel sobre el reino que Dios levantaría en los días de estos reyes? (P. y R. Cap. 40)", o: ["Levantará el Dios del cielo un reino que nunca jamás se corromperá y no será dejado a otro pueblo", "Que Dios restauraría el reino de Israel con mayor gloria de la que tuvo en tiempos del rey Salomón", "Que Dios establecería su reino solo después de que todos los reinos humanos hayan desaparecido", "Que Dios entregaría el reino eterno exclusivamente al pueblo hebreo por su fidelidad al pacto"], c: "Levantará el Dios del cielo un reino que nunca jamás se corromperá y no será dejado a otro pueblo"},
+            {q: "33. ¿Cómo reaccionó Nabucodonosor al escuchar la declaración e interpretación del sueño por Daniel? (P. y R. Cap. 40)", o: ["Con humildad y reverencia cayó sobre su rostro y humillóse diciendo: Ciertamente el Dios vuestro es Dios de dioses", "Quedó en silencio absoluto durante largo tiempo sin poder articular ninguna palabra al respecto", "Expresó su desacuerdo con la interpretación y pidió a Daniel que la revisara y corrigiera de nuevo", "Se llenó de temor y mandó que lo dejaran solo en su cámara real privada sin ningún testigo"], c: "Con humildad y reverencia cayó sobre su rostro y humillóse diciendo: Ciertamente el Dios vuestro es Dios de dioses"},
+            {q: "34. ¿Qué ocurrió con el decreto de muerte para los sabios después de la revelación de Daniel? (P. y R. Cap. 40)", o: ["Nabucodonosor revocó el decreto que había dado para que destruyeran a los magos", "El decreto siguió en pie pero Daniel intercedió personalmente por cada uno de los sabios condenados", "El rey olvidó el decreto al estar tan impresionado con la interpretación perfecta de Daniel", "Los sabios fueron perdonados porque prometieron al rey que aprenderían de la sabiduría de Daniel"], c: "Nabucodonosor revocó el decreto que había dado para que destruyeran a los magos"},
+            {q: "35. ¿Qué posición de gran honor y responsabilidad recibió Daniel como resultado de haber revelado el sueño? (P. y R. Cap. 40)", o: ["El rey engrandeció a Daniel y púsolo por gobernador de toda la provincia de Babilonia y príncipe de los sabios", "Daniel fue nombrado consejero personal del rey con acceso directo al trono en cualquier momento", "Daniel recibió grandes riquezas y tesoros pero no aceptó ningún cargo de gobierno en el reino", "Daniel fue nombrado sumo sacerdote de todos los templos del reino para honrar a su Dios hebreo"], c: "El rey engrandeció a Daniel y púsolo por gobernador de toda la provincia de Babilonia y príncipe de los sabios"},
+            {q: "36. ¿Qué solicitó Daniel al rey en favor de sus tres compañeros Ananías, Misael y Azarías? (P. y R. Cap. 40)", o: ["Daniel solicitó del rey y él puso sobre los negocios de la provincia de Babilonia a Sadrach, Mesach y Abed-nego", "Solicitó que sus compañeros fueran nombrados copresidentes junto a Daniel en el gobierno real", "Solicitó que sus compañeros pudieran regresar libremente a la tierra de Israel sin restricciones", "Solicitó que sus compañeros recibieran la misma educación privilegiada que él había tenido"], c: "Daniel solicitó del rey y él puso sobre los negocios de la provincia de Babilonia a Sadrach, Mesach y Abed-nego"},
+            {q: "37. ¿Qué revela la Palabra de Dios sobre lo que está detrás del desarrollo de las naciones según el capítulo? (P. y R. Cap. 40)", o: ["Contemplamos a los agentes del que es todo misericordioso que cumplen silenciosa y pacientemente los designios de Dios", "Un plan predeterminado que los seres humanos no pueden alterar de ninguna manera posible", "La lucha constante entre el bien y el mal donde el bien siempre termina triunfando al final", "La sabiduría acumulada de los profetas bíblicos que guiaron a las naciones hacia el bien eterno"], c: "Contemplamos a los agentes del que es todo misericordioso que cumplen silenciosa y pacientemente los designios de Dios"},
+            {q: "38. ¿Qué declaró el apóstol Pablo en Hechos 17:24-27 sobre el propósito de Dios con las naciones? (P. y R. Cap. 40)", o: ["De una sangre ha hecho todo el linaje de los hombres para que buscasen a Dios si en alguna manera palpando le hallen", "Que Dios creó las naciones para que compitieran entre sí y así revelaran su gloria y poder eterno", "Que Dios predestinó a cada nación para cumplir un papel específico en el plan de la salvación", "Que las naciones fueron creadas para aprender las unas de las otras sobre la naturaleza de Dios"], c: "De una sangre ha hecho todo el linaje de los hombres para que buscasen a Dios si en alguna manera palpando le hallen"},
+            {q: "39. ¿Qué contiene la ley de Dios según la enseñanza del capítulo 40 de Profetas y Reyes? (P. y R. Cap. 40)", o: ["Los principios en que se basa toda verdadera prosperidad tanto de las naciones como de los individuos", "Las reglas específicas que cada nación debe seguir para obtener victoria militar sobre sus enemigos", "Los requisitos ceremoniales que el pueblo de Dios debe cumplir para mantener su alianza con él", "Los principios económicos que garantizan el bienestar material de todo pueblo que los obedezca"], c: "Los principios en que se basa toda verdadera prosperidad tanto de las naciones como de los individuos"},
+            {q: "40. ¿Cómo describió Moisés la ley de Dios a los israelitas según el pasaje citado en el capítulo? (P. y R. Cap. 40)", o: ["Esta es vuestra sabiduría y vuestra inteligencia. Porque no os es cosa vana, mas es vuestra vida", "Como una carga pesada que debían llevar con paciencia hasta llegar a la tierra prometida", "Como un conjunto de reglas temporales que serían reemplazadas por leyes más perfectas después", "Como el fundamento del sistema político y económico que Dios establecería en Israel para siempre"], c: "Esta es vuestra sabiduría y vuestra inteligencia. Porque no os es cosa vana, mas es vuestra vida"},
+            
+            // ── NIVEL 3 ──────────────────────────────────────────────────────────────
+            {q: "41. ¿A quiénes se extienden las bendiciones prometidas a Israel según la enseñanza del capítulo? (P. y R. Cap. 40)", o: ["A toda nación y a todo individuo debajo de los anchos cielos bajo las mismas condiciones y grado", "Solo a los descendientes físicos de Abraham que mantengan las tradiciones del pueblo hebreo", "Únicamente a las naciones que acepten formalmente la ley de Moisés como su código legal", "A todos los gentiles que se conviertan formalmente a la fe hebrea y observen sus mandamientos"], c: "A toda nación y a todo individuo debajo de los anchos cielos bajo las mismas condiciones y grado"},
+            {q: "42. ¿Qué pudo hacer el Omnisciente centenares de años antes de que ciertas naciones existieran? (P. y R. Cap. 40)", o: ["El Omnisciente miró a través de los siglos y predijo el nacimiento y la caída de los reinos universales", "Preparar a líderes específicos que guiarían esas naciones según su voluntad divina y perfecta", "Establecer las condiciones geográficas y climáticas que determinarían el desarrollo de esas naciones", "Escribir la historia completa de esas naciones en registros que solo los ángeles podían leer"], c: "El Omnisciente miró a través de los siglos y predijo el nacimiento y la caída de los reinos universales"},
+            {q: "43. ¿Por qué cayó finalmente Babilonia según la enseñanza histórica del capítulo 40? (P. y R. Cap. 40)", o: ["Porque en tiempos de prosperidad sus gobernantes se habían considerado independientes de Dios y habían atribuido la gloria a las hazañas humanas", "Porque sus gobernantes fueron incapaces de mantener la paz entre los diferentes pueblos del gran imperio", "Porque no tuvieron suficiente poder militar para resistir los ataques de sus poderosos enemigos orientales", "Porque Dios decidió arbitrariamente terminar con ese reino para dar paso al siguiente de la profecía"], c: "Porque en tiempos de prosperidad sus gobernantes se habían considerado independientes de Dios y habían atribuido la gloria a las hazañas humanas"},
+            {q: "44. ¿Por qué fue el reino medo-persa objeto de la ira del Cielo según el capítulo? (P. y R. Cap. 40)", o: ["Porque en él se pisoteaba la ley de Dios y prevalecían la impiedad, la blasfemia y la corrupción", "Porque conquistó violentamente el reino de Babilonia en lugar de esperar la caída natural del mismo", "Porque persiguió activamente al pueblo hebreo e intentó destruir todos sus registros sagrados", "Porque sus gobernantes rechazaron explícitamente al Dios de Israel después de conocer sus obras"], c: "Porque en él se pisoteaba la ley de Dios y prevalecían la impiedad, la blasfemia y la corrupción"},
+            {q: "45. ¿Qué característica moral tuvieron los reinos que siguieron al medo-persa según el capítulo? (P. y R. Cap. 40)", o: ["Los reinos que siguieron fueron aun más viles y corruptos hundiéndose cada vez más en su falta de valor moral", "Fueron más justos y tolerantes especialmente con el pueblo hebreo que vivía en su territorio", "Mantuvieron el mismo nivel moral del reino medo-persa sin mejoras ni deterioro apreciables", "Mostraron mayor respeto por la ley de Dios aunque sin reconocer abiertamente su origen divino"], c: "Los reinos que siguieron fueron aun más viles y corruptos hundiéndose cada vez más en su falta de valor moral"},
+            {q: "46. ¿De dónde proviene el poder de todo gobernante de la tierra según la enseñanza del capítulo? (P. y R. Cap. 40)", o: ["El poder ejercido por todo gobernante de la tierra es impartido del Cielo", "Proviene de la confianza del pueblo que lo eligió o que lo respaldó para gobernar la nación", "Viene de las capacidades naturales con que nació ese líder y que Dios le concedió al crearlo", "Depende de las alianzas que forma con otros poderes y de la sabiduría de todos sus consejeros"], c: "El poder ejercido por todo gobernante de la tierra es impartido del Cielo"},
+            {q: "47. ¿Qué palabras del Vigía divino se dirigen a cada gobernante de la tierra según el capítulo? (P. y R. Cap. 40)", o: ["Yo te ceñiré, aunque tú no me conociste, según Isaías 45:5", "Redime tus pecados con justicia y tus iniquidades con misericordias para con los pobres del pueblo", "La justicia engrandece la nación y con justicia será afirmado el trono del gobernante justo", "Busca primeramente el reino de Dios y todo lo demás te será añadido en abundancia perpetua"], c: "Yo te ceñiré, aunque tú no me conociste, según Isaías 45:5"},
+            {q: "48. ¿Cuál es la lección de la vida que el capítulo presenta dirigida específicamente a Nabucodonosor? (P. y R. Cap. 40)", o: ["Redime tus pecados con justicia, y tus iniquidades con misericordias para con los pobres, según Daniel 4:27", "Reconoce que el Dios de Israel es el único Dios verdadero y abandona toda forma de idolatría", "Devuelve a los hebreos su libertad y permite que regresen a su tierra natal de Israel de inmediato", "Aprende del ejemplo de Daniel que la sabiduría de Dios supera toda sabiduría humana conocida"], c: "Redime tus pecados con justicia, y tus iniquidades con misericordias para con los pobres, según Daniel 4:27"},
+            {q: "49. ¿En qué se mide verdaderamente la fuerza de las naciones y los individuos según el capítulo? (P. y R. Cap. 40)", o: ["Se mide por la fidelidad con que cumplen el propósito de Dios", "Por la cantidad de recursos materiales y militares que poseen para defender su extenso territorio", "Por la sabiduría y la preparación intelectual de sus líderes y sus ciudadanos más destacados", "Por las alianzas estratégicas que logran construir con otras naciones poderosas del mundo"], c: "Se mide por la fidelidad con que cumplen el propósito de Dios"},
+            {q: "50. ¿En qué única fuente se presenta claramente la filosofía verdadera de la historia según el capítulo? (P. y R. Cap. 40)", o: ["Esto se presenta claramente tan sólo en la Palabra de Dios", "Igualmente bien en los documentos históricos seculares y en los registros de las grandes civilizaciones", "En la filosofía griega y romana que fue la primera en descubrir los verdaderos principios de la historia", "En la combinación del estudio bíblico con las ciencias históricas y arqueológicas modernas"], c: "Esto se presenta claramente tan sólo en la Palabra de Dios"},
+            {q: "51. ¿Cuándo buscaban los gobernantes babilónicos la ayuda de hombres como Daniel según el capítulo? (P. y R. Cap. 40)", o: ["Sólo hicieron de Dios su refugio cuando estaban perplejos y acosados", "Regularmente como parte de sus consultas diarias con todos los consejeros del palacio real", "Únicamente en ocasiones de guerra cuando necesitaban orientación profética para lograr la victoria", "En cada momento importante del calendario religioso babilónico a lo largo de todo el año"], c: "Sólo hicieron de Dios su refugio cuando estaban perplejos y acosados"},
+            {q: "52. ¿Por qué los gobernantes de Babilonia no podían comprender las revelaciones proféticas de Dios? (P. y R. Cap. 40)", o: ["Porque se habían separado tanto de Dios por la transgresión que no podían comprender las revelaciones ni las advertencias", "Porque no tenían el conocimiento bíblico suficiente para interpretar correctamente las visiones", "Porque sus magos y astrólogos les impedían acceder directamente a las verdades reveladas de Dios", "Porque el idioma de las profecías era hebreo y ellos no lo hablaban ni lo entendían bien"], c: "Porque se habían separado tanto de Dios por la transgresión que no podían comprender las revelaciones ni las advertencias"},
+            {q: "53. ¿Qué significa comprender que la justicia engrandece la nación y que Dios quita y pone reyes? (P. y R. Cap. 40)", o: ["Es comprender la filosofía de la historia según lo que revela la Palabra de Dios", "Es entender que los gobernantes solo prosperan cuando siguen los consejos de los profetas de Dios", "Es reconocer que el estudio de la historia secular nos enseña los mismos principios bíblicos", "Es admitir que el poder humano siempre termina destruyendo todo lo que construye en la tierra"], c: "Es comprender la filosofía de la historia según lo que revela la Palabra de Dios"},
+            {q: "54. ¿Qué cargo específico tenía Arioc en el reino de Babilonia cuando Daniel interactuó con él? (P. y R. Cap. 40)", o: ["Arioc, capitán de la guardia del rey, estaba encargado de ejecutar el decreto real sobre los sabios", "Era el secretario personal del rey encargado de registrar todos los decretos y decisiones reales", "Era el jefe de los astrólogos del palacio encargado de interpretar los sueños del monarca real", "Era el gobernador principal de la ciudad de Babilonia que supervisaba el orden en el palacio"], c: "Arioc, capitán de la guardia del rey, estaba encargado de ejecutar el decreto real sobre los sabios"},
+            {q: "55. ¿Cómo presentó Arioc a Daniel ante el rey Nabucodonosor cuando lo llevó a su presencia? (P. y R. Cap. 40)", o: ["Un varón de los trasportados de Judá he hallado el cual declarará al rey la interpretación", "Este joven hebreo afirma que su Dios le ha revelado el sueño y desea declarar su significado", "He encontrado a Daniel el sabio hebreo que ya conoce el sueño y desea revelarle su significado", "El prisionero hebreo Daniel solicita urgentemente una audiencia con el rey sobre el sueño"], c: "Un varón de los trasportados de Judá he hallado el cual declarará al rey la interpretación"},
+            {q: "56. ¿Qué visión del propósito humano presentó Dios al crear la tierra según el capítulo? (P. y R. Cap. 40)", o: ["Quería que fuese habitada por seres cuya existencia resultara de beneficio propio y mutuo honrando al Creador", "Que fuera el escenario donde se demostraría la superioridad del pueblo de Israel sobre las naciones", "Que sirviera únicamente como el lugar donde se desarrollaría el plan completo de la redención humana", "Que fuera habitada por seres perfectos que nunca cometerían ningún tipo de pecado ni error"], c: "Quería que fuese habitada por seres cuya existencia resultara de beneficio propio y mutuo honrando al Creador"},
+            {q: "57. ¿Qué promesa bíblica citó el capítulo para los que se identifican con el propósito de Dios? (P. y R. Cap. 40)", o: ["Este pueblo crié para mí; mis alabanzas publicará, según Isaías 43:21", "Yo honraré a los que me honran y los que me desprecian serán tenidos en poco, de 1 Samuel 2:30", "El que persevere hasta el fin éste será salvo, según la promesa del Señor Jesucristo en Mateo", "Buscad primeramente el reino de Dios y su justicia y todas estas cosas os serán añadidas"], c: "Este pueblo crié para mí; mis alabanzas publicará, según Isaías 43:21"},
+            {q: "58. ¿Qué habría ocurrido con Babilonia si sus gobernantes hubieran cultivado siempre el temor de Jehová? (P. y R. Cap. 40)", o: ["Se les habría dado una sabiduría y un poder que los habrían unido a él y mantenido fuertes", "Habrían conquistado todos los reinos del mundo y establecido un imperio que duraría para siempre", "Habrían recibido la promesa divina de que su reino nunca sería destruido ni heredado por otros", "Habrían podido entender todas las profecías de Daniel sin necesidad de pedirle su interpretación"], c: "Se les habría dado una sabiduría y un poder que los habrían unido a él y mantenido fuertes"},
+            {q: "59. ¿Cuál es la gran verdad central que Dios quería comunicar a Nabucodonosor a través del sueño? (P. y R. Cap. 40)", o: ["Dios iba a revelarle que él ejerce el poder sobre los reinos del mundo, el poder de entronizar y de destronar a los reyes", "Que Babilonia sería destruida muy pronto y que el rey debía prepararse para ese inevitable acontecimiento", "Que Daniel y sus compañeros debían ser honrados como los representantes del Dios verdadero y eterno", "Que la idolatría de Babilonia era el principal obstáculo para la prosperidad y grandeza del reino"], c: "Dios iba a revelarle que él ejerce el poder sobre los reinos del mundo, el poder de entronizar y de destronar a los reyes"},
+            {q: "60. ¿Cómo se mide la fuerza verdadera de las naciones y los individuos según el último párrafo del capítulo? (P. y R. Cap. 40)", o: ["Se mide por la fidelidad con que cumplen el propósito de Dios, no en sus recursos ni jactanciosa grandeza", "Debemos estudiar la historia secular para comprender mejor los propósitos de Dios en el mundo", "El éxito espiritual depende principalmente del talento natural con que Dios nos ha dotado", "Las profecías de Daniel son incomprensibles para el ser humano moderno sin revelación especial"], c: "Se mide por la fidelidad con que cumplen el propósito de Dios, no en sus recursos ni jactanciosa grandeza"}
+            
+];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>

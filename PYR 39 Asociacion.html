@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Profetas y reyes Capítulo 39</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Profetas y Reyes Capítulo 39 Asociacion</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Profetas y Reyes - Capítulo 39 Asociacion Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            // ── NIVEL 1 ──────────────────────────────────────────────────────────────
+            {q: "1. ¿Qué tipo de hombres se contaban entre los israelitas llevados a Babilonia? (P. y R. Cap. 39)", o: ["Patriotas tan fieles a los buenos principios como el acero, que honrarían a Dios aun cuando lo perdiesen todo", "Sacerdotes y levitas devotos que nunca dejaron de ofrecer sacrificios a Dios en tierra extraña", "Guerreros valientes que resistieron con toda su fuerza la deportación ordenada por Nabucodonosor", "Estudiantes brillantes dispuestos a aprender la sabiduría y ciencia de los caldeos babilonios"], c: "Patriotas tan fieles a los buenos principios como el acero, que honrarían a Dios aun cuando lo perdiesen todo"},
+            {q: "2. ¿Qué propósito debían cumplir los hebreos fieles en la tierra de su cautiverio? (P. y R. Cap. 39)", o: ["Dar a las naciones paganas las bendiciones provenientes del conocimiento de Jehová siendo sus representantes", "Preparar el regreso del pueblo hebreo a la tierra prometida lo más pronto posible", "Demostrar la superioridad militar e intelectual del pueblo hebreo sobre todas las naciones", "Convencer al rey Nabucodonosor de que liberara a todo el pueblo de Israel del cautiverio"], c: "Dar a las naciones paganas las bendiciones provenientes del conocimiento de Jehová siendo sus representantes"},
+            {q: "3. ¿Qué consideraban los hebreos fieles como un alto honor según el capítulo? (P. y R. Cap. 39)", o: ["La fe que sostenían y el nombre de adoradores del Dios viviente en medio de los idólatras", "Haber sido seleccionados personalmente por el rey para servir en el palacio real babilónico", "Conocer más sabiduría y ciencia que todos los magos y astrólogos del reino de Babilonia", "Ser los representantes políticos del pueblo hebreo ante la corte del mayor monarca del mundo"], c: "La fe que sostenían y el nombre de adoradores del Dios viviente en medio de los idólatras"},
+            {q: "4. ¿Qué mencionaban jactanciosamente los vencedores babilonios respecto a los hebreos cautivos? (P. y R. Cap. 39)", o: ["Que su religión y costumbres eran superiores a la religión y costumbres de los hebreos", "Que los dioses de Babilonia habían derrotado completamente al Dios de Israel para siempre", "Que los utensilios del templo hebreo eran inferiores en valor a los tesoros de Babilonia", "Que los jóvenes hebreos habían abandonado voluntariamente su fe para servir al rey"], c: "Que su religión y costumbres eran superiores a la religión y costumbres de los hebreos"},
+            {q: "5. ¿De qué única manera pudo Dios dar testimonio de su supremacía ante Babilonia? (P. y R. Cap. 39)", o: ["Por medio de los que le eran leales, que era la única manera en que podía ser dado ese testimonio", "Por medio de señales y milagros visibles en el cielo sobre la ciudad de Babilonia", "Por medio de profetas enviados especialmente a predicar en las calles de la ciudad", "Por medio de victorias militares que demostraron el poder del Dios de Israel ante las naciones"], c: "Por medio de los que le eran leales, que era la única manera en que podía ser dado ese testimonio"},
+            {q: "6. ¿Cómo describe el capítulo a Daniel y sus tres compañeros? (P. y R. Cap. 39)", o: ["Ilustres ejemplos de lo que pueden llegar a ser los hombres que se unen con el Dios de sabiduría y poder", "Jóvenes orgullosos de su linaje real que nunca olvidaron su posición social privilegiada", "Estudiantes mediocres que solo destacaron gracias a la intervención sobrenatural de Dios", "Sacerdotes devotos que mantuvieron en secreto su adoración a Jehová dentro del palacio"], c: "Ilustres ejemplos de lo que pueden llegar a ser los hombres que se unen con el Dios de sabiduría y poder"},
+            {q: "7. ¿Por qué resolvió Nabucodonosor educar especialmente a Daniel y sus compañeros? (P. y R. Cap. 39)", o: ["Porque vio en ellos una promesa de capacidad notable para ocupar puestos importantes en su reino", "Porque eran los únicos jóvenes que ya hablaban el idioma caldeo con total fluidez natural", "Porque el príncipe de los eunucos los recomendó como los más obedientes del grupo hebreo", "Porque sus padres habían pedido directamente al rey que les concediera una educación especial"], c: "Porque vio en ellos una promesa de capacidad notable para ocupar puestos importantes en su reino"},
+            {q: "8. ¿Cuánto tiempo duraría la educación especial de los jóvenes hebreos en el palacio real? (P. y R. Cap. 39)", o: ["Tres años, durante los cuales se les concederían las ventajas educativas que tenían los príncipes", "Cinco años, al cabo de los cuales serían examinados por los sabios principales del reino", "Dos años, tiempo suficiente para aprender el idioma y las costumbres del pueblo caldeo", "Siete años, siguiendo el patrón bíblico de los ciclos sabáticos del pueblo de Israel"], c: "Tres años, durante los cuales se les concederían las ventajas educativas que tenían los príncipes"},
+            {q: "9. ¿Por qué se cambiaron los nombres de Daniel y sus compañeros según el capítulo? (P. y R. Cap. 39)", o: ["Para conmemorar divinidades caldeas e inducirlos gradualmente a renunciar a su religión", "Para facilitar la comunicación entre los jóvenes hebreos y los funcionarios babilónicos", "Para honrarlos como los mejores estudiantes seleccionados de la escuela del palacio real", "Para proteger su identidad hebrea de los enemigos que querían eliminarlos del palacio"], c: "Para conmemorar divinidades caldeas e inducirlos gradualmente a renunciar a su religión"},
+            {q: "10. ¿Qué importancia tenían los nombres que los padres hebreos daban a sus hijos? (P. y R. Cap. 39)", o: ["Tenían gran significado y expresaban los rasgos de carácter que deseaban ver en sus hijos", "Eran simplemente nombres tradicionales sin ningún significado especial ni propósito espiritual", "Identificaban únicamente la tribu y familia de pertenencia sin mayor significado personal", "Eran asignados por los sacerdotes del templo según las circunstancias específicas del nacimiento"], c: "Tenían gran significado y expresaban los rasgos de carácter que deseaban ver en sus hijos"},
+            {q: "11. ¿Cuál era la estrategia gradual del rey para lograr que los jóvenes renunciaran a su religión? (P. y R. Cap. 39)", o: ["Darles nombres idólatras, ponerlos en trato íntimo con costumbres paganas y ritos seductores del culto", "Obligarlos directamente bajo amenaza de muerte a renunciar a su fe hebrea de inmediato", "Separar a los jóvenes de sus compañeros para que no pudieran apoyarse mutuamente en su fe", "Convencerlos intelectualmente de que los dioses babilónicos eran superiores al Dios hebreo"], c: "Darles nombres idólatras, ponerlos en trato íntimo con costumbres paganas y ritos seductores del culto"},
+            {q: "12. ¿Por qué estaba consagrado a la idolatría el alimento de la mesa del rey? (P. y R. Cap. 39)", o: ["Porque una porción de esas cosas se ofrecía a los ídolos y compartirlo sería tributo a los dioses", "Porque era preparado por sacerdotes paganos que lo bendecían en nombre de sus dioses caldeos", "Porque el mismo rey lo consagraba en un ritual sagrado especial cada mañana sin excepción", "Porque los ingredientes eran traídos directamente de los templos de los dioses de Babilonia"], c: "Porque una porción de esas cosas se ofrecía a los ídolos y compartirlo sería tributo a los dioses"},
+            {q: "13. ¿Qué habría significado para Daniel hacer como que comía de la comida del rey? (P. y R. Cap. 39)", o: ["Habría sido negar su fe y colocarse de parte del paganismo deshonrando los principios de la ley de Dios", "Habría sido simplemente aceptar la buena voluntad del rey sin ninguna implicación religiosa", "Habría sido una pequeña concesión temporal que Dios entendería dadas las difíciles circunstancias", "Habría demostrado que era leal al rey y merecía continuar sus estudios privilegiados en el palacio"], c: "Habría sido negar su fe y colocarse de parte del paganismo deshonrando los principios de la ley de Dios"},
+            {q: "14. ¿Qué otro riesgo adicional no podían correr los jóvenes hebreos al consumir la comida del rey? (P. y R. Cap. 39)", o: ["El efecto enervador del lujo y la disipación sobre el desarrollo físico, mental y espiritual", "El riesgo de perder la confianza del rey si se descubría que no comían toda la ración asignada", "El peligro de que la comida estuviera envenenada por los enemigos de los hebreos en la corte", "El temor de que los otros estudiantes se quejaran al príncipe por el trato diferente que recibían"], c: "El efecto enervador del lujo y la disipación sobre el desarrollo físico, mental y espiritual"},
+            {q: "15. ¿La historia de qué personajes bíblicos conocían los jóvenes respecto a la intemperancia? (P. y R. Cap. 39)", o: ["La historia de Nadab y Abihú, cuya intemperancia y resultados describían los pergaminos del Pentateuco", "La historia de Noé, cuya embriaguez trajo vergüenza y consecuencias graves a toda su familia", "La historia de Sansón, cuya debilidad física fue causada por abandonar su voto de nazareo", "La historia de Salomón, cuya sabiduría fue opacada por todos sus excesos y placeres mundanos"], c: "La historia de Nadab y Abihú, cuya intemperancia y resultados describían los pergaminos del Pentateuco"},
+            {q: "16. ¿Qué les enseñaron los padres de Daniel y sus compañeros respecto a sus facultades? (P. y R. Cap. 39)", o: ["Que Dios los tendría por responsables de sus facultades y que no debían atrofiarlas ni debilitarlas", "Que las facultades físicas eran menos importantes que las facultades espirituales ante Dios", "Que podían usar sus facultades libremente siempre que no cayeran en la idolatría babilónica", "Que las facultades naturales eran un regalo de Dios que no requería ningún cuidado especial"], c: "Que Dios los tendría por responsables de sus facultades y que no debían atrofiarlas ni debilitarlas"},
+            {q: "17. ¿Qué fue la educación recibida de sus padres para Daniel y sus compañeros en Babilonia? (P. y R. Cap. 39)", o: ["Un medio de preservación entre las influencias desmoralizadoras de la corte babilónica", "Una carga que les impedía adaptarse completamente a las costumbres y cultura de Babilonia", "Una ventaja intelectual que los hacía destacar sobre todos los demás estudiantes del palacio", "Una fuente de orgullo que les impedía relacionarse normalmente con sus compañeros caldeos"], c: "Un medio de preservación entre las influencias desmoralizadoras de la corte babilónica"},
+            {q: "18. ¿Qué excusa plausible podría haber encontrado Daniel para apartarse de sus principios? (P. y R. Cap. 39)", o: ["Que dependía del favor del rey y estaba sometido a su poder por lo que no le quedaba otro remedio", "Que sus compañeros también comían la comida del rey y él no quería parecer orgulloso ni diferente", "Que Dios entendería la situación tan difícil y le perdonaría esa pequeña concesión temporal", "Que la comida era necesaria para mantener su salud y cumplir bien con todos sus estudios"], c: "Que dependía del favor del rey y estaba sometido a su poder por lo que no le quedaba otro remedio"},
+            {q: "19. ¿Qué apreciaba Daniel más que el favor del mayor potentado de la tierra? (P. y R. Cap. 39)", o: ["La aprobación de Dios, más que el favor del rey y aun más que la vida misma", "La amistad con sus compañeros hebreos y la unidad de su pueblo en tierra extranjera", "El conocimiento y la sabiduría que Dios le daba para cumplir su misión en Babilonia", "El regreso eventual a su tierra prometida y la restauración del reino de Israel"], c: "La aprobación de Dios, más que el favor del rey y aun más que la vida misma"},
+            {q: "20. ¿Cómo obraron los jóvenes hebreos al tomar la decisión de no contaminarse con la comida? (P. y R. Cap. 39)", o: ["No obraron presuntuosamente sino confiando firmemente en Dios para cualquier resultado", "Obraron con valentía y desafío directo a todas las autoridades del palacio babilónico", "Obraron con orgullo nacional queriendo demostrar la superioridad del pueblo hebreo", "Obraron con timidez y temor sin saber con certeza si Dios los respaldaría en su decisión"], c: "No obraron presuntuosamente sino confiando firmemente en Dios para cualquier resultado"},
+            
+            // ── NIVEL 2 ──────────────────────────────────────────────────────────────
+            {q: "21. ¿Qué habría ocurrido si los jóvenes hubieran cedido a la presión de las circunstancias? (P. y R. Cap. 39)", o: ["Su desvío habría debilitado su sentido de lo recto y su aborrecimiento por lo malo", "Solo habrían sufrido una pequeña pérdida espiritual fácilmente recuperable después", "Habrían ganado la confianza del rey sin perder realmente su relación con Dios", "Simplemente habrían demostrado prudencia y sabiduría práctica ante una situación difícil"], c: "Su desvío habría debilitado su sentido de lo recto y su aborrecimiento por lo malo"},
+            {q: "22. ¿A dónde habría conducido el primer paso en la dirección errónea según el capítulo? (P. y R. Cap. 39)", o: ["A otros pasos tales hasta que, cortada su relación con el Cielo, fueran arrastrados por la tentación", "A una leve desviación temporal de sus principios que podría ser corregida fácilmente después", "A un mayor entendimiento de la realidad babilónica que los haría más efectivos como testigos", "A la pérdida únicamente de su salud física sin afectar en nada su carácter espiritual"], c: "A otros pasos tales hasta que, cortada su relación con el Cielo, fueran arrastrados por la tentación"},
+            {q: "23. ¿Qué hizo Dios a favor de Daniel ante el príncipe de los eunucos? (P. y R. Cap. 39)", o: ["Puso a Daniel en gracia y en buena voluntad con el príncipe de los eunucos", "Le dio a Daniel palabras sabias para convencer al príncipe con argumentos irrefutables", "Envió un ángel que se apareció al príncipe en sueños para ablandar completamente su corazón", "Hizo que el príncipe olvidara completamente las órdenes del rey respecto a la alimentación"], c: "Puso a Daniel en gracia y en buena voluntad con el príncipe de los eunucos"},
+            {q: "24. ¿Qué temía el príncipe de los eunucos si accedía a la petición de Daniel? (P. y R. Cap. 39)", o: ["Que el rey le condenara la cabeza al ver los rostros más tristes de los jóvenes hebreos", "Que los otros jóvenes se quejaran al rey por el trato especial dado a los hebreos cautivos", "Que los jóvenes hebreos enfermaran gravemente y murieran arruinando su carrera en el palacio", "Que los dioses babilónicos se enojaran por permitir que sus esclavos rechazaran su comida"], c: "Que el rey le condenara la cabeza al ver los rostros más tristes de los jóvenes hebreos"},
+            {q: "25. ¿Cuántos días de prueba solicitó Daniel a Melsar para demostrar la suficiencia de su dieta? (P. y R. Cap. 39)", o: ["Diez días durante los cuales se proveería alimento sencillo a los jóvenes hebreos", "Siete días siguiendo el modelo del reposo sabático que conocían desde su niñez hebrea", "Treinta días para dar tiempo suficiente para que los resultados fueran completamente evidentes", "Tres días en honor a la fe en el poder de Dios para obrar milagros en tiempo breve"], c: "Diez días durante los cuales se proveería alimento sencillo a los jóvenes hebreos"},
+            {q: "26. ¿Cómo respondió Melsar ante la propuesta de la prueba de los diez días? (P. y R. Cap. 39)", o: ["Consintió en ello aunque con temor de que esa concesión pudiera desagradar al rey", "Rechazó la propuesta y los obligó a comer la ración completa del rey sin ninguna excepción", "Consultó con el príncipe de los eunucos antes de aceptar o rechazar la propuesta de Daniel", "Aceptó inmediatamente con entusiasmo sin ningún tipo de temor ni reserva personal"], c: "Consintió en ello aunque con temor de que esa concesión pudiera desagradar al rey"},
+            {q: "27. ¿Cuál fue el resultado al final de la prueba de los diez días? (P. y R. Cap. 39)", o: ["El rostro de ellos pareció mejor y más nutrido de carne que los que comían la ración del rey", "El rostro de ellos apareció igual al de los otros muchachos que comían la ración del rey", "El rostro de ellos apareció más pálido pero con una luz sobrenatural claramente evidente", "El rostro de ellos sorprendió negativamente a Melsar quien esperaba un resultado diferente"], c: "El rostro de ellos pareció mejor y más nutrido de carne que los que comían la ración del rey"},
+            {q: "28. ¿Qué se permitió a Daniel y sus amigos como resultado de la prueba exitosa? (P. y R. Cap. 39)", o: ["Seguir su régimen sencillo durante todo el curso de su educación de tres años", "Regresar a sus hogares en Israel durante los períodos de descanso y días festivos hebreos", "Elegir libremente qué materias estudiar durante el resto de su educación en el palacio", "Tener un horario especial de estudios diferente al de los demás jóvenes del palacio real"], c: "Seguir su régimen sencillo durante todo el curso de su educación de tres años"},
+            {q: "29. ¿Qué actitud unían los jóvenes a sus hábitos de renunciamiento durante los tres años de estudio? (P. y R. Cap. 39)", o: ["Un propósito ferviente, diligencia y constancia que los caracterizó durante todo el tiempo", "Una actitud de superioridad intelectual que los separaba del resto de los estudiantes caldeos", "Una actitud de resignación pasiva esperando el momento en que Dios los librara del cautiverio", "Un espíritu competitivo que los impulsaba a superar a todos sus compañeros de estudios"], c: "Un propósito ferviente, diligencia y constancia que los caracterizó durante todo el tiempo"},
+            {q: "30. ¿Qué no era lo que había llevado a los jóvenes a la corte del rey según el capítulo? (P. y R. Cap. 39)", o: ["No era el orgullo ni la ambición sino que eran cautivos puestos allí por la Sabiduría infinita", "No era su talento natural sino que Dios los había preparado especialmente para ese momento", "No era la voluntad de sus padres sino que fue una decisión personal que ellos tomaron juntos", "No era el deseo de poder sino que simplemente obedecieron las órdenes del rey de Judá"], c: "No era el orgullo ni la ambición sino que eran cautivos puestos allí por la Sabiduría infinita"},
+            {q: "31. ¿Cómo procuraron conducirse los jóvenes privados de la influencia del hogar? (P. y R. Cap. 39)", o: ["En forma que honrase a su pueblo oprimido y glorificase al Dios cuyos siervos eran", "En forma que impresionara a los maestros caldeos con su talento y dedicación al estudio", "En forma que les ganara el favor del rey para obtener privilegios especiales en el palacio", "En forma que les permitiera regresar lo más pronto posible a su tierra natal de Israel"], c: "En forma que honrase a su pueblo oprimido y glorificase al Dios cuyos siervos eran"},
+            {q: "32. ¿Qué dones especiales le dio Dios a los cuatro jóvenes hebreos? (P. y R. Cap. 39)", o: ["Conocimiento e inteligencia en todas las letras y ciencia, y Daniel tuvo entendimiento en toda visión y sueños", "Solo le dio conocimiento y sabiduría a Daniel por ser el más fiel de los cuatro jóvenes", "Les dio fortaleza física extraordinaria visible en su apariencia ante el rey y toda su corte", "Les dio el don de profecía y de lenguas para comunicarse con todas las naciones del mundo"], c: "Conocimiento e inteligencia en todas las letras y ciencia, y Daniel tuvo entendimiento en toda visión y sueños"},
+            {q: "33. ¿Qué promesa bíblica se menciona como cumplida en Daniel y sus compañeros? (P. y R. Cap. 39)", o: ["'Yo honraré a los que me honran' de 1 Samuel 2:30", "'El que persevere hasta el fin éste será salvo' de Mateo 24:13", "'Todo lo puedo en Cristo que me fortalece' de Filipenses 4:13", "'Buscad primeramente el reino de Dios y su justicia' de Mateo 6:33"], c: "'Yo honraré a los que me honran' de 1 Samuel 2:30"},
+            {q: "34. ¿Qué se manifestó en Daniel mientras se aferraba a Dios con confianza inquebrantable? (P. y R. Cap. 39)", o: ["El espíritu del poder profético que le permitió leer los misterios de lo por venir", "El don de lenguas que le permitió comunicarse fluidamente con todos los pueblos del reino", "El don de sanidad que le permitió sanar a los enfermos de la corte babilónica", "El espíritu de valentía que le permitió desafiar abiertamente las costumbres paganas"], c: "El espíritu del poder profético que le permitió leer los misterios de lo por venir"},
+            {q: "35. ¿Cuál fue el resultado cuando los jóvenes hebreos fueron examinados para el servicio del reino? (P. y R. Cap. 39)", o: ["No fue hallado entre todos ellos otro como Daniel, Ananías, Misael y Azarías", "Solo Daniel fue hallado superior y los demás tuvieron resultados mediocres en el examen", "Fueron considerados iguales a los mejores sabios y magos del reino de Babilonia", "Superaron en ciencias pero mostraron debilidad en el idioma y las letras caldeas"], c: "No fue hallado entre todos ellos otro como Daniel, Ananías, Misael y Azarías"},
+            {q: "36. ¿Cuántas veces mejores que los magos y astrólogos resultaron ser los cuatro jóvenes? (P. y R. Cap. 39)", o: ["Diez veces mejores que todos los magos y astrólogos que había en todo su reino", "Siete veces mejores que todos los magos y astrólogos que había en todo su reino", "Cinco veces mejores que todos los magos y astrólogos que había en todo su reino", "Tres veces mejores que todos los magos y astrólogos que había en todo su reino"], c: "Diez veces mejores que todos los magos y astrólogos que había en todo su reino"},
+            {q: "37. ¿Qué describía el porte erguido, paso firme, rostro hermoso y aliento no contaminado de los jóvenes? (P. y R. Cap. 39)", o: ["Certificados de sus buenos hábitos, insignias de la nobleza con que la naturaleza honra a los obedientes", "Señales sobrenaturales que Dios había puesto en ellos para que todos los reconocieran", "El resultado de la buena alimentación que habían recibido en su hogar hebreo desde niños", "Evidencia de la superioridad racial del pueblo hebreo sobre todos los demás pueblos paganos"], c: "Certificados de sus buenos hábitos, insignias de la nobleza con que la naturaleza honra a los obedientes"},
+            {q: "38. ¿Cómo obtuvieron Daniel y sus compañeros su gran sabiduría según el capítulo? (P. y R. Cap. 39)", o: ["Por el uso fiel de sus facultades bajo la dirección del Espíritu Santo relacionándose con la Fuente", "Por casualidad y dones naturales excepcionales con los que nacieron como pueblo hebreo", "Por el intenso estudio de los libros caldeos durante los tres años de su educación especial", "Por la ayuda de ángeles que les revelaban las respuestas en los exámenes del palacio"], c: "Por el uso fiel de sus facultades bajo la dirección del Espíritu Santo relacionándose con la Fuente"},
+            {q: "39. ¿Con qué único propósito procuraban Daniel y sus compañeros adquirir conocimiento? (P. y R. Cap. 39)", o: ["Con el propósito de poder honrar a Dios y destacarse como representantes de la religión verdadera", "Con el propósito de regresar algún día a Israel con poder suficiente para libertar a su pueblo", "Con el propósito de superar a los magos caldeos y demostrar la inferioridad del paganismo", "Con el propósito de llegar a ser los consejeros más influyentes del rey Nabucodonosor"], c: "Con el propósito de poder honrar a Dios y destacarse como representantes de la religión verdadera"},
+            {q: "40. ¿Con quién compara el capítulo la relación de Daniel con Dios en cuanto a caminar con él? (P. y R. Cap. 39)", o: ["Con Enoc, orando constantemente, estudiando concienzudamente y manteniéndose en relación con el Invisible", "Con Abraham, el padre de la fe que dejó todo para seguir la dirección divina sin dudar", "Con Moisés, quien habló cara a cara con Dios en el desierto durante cuarenta largos años", "Con Elías, el profeta que fue llevado al cielo sin ver la muerte por su extrema fidelidad"], c: "Con Enoc, orando constantemente, estudiando concienzudamente y manteniéndose en relación con el Invisible"},
+            
+            // ── NIVEL 3 ──────────────────────────────────────────────────────────────
+            {q: "41. ¿De qué depende el verdadero éxito en cualquier ramo de trabajo según el capítulo? (P. y R. Cap. 39)", o: ["De la fe, la discreción, la virtud y la perseverancia; es el desarrollo de las providencias de Dios", "De los dones naturales, la inteligencia innata y las oportunidades que Dios concede al nacer", "De la educación recibida en los mejores centros de enseñanza del mundo conocido", "De la protección divina sobrenatural que suple completamente la falta de esfuerzo humano"], c: "De la fe, la discreción, la virtud y la perseverancia; es el desarrollo de las providencias de Dios"},
+            {q: "42. ¿Qué principio divino se revela en la experiencia de Daniel y sus compañeros? (P. y R. Cap. 39)", o: ["El principio de cooperación entre el esfuerzo humano y el poder divino, sin la cual no hay éxito", "El principio de que Dios actúa solo cuando el ser humano ha hecho absolutamente todo lo posible", "El principio de que la gracia divina reemplaza completamente el esfuerzo humano en todo", "El principio de que solo los que nacen con dones especiales pueden ser verdaderamente usados"], c: "El principio de cooperación entre el esfuerzo humano y el poder divino, sin la cual no hay éxito"},
+            {q: "43. ¿Para qué nos es dada la gracia de Dios según el capítulo 39? (P. y R. Cap. 39)", o: ["Para obrar en nosotros el querer y el hacer, nunca para reemplazar nuestro propio esfuerzo", "Para protegernos de todo peligro físico y espiritual sin ningún esfuerzo de nuestra parte", "Para darnos dones naturales superiores a los de todas las personas que nos rodean", "Para garantizarnos el éxito sin importar las decisiones que tomemos en nuestra vida"], c: "Para obrar en nosotros el querer y el hacer, nunca para reemplazar nuestro propio esfuerzo"},
+            {q: "44. ¿Qué promete el capítulo a todos los que se esfuercen por hacer la voluntad de Dios? (P. y R. Cap. 39)", o: ["Que el Señor cooperará con ellos y mediante su Espíritu fortalecerá todo propósito fiel", "Que el Señor los librará de todo sufrimiento y los prosperará en absolutamente todos sus proyectos", "Que el Señor les concederá el favor de todos los gobernantes y personas poderosas del mundo", "Que el Señor los llevará a posiciones de liderazgo en la sociedad donde actualmente viven"], c: "Que el Señor cooperará con ellos y mediante su Espíritu fortalecerá todo propósito fiel"},
+            {q: "45. ¿Qué hizo idóneos a Daniel y sus compañeros para un puesto de tanta confianza y honor? (P. y R. Cap. 39)", o: ["La fidelidad en las cosas pequeñas que dio carácter a toda su vida honrando a Dios en todo", "La educación superior que recibieron en la academia del palacio del rey Nabucodonosor", "Los dones sobrenaturales que Dios les concedió como recompensa por su fe inquebrantable", "Las relaciones estratégicas que supieron cultivar con los funcionarios más importantes del palacio"], c: "La fidelidad en las cosas pequeñas que dio carácter a toda su vida honrando a Dios en todo"},
+            {q: "46. ¿Qué paralelo establece el capítulo entre el llamado de Daniel y el de los creyentes de hoy? (P. y R. Cap. 39)", o: ["Así como Dios llamó a Daniel para testificar en Babilonia, nos llama hoy a ser testigos en el mundo", "El llamado de Daniel fue único y extraordinario sin ningún paralelo posible con los creyentes de hoy", "Solo los que tienen dones proféticos como Daniel tienen un llamado comparable al suyo hoy", "El llamado de Daniel fue nacional para todo Israel mientras que hoy es solo individual"], c: "Así como Dios llamó a Daniel para testificar en Babilonia, nos llama hoy a ser testigos en el mundo"},
+            {q: "47. ¿Qué error cometen muchos según el capítulo en relación con las oportunidades diarias? (P. y R. Cap. 39)", o: ["Esperan algo grande que hacer mientras desperdician diariamente las oportunidades de ser fieles en lo pequeño", "Tratan de hacer demasiadas cosas a la vez sin enfocarse en una sola tarea realmente importante", "Estudian mucho pero no aplican el conocimiento que adquieren en su vida espiritual diaria", "Se conforman con hacer solo lo mínimo necesario sin buscar la excelencia en todo"], c: "Esperan algo grande que hacer mientras desperdician diariamente las oportunidades de ser fieles en lo pequeño"},
+            {q: "48. ¿Qué dice el capítulo sobre los deberes en la vida del verdadero cristiano? (P. y R. Cap. 39)", o: ["No hay cosas que no sean esenciales; a la vista del Omnipotente todo deber es importante", "Las cosas pequeñas no son importantes comparadas con las grandes obras que se hacen para Dios", "Solo las grandes responsabilidades y decisiones importan verdaderamente delante de Dios", "Las cosas pequeñas son solo preparación para las grandes pero en sí mismas no tienen valor"], c: "No hay cosas que no sean esenciales; a la vista del Omnipotente todo deber es importante"},
+            {q: "49. ¿Por qué seremos juzgados según la enseñanza del capítulo 39? (P. y R. Cap. 39)", o: ["Por lo que debiéramos haber hecho y no hicimos porque no usamos nuestras facultades para glorificar a Dios", "Solo por las grandes faltas cometidas conscientemente contra los mandamientos de Dios", "Por las obras visibles que realizamos y que otros pudieron observar claramente y evaluar", "Solo por las actitudes del corazón y los pensamientos íntimos que nadie más puede ver"], c: "Por lo que debiéramos haber hecho y no hicimos porque no usamos nuestras facultades para glorificar a Dios"},
+            {q: "50. ¿De qué resulta un carácter noble según el capítulo 39? (P. y R. Cap. 39)", o: ["De la disciplina propia, la sujeción de la naturaleza inferior a la superior y la entrega al servicio de Dios", "De los favores y dones especiales de la Providencia que Dios concede a sus escogidos favoritos", "De la casualidad y las circunstancias favorables que rodean a una persona desde su nacimiento", "De la educación recibida en un ambiente cristiano y de la crianza en un hogar fiel a Dios"], c: "De la disciplina propia, la sujeción de la naturaleza inferior a la superior y la entrega al servicio de Dios"},
+            {q: "51. ¿Qué tipo de hombres dice el capítulo que se necesitan hoy, como Daniel? (P. y R. Cap. 39)", o: ["Hombres activos y audaces para la causa del bien con corazones puros, manos fuertes y valor intrépido", "Hombres pacientes y contemplativos dedicados únicamente a la oración y el estudio profundo", "Hombres diplomáticos y astutos para navegar con éxito las complejidades del mundo moderno", "Hombres exitosos en los negocios para sostener económicamente la causa de Dios en el mundo"], c: "Hombres activos y audaces para la causa del bien con corazones puros, manos fuertes y valor intrépido"},
+            {q: "52. ¿Cómo encauza el adversario sus tentaciones para debilitar a los seres humanos? (P. y R. Cap. 39)", o: ["Encauza sus tentaciones para debilitar y degradar las facultades físicas del ser humano", "Ataca principalmente la mente con dudas y filosofías que contradicen directamente la Biblia", "Se concentra en destruir las relaciones familiares para aislar completamente al creyente", "Usa la persecución física y el sufrimiento para quebrar la fe del creyente en Dios"], c: "Encauza sus tentaciones para debilitar y degradar las facultades físicas del ser humano"},
+            {q: "53. ¿Bajo qué control deben estar las pasiones del ser humano según el capítulo? (P. y R. Cap. 39)", o: ["Las pasiones deben ser controladas por la voluntad, que debe estar a su vez bajo el control de Dios", "Las pasiones deben ser controladas únicamente por la razón humana santificada por la educación", "Las pasiones deben ser completamente eliminadas mediante la disciplina espiritual rigurosa", "Las pasiones deben ser canalizadas hacia actividades útiles sin necesidad de controlarlas"], c: "Las pasiones deben ser controladas por la voluntad, que debe estar a su vez bajo el control de Dios"},
+            {q: "54. ¿Qué ejemplo representa la experiencia de los jóvenes hebreos según el capítulo? (P. y R. Cap. 39)", o: ["El triunfo de los buenos principios sobre la tentación, de la pureza sobre la depravación y la lealtad", "El ejemplo de que la educación secular puede combinarse perfectamente con la fe religiosa", "El ejemplo del poder político que puede alcanzar un pueblo fiel cuando confía en su Dios", "El ejemplo de que Dios siempre salva a sus hijos de toda dificultad y sufrimiento posibles"], c: "El triunfo de los buenos principios sobre la tentación, de la pureza sobre la depravación y la lealtad"},
+            {q: "55. ¿Qué pueden hacer los jóvenes de hoy que vivieron también los jóvenes hebreos? (P. y R. Cap. 39)", o: ["Tener el mismo espíritu, sacar fuerza de la misma fuente y poseer el mismo poder de dominio propio", "Recibir visiones y profecías directas de Dios igual que las que recibió Daniel en Babilonia", "Vivir completamente separados del mundo para no contaminarse como lo hicieron los hebreos", "Demostrar que los creyentes de hoy tienen mayor fortaleza espiritual que los hebreos en Babilonia"], c: "Tener el mismo espíritu, sacar fuerza de la misma fuente y poseer el mismo poder de dominio propio"},
+            {q: "56. ¿Quién puede alcanzar la victoria sobre la tentación según el capítulo 39? (P. y R. Cap. 39)", o: ["Solo el que resuelva hacer el bien por el bien mismo con determinación enérgica y vigilancia constante", "Solo el que ha recibido una educación cristiana perfecta desde su más tierna infancia", "Solo el que ha sido bendecido con dones espirituales especiales por la gracia de Dios", "Solo el que vive completamente separado de las influencias del mundo que lo rodea"], c: "Solo el que resuelva hacer el bien por el bien mismo con determinación enérgica y vigilancia constante"},
+            {q: "57. ¿Qué describe el capítulo sobre lo que imaginaban Daniel y sus compañeros al despedirse del hogar? (P. y R. Cap. 39)", o: ["Poco se imaginaban cuál sería su alto destino al entregarse a la dirección divina con fidelidad", "Se imaginaban perfectamente que serían los líderes más importantes del poderoso reino de Babilonia", "No se imaginaban que algún día podrían regresar victoriosamente a su tierra natal de Israel", "Se imaginaban que serían mártires que darían su vida valientemente por su fe en Dios"], c: "Poco se imaginaban cuál sería su alto destino al entregarse a la dirección divina con fidelidad"},
+            {q: "58. ¿Qué pudo cumplir Dios mediante Daniel y sus compañeros? (P. y R. Cap. 39)", o: ["Su propósito porque se entregaron a la dirección divina con tal fidelidad y constancia", "Sus planes de destrucción sobre Babilonia como castigo merecido por sus pecados y maldades", "Sus promesas de restaurar el reino de Israel con mayor gloria que antes del cautiverio", "Sus designios de convertir al rey Nabucodonosor a la adoración del único Dios verdadero"], c: "Su propósito porque se entregaron a la dirección divina con tal fidelidad y constancia"},
+            {q: "59. ¿Qué desea Dios revelar hoy mediante los jóvenes y niños según el último párrafo del capítulo? (P. y R. Cap. 39)", o: ["Las mismas poderosas verdades que fueron reveladas mediante Daniel y sus compañeros en Babilonia", "Verdades nuevas y más avanzadas que las que pudo revelar mediante los hebreos en Babilonia", "Solo las verdades básicas del evangelio que todo creyente ya conoce desde su infancia", "Las profecías específicas del tiempo del fin que Daniel no pudo entender completamente"], c: "Las mismas poderosas verdades que fueron reveladas mediante Daniel y sus compañeros en Babilonia"},
+            {q: "60. ¿Qué demuestra la vida de Daniel y sus compañeros según el último párrafo del capítulo? (P. y R. Cap. 39)", o: ["Lo que Dios hará en favor de los que se entreguen a él y procuren con todo el corazón realizar su propósito", "Que solo aquellos que han sufrido el cautiverio pueden entender plenamente la fidelidad a Dios", "Que los jóvenes del tiempo antiguo tenían mayor fortaleza espiritual que los jóvenes de hoy", "Que la fidelidad a Dios garantiza siempre el éxito material y el reconocimiento social"], c: "Lo que Dios hará en favor de los que se entreguen a él y procuren con todo el corazón realizar su propósito"}
+            
+];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>

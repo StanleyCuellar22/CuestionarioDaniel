@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Daniel Capítulo 9 Asociacion (RVR1995)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-label {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .score-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .option-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .correct .option-icon {
+            color: #22c55e;
+        }
+
+        .incorrect .option-icon {
+            color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 4em;
+            color: #3b82f6;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.3em;
+            color: #374151;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Cuestionario - Daniel Capítulo 9 Asociacion</h1>
+            
+            <div id="quiz-content">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-label" id="progress-text">Pregunta 1 de 70</span>
+                        <span class="score-label" id="score-text">Puntaje: 0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <button class="btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            </div>
+
+            <div id="result-content" style="display: none;">
+                <div class="result-container">
+                    <h1>¡Cuestionario Completado!</h1>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-message" id="result-message"></div>
+                    <button class="btn" id="restart-btn">🔄 Reiniciar Cuestionario</button>
+                    <a href="index.html" class="quiz-item">
+                        <div class="quiz-icon">📝</div>
+                        <div class="quiz-info">
+                            <div class="quiz-title">Regresar</div>
+                            <div class="quiz-subtitle">Regresar al menú principal</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">Libro de Daniel - Capítulo 9 Asociacion (Reina Valera 1995) Club Jabnia</div>
+    </div>
+
+    <script>
+
+        const allQuestions = [
+            {q: "1. ¿En qué año se sitúa la oración de Daniel por su pueblo? Daniel 9:1", o: ["En el primer año de Darío hijo de Asuero", "En el primer año de Ciro", "En el tercer año de Belsasar", "En el segundo año de Nabucodonosor"], c: "En el primer año de Darío hijo de Asuero"},
+            {q: "2. ¿De qué nación era Darío, según Daniel? Daniel 9:1", o: ["De la nación de los medos", "De la nación de los persas", "De la nación de los caldeos", "De la nación de los babilonios"], c: "De la nación de los medos"},
+            {q: "1. ¿En qué año se sitúa la oración de Daniel por su pueblo? (Daniel 9:1)", o: ["En el primer año de Darío hijo de Asuero", "En el primer año de Ciro", "En el tercer año de Belsasar", "En el segundo año de Nabucodonosor"], c: "En el primer año de Darío hijo de Asuero"},
+            {q: "2. ¿De qué nación era Darío, según Daniel? (Daniel 9:1)", o: ["De la nación de los medos", "De la nación de los persas", "De la nación de los caldeos", "De la nación de los babilonios"], c: "De la nación de los medos"},
+            {q: "3. ¿Sobre qué reino vino a ser rey Darío? (Daniel 9:1)", o: ["Sobre el reino de los caldeos", "Sobre el reino de Judá", "Sobre el reino de Persia", "Sobre el reino de Babilonia y Media"], c: "Sobre el reino de los caldeos"},
+            {q: "4. ¿Qué hacía Daniel en el primer año del reinado de Darío? (Daniel 9:2)", o: ["Miraba atentamente en los libros", "Consultaba a los sabios", "Ayunaba en el templo", "Interpretaba sueños"], c: "Miraba atentamente en los libros"},
+            {q: "5. ¿En qué libros miraba Daniel? (Daniel 9:2)", o: ["En los libros", "En las profecías selladas", "En los escritos del rey", "En las tablas de los caldeos"], c: "En los libros"},
+            {q: "6. ¿A qué profeta menciona Daniel? (Daniel 9:2)", o: ["Al profeta Jeremías", "Al profeta Isaías", "Al profeta Ezequiel", "Al profeta Oseas"], c: "Al profeta Jeremías"},
+            {q: "7. ¿Sobre qué hablaba Jehová por medio de Jeremías? (Daniel 9:2)", o: ["Sobre las desolaciones de Jerusalén", "Sobre la caída de Babilonia", "Sobre el reino eterno", "Sobre la restauración del templo"], c: "Sobre las desolaciones de Jerusalén"},
+            {q: "8. ¿Cuántos años debían cumplirse según la profecía? (Daniel 9:2)", o: ["Setenta años", "Cincuenta años", "Cien años", "Cuatrocientos años"], c: "Setenta años"},
+            {q: "9. ¿Qué hizo Daniel después de comprender esto? (Daniel 9:3)", o: ["Volví mi rostro a Dios, el Señor", "Fui al templo de Jerusalén", "Consulté a los sacerdotes", "Escribí una visión"], c: "Volví mi rostro a Dios, el Señor"},
+            {q: "10. ¿Cómo buscó Daniel a Dios? (Daniel 9:3)", o: ["En oración y ruego", "En sacrificios", "En sueños", "En silencio"], c: "En oración y ruego"},
+            {q: "11. ¿Qué acompañó su oración? (Daniel 9:3)", o: ["Ayuno, ropas ásperas y ceniza", "Cantos y alabanzas", "Ofrendas y libaciones", "Fiesta y alegría"], c: "Ayuno, ropas ásperas y ceniza"},
+            {q: "12. ¿A quién oró Daniel? (Daniel 9:4)", o: ["A Jehová, mi Dios", "Al Dios de los cielos", "Al Señor de los ejércitos", "Al Altísimo"], c: "A Jehová, mi Dios"},
+            {q: "13. ¿Qué hizo Daniel además de orar? (Daniel 9:4)", o: ["Hice confesión", "Hice promesa", "Hice sacrificio", "Hice pacto"], c: "Hice confesión"},
+            {q: "14. ¿Cómo describe Daniel a Dios? (Daniel 9:4)", o: ["Dios grande, digno de ser temido", "Dios misericordioso y santo", "Dios justo y eterno", "Dios creador del cielo"], c: "Dios grande, digno de ser temido"},
+            {q: "15. ¿Qué guarda Dios según Daniel? (Daniel 9:4)", o: ["El pacto y la misericordia", "El juicio y la ley", "El reino y el poder", "La gloria y la honra"], c: "El pacto y la misericordia"},
+            {q: "16. ¿Con quién guarda Dios el pacto? (Daniel 9:4)", o: ["Con los que le aman y guardan sus mandamientos", "Con los sacerdotes", "Con los reyes", "Con los profetas"], c: "Con los que le aman y guardan sus mandamientos"},
+            {q: "17. ¿Qué reconoce Daniel acerca del pueblo? (Daniel 9:5)", o: ["Hemos pecado", "Hemos vencido", "Hemos prosperado", "Hemos obedecido"], c: "Hemos pecado"},
+            {q: "18. ¿Qué más confiesa Daniel? (Daniel 9:5)", o: ["Hemos cometido iniquidad", "Hemos sido fieles", "Hemos sido justos", "Hemos sido humildes"], c: "Hemos cometido iniquidad"},
+            {q: "19. ¿Cómo describe la conducta del pueblo? (Daniel 9:5)", o: ["Hemos actuado impíamente", "Hemos actuado sabiamente", "Hemos actuado fielmente", "Hemos actuado justamente"], c: "Hemos actuado impíamente"},
+            {q: "20. ¿De qué se apartaron? (Daniel 9:5)", o: ["De tus mandamientos y de tus ordenanzas", "De la ciudad", "Del templo", "Del sacrificio"], c: "De tus mandamientos y de tus ordenanzas"},
+            
+            // ── NIVEL 2 ──────────────────────────────────────────────────────────────
+            {q: "21. ¿A quiénes no obedecieron? (Daniel 9:6)", o: ["A tus siervos los profetas", "A los reyes extranjeros", "A los sacerdotes", "A los jueces"], c: "A tus siervos los profetas"},
+            {q: "22. ¿En nombre de quién hablaron los profetas? (Daniel 9:6)", o: ["En tu nombre", "En nombre del rey", "En nombre del pueblo", "En nombre del templo"], c: "En tu nombre"},
+            {q: "23. ¿A quiénes hablaron los profetas? (Daniel 9:6)", o: ["A reyes, príncipes, padres y al pueblo", "Solo a los sacerdotes", "Solo a los reyes", "Solo al pueblo"], c: "A reyes, príncipes, padres y al pueblo"},
+            {q: "24. ¿A quién pertenece la justicia? (Daniel 9:7)", o: ["Tuya es, Señor, la justicia", "Nuestra es la justicia", "Del pueblo es la justicia", "De los reyes es la justicia"], c: "Tuya es, Señor, la justicia"},
+            {q: "25. ¿Qué pertenece al pueblo? (Daniel 9:7)", o: ["La confusión de rostro", "La gloria", "La victoria", "La paz"], c: "La confusión de rostro"},
+            {q: "26. ¿Quiénes llevan confusión de rostro? (Daniel 9:7)", o: ["Todo hombre de Judá", "Solo los sacerdotes", "Solo los reyes", "Solo los profetas"], c: "Todo hombre de Judá"},
+            {q: "27. ¿A quiénes más incluye Daniel? (Daniel 9:7)", o: ["Los habitantes de Jerusalén y todo Israel", "Solo Jerusalén", "Solo Judá", "Solo los cautivos"], c: "Los habitantes de Jerusalén y todo Israel"},
+            {q: "28. ¿Dónde estaban dispersos? (Daniel 9:7)", o: ["En todas las tierras adonde los has echado", "En Babilonia solamente", "En Persia solamente", "En Jerusalén"], c: "En todas las tierras adonde los has echado"},
+            {q: "29. ¿Por causa de qué ocurrió esto? (Daniel 9:7)", o: ["A causa de su rebelión", "Por causa del hambre", "Por causa de la guerra", "Por causa del rey"], c: "A causa de su rebelión"},
+            {q: "30. ¿Contra quién se rebelaron? (Daniel 9:7)", o: ["Contra ti", "Contra el rey", "Contra la ley", "Contra los profetas"], c: "Contra ti"},
+            {q: "31. ¿A quién pertenece la misericordia y el perdón? (Daniel 9:9)", o: ["De Jehová, nuestro Dios", "Del pueblo", "De los sacerdotes", "De los reyes"], c: "De Jehová, nuestro Dios"},
+            {q: "32. ¿Qué reconoce Daniel aun así? (Daniel 9:9)", o: ["Aunque contra él nos hemos rebelado", "Aunque hemos obedecido", "Aunque hemos guardado la ley", "Aunque hemos sido fieles"], c: "Aunque contra él nos hemos rebelado"},
+            {q: "33. ¿Qué no obedecieron? (Daniel 9:10)", o: ["La voz de Jehová, nuestro Dios", "La voz del rey", "La voz de los sacerdotes", "La voz del pueblo"], c: "La voz de Jehová, nuestro Dios"},
+            {q: "34. ¿Para qué no obedecieron su voz? (Daniel 9:10)", o: ["Para andar en sus leyes", "Para gobernar la nación", "Para edificar el templo", "Para volver a Jerusalén"], c: "Para andar en sus leyes"},
+            {q: "35. ¿Por medio de quién puso Dios sus leyes? (Daniel 9:10)", o: ["Por medio de sus siervos los profetas", "Por medio de los reyes", "Por medio de los jueces", "Por medio de los sacerdotes"], c: "Por medio de sus siervos los profetas"},
+            {q: "36. ¿Qué hizo todo Israel? (Daniel 9:11)", o: ["Traspasó tu Ley", "Guardó tu Ley", "Amó tu Ley", "Restauró tu Ley"], c: "Traspasó tu Ley"},
+            {q: "37. ¿Qué cayó sobre ellos por esto? (Daniel 9:11)", o: ["La maldición y el juramento", "La bendición", "La paz", "La restauración"], c: "La maldición y el juramento"},
+            {q: "38. ¿Dónde estaba escrito esto? (Daniel 9:11)", o: ["En la ley de Moisés", "En los libros reales", "En los salmos", "En los profetas menores"], c: "En la ley de Moisés"},
+            {q: "39. ¿Quién es llamado siervo de Dios? (Daniel 9:11)", o: ["Moisés", "Jeremías", "Daniel", "Isaías"], c: "Moisés"},
+            {q: "40. ¿Por qué vino todo este mal? (Daniel 9:11)", o: ["Porque contra Dios pecamos", "Porque el rey lo decidió", "Porque el pueblo se rebeló contra Babilonia", "Porque el templo fue destruido"], c: "Porque contra Dios pecamos"},
+            
+            // ── NIVEL 3 ──────────────────────────────────────────────────────────────
+            {q: "41. ¿Qué hizo Jehová con la palabra que habló contra Israel? (Daniel 9:12)", o: ["La cumplió", "La anuló", "La pospuso", "La olvidó"], c: "La cumplió"},
+            {q: "42. ¿Contra quiénes habló Jehová esa palabra? (Daniel 9:12)", o: ["Contra nosotros y contra nuestros jefes", "Contra los reyes de Babilonia", "Contra las naciones vecinas", "Contra los sacerdotes"], c: "Contra nosotros y contra nuestros jefes"},
+            {q: "43. ¿Qué trajo Jehová sobre el pueblo? (Daniel 9:12)", o: ["Tan gran mal", "Gran prosperidad", "Paz duradera", "Victoria militar"], c: "Tan gran mal"},
+            {q: "44. ¿Qué se dice de lo ocurrido con Jerusalén? (Daniel 9:12)", o: ["Nunca fue hecho debajo del cielo nada semejante", "Fue igual a otras ciudades", "Fue menor que en Samaria", "Fue comparable con Egipto"], c: "Nunca fue hecho debajo del cielo nada semejante"},
+            {q: "45. ¿Conforme a qué vino todo este mal? (Daniel 9:13)", o: ["Conforme está escrito en la ley de Moisés", "Conforme a la palabra de los profetas", "Conforme a la voluntad del rey", "Conforme a la decisión del pueblo"], c: "Conforme está escrito en la ley de Moisés"},
+            {q: "46. ¿Qué no hizo el pueblo a pesar del castigo? (Daniel 9:13)", o: ["Implorar el favor de Jehová", "Ofrecer sacrificios", "Guardar las fiestas", "Reconstruir el templo"], c: "Implorar el favor de Jehová"},
+            {q: "47. ¿Qué no hicieron respecto a sus maldades? (Daniel 9:13)", o: ["No nos hemos convertido", "Nos arrepentimos", "Las abandonamos", "Las confesamos"], c: "No nos hemos convertido"},
+            {q: "48. ¿Qué no entendieron según Daniel? (Daniel 9:13)", o: ["Tu verdad", "La ley", "La profecía", "El juicio"], c: "Tu verdad"},
+            {q: "49. ¿Qué hizo Jehová respecto al mal? (Daniel 9:14)", o: ["Veló sobre el mal y lo trajo", "Lo olvidó", "Lo detuvo", "Lo anuló"], c: "Veló sobre el mal y lo trajo"},
+            {q: "50. ¿Cómo es Jehová en todas sus obras? (Daniel 9:14)", o: ["Justo", "Misericordioso solamente", "Temible solamente", "Severo solamente"], c: "Justo"},
+            {q: "51. ¿Qué no hizo el pueblo? (Daniel 9:14)", o: ["No obedecimos a su voz", "No ofrecimos sacrificios", "No guardamos el sábado", "No reconstruimos el templo"], c: "No obedecimos a su voz"},
+            {q: "52. ¿De dónde sacó Dios a su pueblo? (Daniel 9:15)", o: ["De la tierra de Egipto", "De Babilonia", "De Asiria", "De Canaán"], c: "De la tierra de Egipto"},
+            {q: "53. ¿Con qué sacó Dios a su pueblo? (Daniel 9:15)", o: ["Con mano poderosa", "Con ejército grande", "Con señales del cielo", "Con sabiduría"], c: "Con mano poderosa"},
+            {q: "54. ¿Qué se hizo Dios con esa liberación? (Daniel 9:15)", o: ["Se hizo renombre", "Se engrandeció ante reyes", "Fue temido por las naciones", "Fue olvidado"], c: "Se hizo renombre"},
+            {q: "55. ¿Qué vuelve a confesar Daniel? (Daniel 9:15)", o: ["Hemos pecado, hemos actuado impíamente", "Hemos obedecido fielmente", "Hemos guardado la ley", "Hemos sido justos"], c: "Hemos pecado, hemos actuado impíamente"},
+            {q: "56. ¿Qué pide Daniel que se aparte? (Daniel 9:16)", o: ["Tu ira y tu furor", "Tu misericordia", "Tu pacto", "Tu justicia"], c: "Tu ira y tu furor"},
+            {q: "57. ¿De dónde pide que se aparte la ira? (Daniel 9:16)", o: ["De tu ciudad Jerusalén", "De Babilonia", "De los pueblos vecinos", "De los reyes"], c: "De tu ciudad Jerusalén"},
+            {q: "58. ¿Cómo llama Daniel a Jerusalén? (Daniel 9:16)", o: ["Tu santo monte", "La ciudad del rey", "La ciudad fuerte", "La ciudad escogida"], c: "Tu santo monte"},
+            {q: "59. ¿Por qué Jerusalén es oprobio? (Daniel 9:16)", o: ["A causa de nuestros pecados", "Por causa del rey", "Por causa del templo", "Por causa de los enemigos"], c: "A causa de nuestros pecados"},
+            {q: "60. ¿Ante quiénes es oprobio Jerusalén? (Daniel 9:16)", o: ["Todos los que nos rodean", "Solo Babilonia", "Solo Persia", "Solo los caldeos"], c: "Todos los que nos rodean"},
+            
+            // ── NIVEL 4 ──────────────────────────────────────────────────────────────
+            {q: "61. ¿Qué pide Daniel que Dios oiga? (Daniel 9:17)", o: ["La oración y los ruegos de tu siervo", "El clamor del pueblo", "El sacrificio del altar", "El voto de los sacerdotes"], c: "La oración y los ruegos de tu siervo"},
+            {q: "62. ¿Qué pide Daniel que resplandezca? (Daniel 9:17)", o: ["Tu rostro", "Tu gloria", "Tu fuego", "Tu poder"], c: "Tu rostro"},
+            {q: "63. ¿Sobre qué pide que resplandezca el rostro de Dios? (Daniel 9:17)", o: ["Sobre tu santuario asolado", "Sobre la ciudad", "Sobre el pueblo", "Sobre el rey"], c: "Sobre tu santuario asolado"},
+            {q: "64. ¿Por amor de quién hace Daniel esta súplica? (Daniel 9:17)", o: ["Por amor del Señor", "Por amor del pueblo", "Por amor del templo", "Por amor de Jerusalén"], c: "Por amor del Señor"},
+            {q: "65. ¿Qué pide Daniel que Dios incline? (Daniel 9:18)", o: ["Tu oído", "Tu mano", "Tu rostro", "Tu juicio"], c: "Tu oído"},
+            {q: "66. ¿Qué pide Daniel que Dios abra? (Daniel 9:18)", o: ["Tus ojos", "Tus libros", "Tus cielos", "Tus puertas"], c: "Tus ojos"},
+            {q: "67. ¿Qué pide Daniel que Dios mire? (Daniel 9:18)", o: ["Nuestras desolaciones", "Nuestra obediencia", "Nuestros sacrificios", "Nuestro ayuno"], c: "Nuestras desolaciones"},
+            {q: "68. ¿Sobre qué ciudad es invocado el nombre de Dios? (Daniel 9:18)", o: ["Sobre la ciudad", "Sobre el templo", "Sobre el monte", "Sobre el pueblo"], c: "Sobre la ciudad"},
+            {q: "69. ¿En qué no confían para presentar sus ruegos? (Daniel 9:18)", o: ["En nuestras justicias", "En nuestras obras", "En nuestras fuerzas", "En nuestras palabras"], c: "En nuestras justicias"},
+            {q: "70. ¿En qué confían para elevar sus ruegos? (Daniel 9:18)", o: ["En tus muchas misericordias", "En el sacrificio", "En el templo", "En la ley"], c: "En tus muchas misericordias"},
+            {q: "71. ¿Qué clama Daniel primero? (Daniel 9:19)", o: ["¡Oye, Señor!", "¡Sálvanos, Señor!", "¡Guárdanos, Señor!", "¡Enséñanos, Señor!"], c: "¡Oye, Señor!"},
+            {q: "72. ¿Qué clama Daniel después? (Daniel 9:19)", o: ["¡Señor, perdona!", "¡Señor, castiga!", "¡Señor, juzga!", "¡Señor, corrige!"], c: "¡Señor, perdona!"},
+            {q: "73. ¿Qué pide Daniel que el Señor haga? (Daniel 9:19)", o: ["Presta oído y hazlo", "Envíe fuego", "Destruya a los enemigos", "Confirme el pacto"], c: "Presta oído y hazlo"},
+            {q: "74. ¿Qué pide Daniel respecto al tiempo? (Daniel 9:19)", o: ["No tardes", "Tarda un poco", "Espera el momento", "Detente"], c: "No tardes"},
+            {q: "75. ¿Por amor de quién pide Daniel que no tarde? (Daniel 9:19)", o: ["Por amor de ti mismo", "Por amor del pueblo", "Por amor del templo", "Por amor de los sacerdotes"], c: "Por amor de ti mismo"},
+            {q: "76. ¿Por qué razón adicional hace esta súplica? (Daniel 9:19)", o: ["Porque tu nombre es invocado", "Porque el pueblo ayuna", "Porque el templo existe", "Porque hay sacrificios"], c: "Porque tu nombre es invocado"},
+            {q: "77. ¿Sobre quién es invocado el nombre de Dios? (Daniel 9:19)", o: ["Sobre tu ciudad y sobre tu pueblo", "Sobre los reyes", "Sobre los profetas", "Sobre los sacerdotes"], c: "Sobre tu ciudad y sobre tu pueblo"},
+            {q: "78. ¿Qué estaba haciendo Daniel aún mientras oraba? (Daniel 9:20)", o: ["Hablando, orando y confesando su pecado", "Escribiendo una profecía", "Ayunando en silencio", "Interpretando visiones"], c: "Hablando, orando y confesando su pecado"},
+            {q: "79. ¿Qué pecado confesaba Daniel además del suyo? (Daniel 9:20)", o: ["El pecado de mi pueblo Israel", "El pecado de Babilonia", "El pecado de los reyes", "El pecado de los sacerdotes"], c: "El pecado de mi pueblo Israel"},
+            {q: "80. ¿Por qué lugar derramaba Daniel su ruego? (Daniel 9:20)", o: ["Por el monte santo de mi Dios", "Por el templo", "Por Jerusalén", "Por la tierra de Judá"], c: "Por el monte santo de mi Dios"},
+            
+            // ── NIVEL 5 ──────────────────────────────────────────────────────────────
+            {q: "81. ¿Qué hacía Daniel aún cuando ocurrió lo siguiente? (Daniel 9:21)", o: ["Aún estaba hablando en oración", "Aún estaba ayunando", "Aún estaba durmiendo", "Aún estaba escribiendo"], c: "Aún estaba hablando en oración"},
+            {q: "82. ¿Quién vino a Daniel mientras oraba? (Daniel 9:21)", o: ["El varón Gabriel", "El profeta Jeremías", "El ángel Miguel", "Un sacerdote"], c: "El varón Gabriel"},
+            {q: "83. ¿Dónde había visto Daniel a Gabriel antes? (Daniel 9:21)", o: ["En la visión al principio", "En el templo", "En Babilonia", "En sueños"], c: "En la visión al principio"},
+            {q: "84. ¿Cómo vino Gabriel a Daniel? (Daniel 9:21)", o: ["Volando con presteza", "Caminando lentamente", "En silencio", "En fuego"], c: "Volando con presteza"},
+            {q: "85. ¿En qué momento del día vino Gabriel? (Daniel 9:21)", o: ["Como a la hora del sacrificio de la tarde", "A la medianoche", "Al amanecer", "A la hora del sacrificio de la mañana"], c: "Como a la hora del sacrificio de la tarde"},
+            {q: "86. ¿Qué hizo Gabriel con Daniel al llegar? (Daniel 9:22)", o: ["Me hizo entender", "Me reprendió", "Me juzgó", "Me fortaleció"], c: "Me hizo entender"},
+            {q: "87. ¿Para qué salió Gabriel según sus palabras? (Daniel 9:22)", o: ["Para darte sabiduría y entendimiento", "Para traer juicio", "Para anunciar castigo", "Para cerrar la visión"], c: "Para darte sabiduría y entendimiento"},
+            {q: "88. ¿Cuándo fue dada la orden según Gabriel? (Daniel 9:23)", o: ["Al principio de tus ruegos", "Al final de la oración", "Después del ayuno", "En el exilio"], c: "Al principio de tus ruegos"},
+            {q: "89. ¿Por qué vino Gabriel a enseñar la orden? (Daniel 9:23)", o: ["Porque tú eres muy amado", "Porque el pueblo es fiel", "Porque el tiempo había llegado", "Porque Jerusalén fue destruida"], c: "Porque tú eres muy amado"},
+            {q: "90. ¿Qué manda Gabriel a Daniel hacer? (Daniel 9:23)", o: ["Entiende la orden y entiende la visión", "Escribe la visión y sella el libro", "Guarda silencio", "Anuncia el castigo"], c: "Entiende la orden y entiende la visión"},
+            {q: "91. ¿Cuántas semanas están determinadas sobre el pueblo? (Daniel 9:24)", o: ["Setenta semanas", "Sesenta y dos semanas", "Siete semanas", "Cien semanas"], c: "Setenta semanas"},
+            {q: "92. ¿Sobre qué están determinadas esas semanas? (Daniel 9:24)", o: ["Sobre tu pueblo y sobre tu santa ciudad", "Sobre las naciones", "Sobre Babilonia", "Sobre el templo solamente"], c: "Sobre tu pueblo y sobre tu santa ciudad"},
+            {q: "93. ¿Para qué fin se determinan las setenta semanas? (Daniel 9:24)", o: ["Para terminar la prevaricación", "Para destruir a Babilonia", "Para exaltar a los reyes", "Para levantar un imperio"], c: "Para terminar la prevaricación"},
+            {q: "94. ¿Qué otro propósito menciona el texto? (Daniel 9:24)", o: ["Poner fin al pecado", "Restaurar el reino", "Exaltar al pueblo", "Castigar a los enemigos"], c: "Poner fin al pecado"},
+            {q: "95. ¿Qué se haría con la iniquidad? (Daniel 9:24)", o: ["Expiar la iniquidad", "Ignorar la iniquidad", "Castigar sin perdón", "Ocultar la iniquidad"], c: "Expiar la iniquidad"},
+            {q: "96. ¿Qué se traería como resultado? (Daniel 9:24)", o: ["La justicia perdurable", "La paz temporal", "El dominio terrenal", "La victoria militar"], c: "La justicia perdurable"},
+            {q: "97. ¿Qué se sellaría según la profecía? (Daniel 9:24)", o: ["La visión y la profecía", "El templo y el altar", "El libro y la ley", "El juicio final"], c: "La visión y la profecía"},
+            {q: "98. ¿Qué sería ungido? (Daniel 9:24)", o: ["El Santo de los santos", "El rey de Judá", "El templo", "El sacerdote"], c: "El Santo de los santos"},
+            {q: "99. ¿Desde qué evento comienza el período profético? (Daniel 9:25)", o: ["Desde la salida de la orden para restaurar y edificar a Jerusalén", "Desde la caída de Babilonia", "Desde el cautiverio", "Desde la destrucción del templo"], c: "Desde la salida de la orden para restaurar y edificar a Jerusalén"},
+            {q: "100. ¿Hasta quién llega ese período? (Daniel 9:25)", o: ["Hasta el Mesías Príncipe", "Hasta el sumo sacerdote", "Hasta el rey de Persia", "Hasta el profeta"], c: "Hasta el Mesías Príncipe"},
+            
+            // ── NIVEL 6 ──────────────────────────────────────────────────────────────
+            {q: "101. ¿Cuántas semanas se mencionan primero? (Daniel 9:25)", o: ["Siete semanas", "Sesenta y dos semanas", "Setenta semanas", "Catorce semanas"], c: "Siete semanas"},
+            {q: "102. ¿Qué otras semanas se mencionan a continuación? (Daniel 9:25)", o: ["Sesenta y dos semanas", "Siete semanas", "Setenta semanas", "Tres semanas"], c: "Sesenta y dos semanas"},
+            {q: "103. ¿Qué se volvería a edificar? (Daniel 9:25)", o: ["La plaza y el muro", "El templo y el altar", "El palacio y la ciudad", "Las murallas y las puertas"], c: "La plaza y el muro"},
+            {q: "104. ¿En qué tipo de tiempos se edificaría? (Daniel 9:25)", o: ["En tiempos angustiosos", "En tiempos de paz", "En tiempos de abundancia", "En tiempos de reposo"], c: "En tiempos angustiosos"},
+            {q: "105. ¿Qué sucederá después de las sesenta y dos semanas? (Daniel 9:26)", o: ["Se quitará la vida al Mesías", "El Mesías será coronado", "El Mesías gobernará", "El Mesías será exaltado"], c: "Se quitará la vida al Mesías"},
+            {q: "106. ¿Qué se dice de lo que le quedará al Mesías? (Daniel 9:26)", o: ["Nada ya le quedará", "Mucho poder le quedará", "Un reino eterno le quedará", "La ciudad le quedará"], c: "Nada ya le quedará"},
+            {q: "107. ¿Quién destruirá la ciudad y el santuario? (Daniel 9:26)", o: ["El pueblo de un príncipe que ha de venir", "El pueblo de Israel", "Los sacerdotes", "Los caldeos"], c: "El pueblo de un príncipe que ha de venir"},
+            {q: "108. ¿Cómo llegará el fin de la ciudad? (Daniel 9:26)", o: ["Como una inundación", "Como un fuego", "Como una sequía", "Como una plaga"], c: "Como una inundación"},
+            {q: "109. ¿Hasta cuándo durarán las devastaciones? (Daniel 9:26)", o: ["Hasta el fin de la guerra", "Hasta setenta años", "Hasta la restauración", "Hasta el exilio"], c: "Hasta el fin de la guerra"},
+            {q: "110. ¿Qué hará el príncipe en una semana más? (Daniel 9:27)", o: ["Confirmará el pacto con muchos", "Romperá todo pacto", "Destruirá el templo", "Ungirá al sacerdote"], c: "Confirmará el pacto con muchos"},
+            {q: "111. ¿Qué sucederá a la mitad de la semana? (Daniel 9:27)", o: ["Hará cesar el sacrificio y la ofrenda", "Restaurará el sacrificio", "Construirá el templo", "Iniciará la guerra"], c: "Hará cesar el sacrificio y la ofrenda"},
+            {q: "112. ¿Qué vendrá después según el texto? (Daniel 9:27)", o: ["La muchedumbre de las abominaciones", "La restauración del reino", "La paz duradera", "La bendición del pueblo"], c: "La muchedumbre de las abominaciones"},
+            {q: "113. ¿Quién vendrá con esas abominaciones? (Daniel 9:27)", o: ["El desolador", "El libertador", "El profeta", "El sacerdote"], c: "El desolador"},
+            {q: "114. ¿Hasta cuándo vendrá el desolador? (Daniel 9:27)", o: ["Hasta que venga la consumación", "Hasta setenta años", "Hasta el juicio", "Hasta la restauración"], c: "Hasta que venga la consumación"},
+            {q: "115. ¿Qué se derramará finalmente? (Daniel 9:27)", o: ["Lo que está determinado", "La bendición prometida", "La misericordia eterna", "La restauración del templo"], c: "Lo que está determinado"},
+            {q: "116. ¿Sobre quién se derramará? (Daniel 9:27)", o: ["Sobre el desolador", "Sobre Jerusalén", "Sobre el pueblo", "Sobre el santuario"], c: "Sobre el desolador"},
+            {q: "117. ¿Qué acción completa la profecía de las setenta semanas? (Daniel 9:27)", o: ["La consumación", "La restauración", "La edificación", "La coronación"], c: "La consumación"},
+            {q: "118. ¿Quién habló todas estas palabras a Daniel? (Daniel 9:21–23)", o: ["El varón Gabriel", "El profeta Jeremías", "Un sacerdote", "Un rey"], c: "El varón Gabriel"},
+            {q: "119. ¿En qué actitud se encontraba Daniel durante toda la revelación? (Daniel 9:20–21)", o: ["Orando y confesando", "Durmiendo", "Predicando", "Viajando"], c: "Orando y confesando"},
+            {q: "120. ¿Qué se le pidió a Daniel respecto a la visión? (Daniel 9:23)", o: ["Entender la orden y la visión", "Sellarla inmediatamente", "Publicarla al pueblo", "Guardarla en secreto"], c: "Entender la orden y la visión"}     
+
+];
+        let questions = [], currentQuestion = 0, selectedAnswer = null, score = 0;
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(allQuestions).map(q => ({
+                question: q.q,
+                shuffledOptions: shuffleArray(q.o),
+                correctAnswer: q.c
+            }));
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.onclick = () => selectAnswer(opt);
+                const txt = document.createElement('span');
+                txt.className = 'option-text';
+                txt.textContent = opt;
+                btn.appendChild(txt);
+                container.appendChild(btn);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(ans) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = ans;
+            const q = questions[currentQuestion];
+            const isCorrect = ans === q.correctAnswer;
+            if (isCorrect) score++;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.add('disabled');
+                const optTxt = opt.querySelector('.option-text').textContent;
+                if (optTxt === q.correctAnswer) {
+                    opt.classList.add('correct');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✓';
+                    opt.appendChild(icon);
+                } else if (optTxt === ans && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    const icon = document.createElement('span');
+                    icon.className = 'option-icon';
+                    icon.textContent = '✗';
+                    opt.appendChild(icon);
+                }
+            });
+            
+            document.getElementById('score-text').textContent = `Puntaje: ${score}/${currentQuestion + 1}`;
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        document.getElementById('restart-btn').onclick = initQuiz;
+
+        function showResults() {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/${questions.length}`;
+            let msg = '';
+            if (score === questions.length) {
+                msg = '¡Perfecto! Excelente conocimiento';
+            } else if (score >= questions.length * 0.8) {
+                msg = '¡Muy bien! Buen conocimiento';
+            } else if (score >= questions.length * 0.6) {
+                msg = 'Bien, pero puedes mejorar';
+            } else {
+                msg = 'Necesitas estudiar más los capítulos';
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
